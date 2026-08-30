@@ -1,0 +1,6 @@
+@echo off
+echo Running database migrations...
+npx drizzle-kit push --force
+
+echo Starting production server...
+node dist/server/server.js
