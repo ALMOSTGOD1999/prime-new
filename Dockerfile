@@ -16,9 +16,11 @@ ENV NODE_ENV=production
 
 COPY package.json ./
 RUN npm install --omit=dev --ignore-scripts
+RUN npm install --no-save drizzle-kit
 
 COPY --from=builder /app/.output ./.output
+COPY --from=builder /app/drizzle.config.ts ./
 
 EXPOSE 3333
 
-CMD ["node", ".output/server/index.mjs"]
+CMD ["sh", "-c", "npx drizzle-kit push --force && node .output/server/index.mjs"]
