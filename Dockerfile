@@ -15,10 +15,8 @@ ENV NODE_ENV=production
 COPY package.json ./
 RUN npm install --omit=dev --ignore-scripts
 
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
-COPY --from=builder /app/src/lib/db/schema.ts ./src/lib/db/schema.ts
+COPY --from=builder /app/.output ./.output
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx drizzle-kit push --force 2>&1; echo '--- Starting server ---'; node dist/server/server.js"]
+CMD ["node", ".output/server/index.mjs"]
