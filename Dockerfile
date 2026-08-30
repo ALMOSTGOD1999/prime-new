@@ -2,7 +2,7 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm install && npm install @rolldown/binding-linux-x64-musl --no-save
 COPY . .
 RUN npm run build
 
@@ -13,7 +13,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 COPY package.json package-lock.json* ./
-RUN npm install --omit=dev --ignore-scripts
+RUN npm install --omit=dev --ignore-scripts && npm install @rolldown/binding-linux-x64-musl --no-save --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
