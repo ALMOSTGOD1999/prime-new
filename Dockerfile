@@ -1,8 +1,8 @@
-# Stage 1: Install ALL dependencies and build (fresh resolve for Linux)
+# Stage 1: Install ALL dependencies and build
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN rm -f package-lock.json && npm install
+RUN npm install
 COPY . .
 RUN npm run build
 
@@ -13,7 +13,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 COPY package.json package-lock.json* ./
-RUN rm -f package-lock.json && npm install --omit=dev --ignore-scripts
+RUN npm install --omit=dev --ignore-scripts
 
 COPY --from=builder /app/dist ./dist
 
