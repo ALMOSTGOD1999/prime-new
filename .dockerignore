@@ -10,7 +10,6 @@ package-lock.json
 .idea
 *.md
 LICENSE
-drizzle.config.ts
 tsconfig.json
 tsconfig.app.json
 tsconfig.node.json

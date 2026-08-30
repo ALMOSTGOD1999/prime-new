@@ -16,6 +16,8 @@ COPY package.json ./
 RUN npm install --omit=dev --ignore-scripts
 
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder /app/src/lib/db/schema.ts ./src/lib/db/schema.ts
 
 EXPOSE 3000
 
