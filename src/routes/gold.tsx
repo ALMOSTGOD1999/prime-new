@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SiteLayout } from "@/components/SiteLayout";
-import heroGold from "@/assets/hero-gold.jpg";
-import goldJhumkas from "@/assets/gold-jhumkas.jpg";
-import goldChoker from "@/assets/gold-choker.jpg";
-import goldBangles from "@/assets/gold-bangles.jpg";
-import goldNecklaceBride from "@/assets/gold-necklace-bride.jpg";
+import { SiteLayout } from "../components/SiteLayout";
+import heroGold from "../assets/hero-gold.jpg";
+import goldJhumkas from "../assets/gold-jhumkas.jpg";
+import goldChoker from "../assets/gold-choker.jpg";
+import goldBangles from "../assets/gold-bangles.jpg";
+import goldNecklaceBride from "../assets/gold-necklace-bride.jpg";
 
 export const Route = createFileRoute("/gold")({
   head: () => ({

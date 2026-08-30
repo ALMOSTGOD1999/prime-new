@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SiteLayout } from "@/components/SiteLayout";
-import silverHero from "@/assets/silver-hero.jpg";
-import silverNecklace from "@/assets/silver-necklace.jpg";
-import silverStuds from "@/assets/silver-studs.jpg";
-import silverAnklets from "@/assets/silver-anklets.jpg";
-import silverTribal from "@/assets/silver-tribal.jpg";
+import { SiteLayout } from "../components/SiteLayout";
+import silverHero from "../assets/silver-hero.jpg";
+import silverNecklace from "../assets/silver-necklace.jpg";
+import silverStuds from "../assets/silver-studs.jpg";
+import silverAnklets from "../assets/silver-anklets.jpg";
+import silverTribal from "../assets/silver-tribal.jpg";
 
 export const Route = createFileRoute("/silver")({
   head: () => ({

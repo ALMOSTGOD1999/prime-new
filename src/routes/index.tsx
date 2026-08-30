@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { SiteLayout } from "@/components/SiteLayout";
-import { WelcomeIntro } from "@/components/WelcomeIntro";
-import heroGold from "@/assets/hero-gold.jpg";
-import goldJhumkas from "@/assets/gold-jhumkas.jpg";
-import goldChoker from "@/assets/gold-choker.jpg";
-import goldBangles from "@/assets/gold-bangles.jpg";
-import silverHero from "@/assets/silver-hero.jpg";
+import { SiteLayout } from "../components/SiteLayout";
+import { WelcomeIntro } from "../components/WelcomeIntro";
+import heroGold from "../assets/hero-gold.jpg";
+import goldJhumkas from "../assets/gold-jhumkas.jpg";
+import goldChoker from "../assets/gold-choker.jpg";
+import goldBangles from "../assets/gold-bangles.jpg";
+import silverHero from "../assets/silver-hero.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({

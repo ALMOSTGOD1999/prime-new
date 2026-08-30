@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SiteLayout } from "@/components/SiteLayout";
-import goldBangles from "@/assets/gold-bangles.jpg";
+import { SiteLayout } from "../components/SiteLayout";
+import goldBangles from "../assets/gold-bangles.jpg";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
