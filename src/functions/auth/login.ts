@@ -2,26 +2,31 @@ import { createServerFn } from "@tanstack/react-start";
 import { db } from "../../lib/db";
 import { users } from "../../lib/db/schema";
 import { verifyPassword, signJwt } from "../../lib/auth";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 
 export const login = createServerFn({ method: "POST" })
-  .validator((data: { email: string; password: string }) => data)
+  .validator((data: { userId: string; password: string }) => data)
   .handler(async ({ data }) => {
-    const { email, password } = data;
+    const { userId, password } = data;
 
-    if (!email || !password) {
-      throw new Error("Email and password are required");
+    if (!userId || !password) {
+      throw new Error("User ID and password are required");
     }
 
-    const result = await db.select().from(users).where(eq(users.email, email));
+    // Look up by email OR referral code
+    const result = await db
+      .select()
+      .from(users)
+      .where(or(eq(users.email, userId), eq(users.referralCode, userId)));
+
     if (result.length === 0) {
-      throw new Error("Invalid email or password");
+      throw new Error("Invalid credentials");
     }
 
     const user = result[0];
     const valid = await verifyPassword(password, user.passwordHash);
     if (!valid) {
-      throw new Error("Invalid email or password");
+      throw new Error("Invalid credentials");
     }
 
     const token = signJwt({

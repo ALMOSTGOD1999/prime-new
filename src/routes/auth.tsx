@@ -59,7 +59,7 @@ function AuthPage() {
           navigate({ to: "/dashboard" });
         }
       } else {
-        const result = await login({ data: { email, password } });
+        const result = await login({ data: { userId: email, password } });
         document.cookie = `auth_token=${result.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
         if (result.user?.isAdmin) {
           navigate({ to: "/admin" });
@@ -117,8 +117,7 @@ function AuthPage() {
           )}
           <input
             className={inputClass}
-            type="email"
-            placeholder="Email address"
+            placeholder="User ID or Email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
