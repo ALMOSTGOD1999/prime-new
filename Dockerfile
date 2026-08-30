@@ -21,4 +21,4 @@ COPY --from=builder /app/src/lib/db/schema.ts ./src/lib/db/schema.ts
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx drizzle-kit push --force && node dist/server/server.js"]
+CMD ["node", "dist/server/server.js"]
