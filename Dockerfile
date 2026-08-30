@@ -18,6 +18,6 @@ RUN npm install --omit=dev --ignore-scripts
 
 COPY --from=builder /app/.output ./.output
 
-EXPOSE 3000
+EXPOSE 3333
 
 CMD ["node", ".output/server/index.mjs"]
