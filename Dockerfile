@@ -1,8 +1,8 @@
 # Stage 1: Install ALL dependencies and build
 FROM node:22-alpine AS builder
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm install && npm install @rolldown/binding-linux-x64-musl --no-save
+COPY package.json ./
+RUN npm install
 COPY . .
 RUN npm run build
 
@@ -12,8 +12,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY package.json package-lock.json* ./
-RUN npm install --omit=dev --ignore-scripts && npm install @rolldown/binding-linux-x64-musl --no-save --omit=dev
+COPY package.json ./
+RUN npm install --omit=dev --ignore-scripts
 
 COPY --from=builder /app/dist ./dist
 
