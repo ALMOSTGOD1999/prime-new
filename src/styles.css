@@ -1,0 +1,276 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --font-display: "Playfair Display", serif;
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --color-emerald: var(--emerald);
+  --color-gold: var(--gold);
+  --color-cream: var(--cream);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+
+:root {
+  --radius: 0.125rem;
+  --emerald: oklch(0.348 0.076 165.5);
+  --gold: oklch(0.761 0.129 88.5);
+  --cream: oklch(0.991 0.017 100);
+
+  --background: var(--cream);
+  --foreground: var(--emerald);
+  --card: var(--cream);
+  --card-foreground: var(--emerald);
+  --popover: var(--cream);
+  --popover-foreground: var(--emerald);
+  --primary: var(--emerald);
+  --primary-foreground: var(--cream);
+  --secondary: oklch(0.955 0.02 100);
+  --secondary-foreground: var(--emerald);
+  --muted: oklch(0.955 0.02 100);
+  --muted-foreground: oklch(0.55 0.03 165);
+  --accent: var(--gold);
+  --accent-foreground: var(--emerald);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0.01 100);
+  --border: oklch(0.761 0.129 88.5 / 25%);
+  --input: oklch(0.761 0.129 88.5 / 35%);
+  --ring: var(--gold);
+  --chart-1: var(--gold);
+  --chart-2: var(--emerald);
+  --chart-3: oklch(0.72 0.05 165);
+  --chart-4: oklch(0.85 0.08 88);
+  --chart-5: oklch(0.5 0.06 165);
+  --sidebar: var(--cream);
+  --sidebar-foreground: var(--emerald);
+  --sidebar-primary: var(--emerald);
+  --sidebar-primary-foreground: var(--cream);
+  --sidebar-accent: var(--gold);
+  --sidebar-accent-foreground: var(--emerald);
+  --sidebar-border: oklch(0.761 0.129 88.5 / 25%);
+  --sidebar-ring: var(--gold);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+  }
+}
+
+/* --- Welcome wordmark assembly --- */
+@keyframes fly-in-tl {
+  from {
+    transform: translate(-100vw, -100vh) rotate(-25deg);
+    opacity: 0;
+  }
+  to {
+    transform: translate(0, 0) rotate(0);
+    opacity: 1;
+  }
+}
+@keyframes fly-in-tr {
+  from {
+    transform: translate(100vw, -100vh) rotate(25deg);
+    opacity: 0;
+  }
+  to {
+    transform: translate(0, 0) rotate(0);
+    opacity: 1;
+  }
+}
+@keyframes fly-in-bl {
+  from {
+    transform: translate(-100vw, 100vh) rotate(25deg);
+    opacity: 0;
+  }
+  to {
+    transform: translate(0, 0) rotate(0);
+    opacity: 1;
+  }
+}
+@keyframes fly-in-br {
+  from {
+    transform: translate(100vw, 100vh) rotate(-25deg);
+    opacity: 0;
+  }
+  to {
+    transform: translate(0, 0) rotate(0);
+    opacity: 1;
+  }
+}
+@keyframes diamond-shine {
+  0%,
+  100% {
+    transform: rotate(45deg) scale(0.85);
+    opacity: 0.75;
+    box-shadow: 0 0 0 rgb(255 255 255 / 0);
+  }
+  50% {
+    transform: rotate(45deg) scale(1.25);
+    opacity: 1;
+    box-shadow:
+      0 0 14px rgb(255 255 255 / 0.9),
+      0 0 26px var(--gold);
+  }
+}
+@keyframes intro-fade-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes soft-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.intro-letter {
+  display: inline-block;
+  animation-duration: 1.5s;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.intro-screen {
+  animation: intro-fade-out 0.6s forwards 3.4s;
+}
+.diamond-dot {
+  animation: diamond-shine 2s ease-in-out infinite;
+}
+.soft-rise {
+  animation: soft-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* --- Welcome intro: floating jewellery & diamonds --- */
+@keyframes gem-drift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(45deg);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-22px) rotate(55deg);
+    opacity: 0.9;
+  }
+}
+@keyframes gem-bob {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-16px) scale(1.08);
+    opacity: 0.7;
+  }
+}
+.gem-float {
+  pointer-events: none;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+.gem-diamond {
+  background: var(--gold);
+  box-shadow: 0 0 12px rgb(255 255 255 / 0.6);
+  animation-name: gem-drift;
+  transform: rotate(45deg);
+}
+.gem-gem {
+  border: 2px solid var(--gold);
+  border-radius: 9999px;
+  animation-name: gem-bob;
+}
+.gem-ring {
+  pointer-events: none;
+  animation: gem-bob 5s ease-in-out infinite;
+}
+
+/* --- Footer typewriter cursor --- */
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.typewriter-caret {
+  animation: caret-blink 0.9s step-end infinite;
+}
+
+
