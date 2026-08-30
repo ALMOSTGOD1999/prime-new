@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" width="200" height="220">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C5960C"/>
+      <stop offset="30%" style="stop-color:#D4A91A"/>
+      <stop offset="60%" style="stop-color:#B8860B"/>
+      <stop offset="100%" style="stop-color:#C5960C"/>
+    </linearGradient>
+    <linearGradient id="shadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#B8860B;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#B8860B;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shadow under diamonds -->
+  <ellipse cx="100" cy="130" rx="70" ry="12" fill="url(#shadow)" />
+
+  <!-- Left diamond (rotated square) -->
+  <polygon points="65,15 115,55 65,95 15,55"
+    fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- Right diamond (rotated square) -->
+  <polygon points="135,15 185,55 135,95 85,55"
+    fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- PRIME text -->
+  <text x="100" y="175" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="42" fill="#1a1a4e" letter-spacing="4">PRIME</text>
+</svg>
