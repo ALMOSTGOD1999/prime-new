@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
