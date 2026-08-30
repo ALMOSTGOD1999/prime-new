@@ -1,8 +1,8 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Wordmark } from "@/components/Wordmark";
-import { getMe } from "../functions/auth/me";
-import { logout } from "../functions/auth/logout";
+import { getMe } from "../../functions/auth/me";
+import { logout } from "../../functions/auth/logout";
 
 export const Route = createFileRoute("/admin/layout")({
   component: AdminLayout,
