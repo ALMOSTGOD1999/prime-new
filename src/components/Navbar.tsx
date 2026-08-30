@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Wordmark } from "./Wordmark";
-import { getMe } from "@/functions/auth/me";
-import { logout } from "@/functions/auth/logout";
+import { getMe } from "../functions/auth/me";
+import { logout } from "../functions/auth/logout";
 
 const links = [
   { to: "/", label: "Home" },

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { seed } from "@/functions/admin/seed";
+import { seed } from "../../functions/admin/seed";
 
 export const Route = createFileRoute("/admin/settings")({
   component: AdminSettings,

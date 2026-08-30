@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getTeam } from "@/functions/user/team";
+import { getTeam } from "../../functions/user/team";
 
 export const Route = createFileRoute("/dashboard/team")({
   component: TeamPage,

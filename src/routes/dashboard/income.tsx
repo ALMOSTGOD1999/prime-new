@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getDashboard } from "@/functions/user/dashboard";
+import { getDashboard } from "../../functions/user/dashboard";
 
 export const Route = createFileRoute("/dashboard/income")({
   component: IncomePage,

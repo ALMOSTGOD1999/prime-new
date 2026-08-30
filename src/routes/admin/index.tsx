@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getAdminUsers } from "@/functions/admin/users";
-import { getAdminIncome } from "@/functions/admin/income";
+import { getAdminUsers } from "../../functions/admin/users";
+import { getAdminIncome } from "../../functions/admin/income";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,

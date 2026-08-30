@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getDashboard } from "@/functions/user/dashboard";
-import { activate } from "@/functions/user/activate";
+import { getDashboard } from "../../functions/user/dashboard";
+import { activate } from "../../functions/user/activate";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardIndex,
