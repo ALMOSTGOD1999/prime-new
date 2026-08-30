@@ -21,4 +21,4 @@ COPY --from=builder /app/src/lib/db/schema.ts ./src/lib/db/schema.ts
 
 EXPOSE 3000
 
-CMD ["node", "dist/server/server.js"]
+CMD ["sh", "-c", "npx drizzle-kit push --force 2>&1; echo '--- Starting server ---'; node dist/server/server.js"]
