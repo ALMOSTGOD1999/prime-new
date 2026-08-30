@@ -14,13 +14,4 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
-  environments: {
-    ssr: {
-      build: {
-        rollupOptions: {
-          input: "./src/server.ts",
-        },
-      },
-    },
-  },
 });
