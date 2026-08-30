@@ -79,7 +79,7 @@ export function getUserFromRequest(request: Request) {
 
 // ── Generate referral code ─────────────────────────────
 export function generateReferralCode(userId: number): string {
-  return `PJ${String(userId).padStart(5, "0")}`;
+  return `PR${String(userId).padStart(4, "0")}`;
 }
 
 // ── Seed admin ─────────────────────────────────────────
@@ -94,7 +94,7 @@ export async function seedAdmin() {
       name: "Admin",
       email: "admin",
       passwordHash,
-      referralCode: "ADMIN0",
+      referralCode: "PR0000",
       isActive: true,
       isAdmin: true,
       packageAmount: 2999,
