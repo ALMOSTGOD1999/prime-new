@@ -24,12 +24,6 @@ RUN npm ci --omit=dev --ignore-scripts
 # Copy built assets
 COPY --from=builder /app/dist ./dist
 
-# Copy startup script
-COPY start.sh ./
-RUN chmod +x start.sh
-
-# Expose the port (Coolify sets PORT env)
 EXPOSE 3000
 
-# Run migrations then start server
-CMD ["./start.sh"]
+CMD ["sh", "-c", "npx drizzle-kit push --force && node dist/server/server.js"]
