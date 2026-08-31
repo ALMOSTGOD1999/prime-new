@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { SiteLayout } from "../components/SiteLayout";
 import { Wordmark } from "../components/Wordmark";
@@ -31,18 +31,19 @@ function AuthPage() {
   const [referralCode, setReferralCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [urlReferral, setUrlReferral] = useState("");
   const navigate = useNavigate();
 
-  // Check URL for referral code
-  const searchParams = new URLSearchParams(window.location.search);
-  const urlReferral = searchParams.get("ref") || "";
-
-  useState(() => {
-    if (urlReferral) {
-      setReferralCode(urlReferral);
+  // Safely read URL params only on client (SSR-safe)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref") || "";
+    if (ref) {
+      setUrlReferral(ref);
       setMode("signup");
+      setReferralCode(ref);
     }
-  });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
