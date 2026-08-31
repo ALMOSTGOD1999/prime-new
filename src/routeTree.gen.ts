@@ -11,18 +11,21 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as GoldRouteImport } from './routes/gold'
 import { Route as SilverRouteImport } from './routes/silver'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminAddUserRouteImport } from './routes/admin/add-user'
+import { Route as AdminHistoryRouteImport } from './routes/admin/history'
 import { Route as AdminIncomeRouteImport } from './routes/admin/income'
-import { Route as AdminLayoutRouteImport } from './routes/admin/layout'
+import { Route as AdminPayoutRouteImport } from './routes/admin/payout'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardIncomeRouteImport } from './routes/dashboard/income'
-import { Route as DashboardLayoutRouteImport } from './routes/dashboard/layout'
 import { Route as DashboardTeamRouteImport } from './routes/dashboard/team'
 
 const IndexRoute = IndexRouteImport.update({
@@ -35,6 +38,11 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -43,6 +51,11 @@ const AuthRoute = AuthRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GoldRoute = GoldRouteImport.update({
@@ -56,64 +69,72 @@ const SilverRoute = SilverRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAddUserRoute = AdminAddUserRouteImport.update({
+  id: '/add-user',
+  path: '/add-user',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHistoryRoute = AdminHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminIncomeRoute = AdminIncomeRouteImport.update({
-  id: '/admin/income',
-  path: '/admin/income',
-  getParentRoute: () => rootRouteImport,
+  id: '/income',
+  path: '/income',
+  getParentRoute: () => AdminRoute,
 } as any)
-const AdminLayoutRoute = AdminLayoutRouteImport.update({
-  id: '/admin/layout',
-  path: '/admin/layout',
-  getParentRoute: () => rootRouteImport,
+const AdminPayoutRoute = AdminPayoutRouteImport.update({
+  id: '/payout',
+  path: '/payout',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
-  id: '/admin/settings',
-  path: '/admin/settings',
-  getParentRoute: () => rootRouteImport,
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
-  getParentRoute: () => rootRouteImport,
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/dashboard/',
-  path: '/dashboard/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardIncomeRoute = DashboardIncomeRouteImport.update({
-  id: '/dashboard/income',
-  path: '/dashboard/income',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardLayoutRoute = DashboardLayoutRouteImport.update({
-  id: '/dashboard/layout',
-  path: '/dashboard/layout',
-  getParentRoute: () => rootRouteImport,
+  id: '/income',
+  path: '/income',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardTeamRoute = DashboardTeamRouteImport.update({
-  id: '/dashboard/team',
-  path: '/dashboard/team',
-  getParentRoute: () => rootRouteImport,
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => DashboardRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/gold': typeof GoldRoute
   '/silver': typeof SilverRoute
+  '/admin/add-user': typeof AdminAddUserRoute
+  '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
-  '/admin/layout': typeof AdminLayoutRoute
+  '/admin/payout': typeof AdminPayoutRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/dashboard/income': typeof DashboardIncomeRoute
-  '/dashboard/layout': typeof DashboardLayoutRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -125,12 +146,13 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/gold': typeof GoldRoute
   '/silver': typeof SilverRoute
+  '/admin/add-user': typeof AdminAddUserRoute
+  '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
-  '/admin/layout': typeof AdminLayoutRoute
+  '/admin/payout': typeof AdminPayoutRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/dashboard/income': typeof DashboardIncomeRoute
-  '/dashboard/layout': typeof DashboardLayoutRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -139,16 +161,19 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/gold': typeof GoldRoute
   '/silver': typeof SilverRoute
+  '/admin/add-user': typeof AdminAddUserRoute
+  '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
-  '/admin/layout': typeof AdminLayoutRoute
+  '/admin/payout': typeof AdminPayoutRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/dashboard/income': typeof DashboardIncomeRoute
-  '/dashboard/layout': typeof DashboardLayoutRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -158,16 +183,19 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/auth'
     | '/contact'
+    | '/dashboard'
     | '/gold'
     | '/silver'
+    | '/admin/add-user'
+    | '/admin/history'
     | '/admin/income'
-    | '/admin/layout'
+    | '/admin/payout'
     | '/admin/settings'
     | '/admin/users'
     | '/dashboard/income'
-    | '/dashboard/layout'
     | '/dashboard/team'
     | '/admin/'
     | '/dashboard/'
@@ -179,12 +207,13 @@ export interface FileRouteTypes {
     | '/contact'
     | '/gold'
     | '/silver'
+    | '/admin/add-user'
+    | '/admin/history'
     | '/admin/income'
-    | '/admin/layout'
+    | '/admin/payout'
     | '/admin/settings'
     | '/admin/users'
     | '/dashboard/income'
-    | '/dashboard/layout'
     | '/dashboard/team'
     | '/admin'
     | '/dashboard'
@@ -192,16 +221,19 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/auth'
     | '/contact'
+    | '/dashboard'
     | '/gold'
     | '/silver'
+    | '/admin/add-user'
+    | '/admin/history'
     | '/admin/income'
-    | '/admin/layout'
+    | '/admin/payout'
     | '/admin/settings'
     | '/admin/users'
     | '/dashboard/income'
-    | '/dashboard/layout'
     | '/dashboard/team'
     | '/admin/'
     | '/dashboard/'
@@ -210,19 +242,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   GoldRoute: typeof GoldRoute
   SilverRoute: typeof SilverRoute
-  AdminIncomeRoute: typeof AdminIncomeRoute
-  AdminLayoutRoute: typeof AdminLayoutRoute
-  AdminSettingsRoute: typeof AdminSettingsRoute
-  AdminUsersRoute: typeof AdminUsersRoute
-  DashboardIncomeRoute: typeof DashboardIncomeRoute
-  DashboardLayoutRoute: typeof DashboardLayoutRoute
-  DashboardTeamRoute: typeof DashboardTeamRoute
-  AdminIndexRoute: typeof AdminIndexRoute
-  DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -241,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -253,6 +285,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gold': {
@@ -271,86 +310,124 @@ declare module '@tanstack/react-router' {
     }
     '/admin/': {
       id: '/admin/'
-      path: '/admin'
+      path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/add-user': {
+      id: '/admin/add-user'
+      path: '/add-user'
+      fullPath: '/admin/add-user'
+      preLoaderRoute: typeof AdminAddUserRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/history': {
+      id: '/admin/history'
+      path: '/history'
+      fullPath: '/admin/history'
+      preLoaderRoute: typeof AdminHistoryRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/income': {
       id: '/admin/income'
-      path: '/admin/income'
+      path: '/income'
       fullPath: '/admin/income'
       preLoaderRoute: typeof AdminIncomeRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/admin/layout': {
-      id: '/admin/layout'
-      path: '/admin/layout'
-      fullPath: '/admin/layout'
-      preLoaderRoute: typeof AdminLayoutRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/payout': {
+      id: '/admin/payout'
+      path: '/payout'
+      fullPath: '/admin/payout'
+      preLoaderRoute: typeof AdminPayoutRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/settings': {
       id: '/admin/settings'
-      path: '/admin/settings'
+      path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AdminSettingsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/users': {
       id: '/admin/users'
-      path: '/admin/users'
+      path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/dashboard/': {
       id: '/dashboard/'
-      path: '/dashboard'
+      path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/income': {
       id: '/dashboard/income'
-      path: '/dashboard/income'
+      path: '/income'
       fullPath: '/dashboard/income'
       preLoaderRoute: typeof DashboardIncomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/layout': {
-      id: '/dashboard/layout'
-      path: '/dashboard/layout'
-      fullPath: '/dashboard/layout'
-      preLoaderRoute: typeof DashboardLayoutRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/team': {
       id: '/dashboard/team'
-      path: '/dashboard/team'
+      path: '/team'
       fullPath: '/dashboard/team'
       preLoaderRoute: typeof DashboardTeamRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
     }
   }
 }
 
+interface AdminRouteChildren {
+  AdminAddUserRoute: typeof AdminAddUserRoute
+  AdminHistoryRoute: typeof AdminHistoryRoute
+  AdminIncomeRoute: typeof AdminIncomeRoute
+  AdminPayoutRoute: typeof AdminPayoutRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAddUserRoute: AdminAddUserRoute,
+  AdminHistoryRoute: AdminHistoryRoute,
+  AdminIncomeRoute: AdminIncomeRoute,
+  AdminPayoutRoute: AdminPayoutRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface DashboardRouteChildren {
+  DashboardIncomeRoute: typeof DashboardIncomeRoute
+  DashboardTeamRoute: typeof DashboardTeamRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardIncomeRoute: DashboardIncomeRoute,
+  DashboardTeamRoute: DashboardTeamRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   GoldRoute: GoldRoute,
   SilverRoute: SilverRoute,
-  AdminIncomeRoute: AdminIncomeRoute,
-  AdminLayoutRoute: AdminLayoutRoute,
-  AdminSettingsRoute: AdminSettingsRoute,
-  AdminUsersRoute: AdminUsersRoute,
-  DashboardIncomeRoute: DashboardIncomeRoute,
-  DashboardLayoutRoute: DashboardLayoutRoute,
-  DashboardTeamRoute: DashboardTeamRoute,
-  AdminIndexRoute: AdminIndexRoute,
-  DashboardIndexRoute: DashboardIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
