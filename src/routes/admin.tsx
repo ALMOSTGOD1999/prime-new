@@ -1,10 +1,10 @@
 import { createFileRoute, Link, Outlet, useNavigate, useMatchRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Wordmark } from "../../components/Wordmark";
-import { getMe } from "../../functions/auth/me";
-import { logout } from "../../functions/auth/logout";
+import { Wordmark } from "../components/Wordmark";
+import { getMe } from "../functions/auth/me";
+import { logout } from "../functions/auth/logout";
 
-export const Route = createFileRoute("/admin/layout")({
+export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 

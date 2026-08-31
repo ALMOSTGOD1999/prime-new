@@ -1,11 +1,11 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Wordmark } from "../../components/Wordmark";
-import { getMe } from "../../functions/auth/me";
-import { logout } from "../../functions/auth/logout";
-import { stopImpersonation } from "../../functions/admin/impersonate";
+import { Wordmark } from "../components/Wordmark";
+import { getMe } from "../functions/auth/me";
+import { logout } from "../functions/auth/logout";
+import { stopImpersonation } from "../functions/admin/impersonate";
 
-export const Route = createFileRoute("/dashboard/layout")({
+export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
 });
 
