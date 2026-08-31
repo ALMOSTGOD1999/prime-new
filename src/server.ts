@@ -3,6 +3,10 @@ import "dotenv/config";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { seedAdmin } from "./lib/auth";
+
+// Seed admin user on startup (safe to call repeatedly — no-ops if exists)
+seedAdmin().catch((err) => console.error("[seed] Failed to seed admin:", err));
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
