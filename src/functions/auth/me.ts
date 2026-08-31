@@ -1,12 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getCookie } from "@tanstack/react-start/server";
 import { db } from "../../lib/db";
 import { users } from "../../lib/db/schema";
 import { eq } from "drizzle-orm";
+import { verifyJwt } from "../../lib/auth";
 
 export const getMe = createServerFn({ method: "GET" })
-  .handler(async ({ context }) => {
-    const userId = (context as any)?.userId;
-    if (!userId) {
+  .handler(async () => {
+    const token = getCookie("auth_token");
+    if (!token) {
+      throw new Error("Not authenticated");
+    }
+
+    const payload = await verifyJwt(token);
+    if (!payload || typeof payload["userId"] !== "number") {
       throw new Error("Not authenticated");
     }
 
@@ -25,7 +32,7 @@ export const getMe = createServerFn({ method: "GET" })
         createdAt: users.createdAt,
       })
       .from(users)
-      .where(eq(users.id, userId));
+      .where(eq(users.id, payload["userId"] as number));
 
     if (result.length === 0) {
       throw new Error("User not found");
