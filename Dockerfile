@@ -13,6 +13,7 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV PORT=3333
 
 COPY package.json ./
 RUN npm install --omit=dev --ignore-scripts
@@ -23,4 +24,4 @@ COPY --from=builder /app/drizzle.config.ts ./
 
 EXPOSE 3333
 
-CMD ["sh", "-c", "npx drizzle-kit push --force && node .output/server/index.mjs"]
+CMD ["sh", "-c", "npx drizzle-kit push --force || echo 'DB migration failed, starting server anyway...'; exec node .output/server/index.mjs"]
