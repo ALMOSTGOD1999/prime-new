@@ -53,6 +53,16 @@ export const matchingAwards = pgTable("matching_awards", {
   awardedAt: timestamp("awarded_at").defaultNow().notNull(),
 });
 
+// ── Withdrawals ───────────────────────────────────────
+export const withdrawals = pgTable("withdrawals", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  amount: integer("amount").notNull(),
+  status: text("status", { enum: ["pending", "approved", "rejected"] }).default("pending").notNull(),
+  requestedAt: timestamp("requested_at").defaultNow().notNull(),
+  processedAt: timestamp("processed_at"),
+});
+
 // ── Daily pair tracking (for 3-pair cap) ───────────────
 export const dailyPairs = pgTable("daily_pairs", {
   id: serial("id").primaryKey(),

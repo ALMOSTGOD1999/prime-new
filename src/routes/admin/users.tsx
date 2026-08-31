@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getAdminUsers } from "../../functions/admin/users";
+import { impersonateUser } from "../../functions/admin/impersonate";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsers,
@@ -11,10 +12,12 @@ function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [impersonating, setImpersonating] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   const fetchUsers = (s: string, p: number) => {
     setLoading(true);
-    getAdminUsers({ data: { search: s || undefined, page: p } })
+    getAdminUsers({ data: s ? { search: s, page: p } : { page: p } })
       .then(setData)
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -27,6 +30,21 @@ function AdminUsers() {
   const handleSearch = () => {
     setPage(1);
     fetchUsers(search, 1);
+  };
+
+  const handleImpersonate = async (userId: number, userName: string) => {
+    if (!confirm(`Impersonate ${userName}? You can return to admin anytime.`)) return;
+    setImpersonating(userId);
+    try {
+      const result = await impersonateUser({ data: { targetUserId: userId } });
+      // Store the impersonation token and redirect to dashboard
+      document.cookie = `auth_token=${result.token}; path=/; max-age=${7 * 24 * 60 * 60}`;
+      navigate({ to: "/dashboard" });
+    } catch (err: any) {
+      alert(err.message || "Impersonation failed");
+    } finally {
+      setImpersonating(null);
+    }
   };
 
   const totalPages = data ? Math.ceil(data.total / data.limit) : 1;
@@ -72,6 +90,7 @@ function AdminUsers() {
                     <th className="px-6 py-3 text-left">Admin</th>
                     <th className="px-6 py-3 text-right">Package</th>
                     <th className="px-6 py-3 text-right">Joined</th>
+                    <th className="px-6 py-3 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -109,6 +128,17 @@ function AdminUsers() {
                       </td>
                       <td className="px-6 py-3 text-right text-[10px] text-emerald/50">
                         {new Date(user.createdAt).toLocaleDateString("en-IN")}
+                      </td>
+                      <td className="px-6 py-3 text-right">
+                        {!user.isAdmin && (
+                          <button
+                            onClick={() => handleImpersonate(user.id, user.name)}
+                            disabled={impersonating === user.id}
+                            className="rounded border border-gold/30 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-gold transition-colors hover:bg-gold/10 disabled:opacity-40"
+                          >
+                            {impersonating === user.id ? "..." : "Login"}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}

@@ -170,11 +170,7 @@ function AuthPage() {
           </button>
         </form>
 
-        {mode === "login" && (
-          <p className="mt-8 text-center text-xs text-emerald/50">
-            Admin login: <strong>admin</strong> / Primenew@1111
-          </p>
-        )}
+
       </section>
     </SiteLayout>
   );

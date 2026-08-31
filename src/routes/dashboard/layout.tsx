@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Wordmark } from "../../components/Wordmark";
 import { getMe } from "../../functions/auth/me";
 import { logout } from "../../functions/auth/logout";
+import { stopImpersonation } from "../../functions/admin/impersonate";
 
 export const Route = createFileRoute("/dashboard/layout")({
   component: DashboardLayout,
@@ -12,14 +13,38 @@ function DashboardLayout() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isImpersonating, setIsImpersonating] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     getMe()
-      .then((d) => setUser(d.user))
+      .then((d) => {
+        setUser(d.user);
+        // Check if impersonating (token has impersonatorId)
+        const match = document.cookie.match(/auth_token=([^;]+)/);
+        if (match && match[1]) {
+          try {
+            const parts = match[1].split('.');
+            if (parts[1]) {
+              const payload = JSON.parse(atob(parts[1]));
+              if (payload.impersonatorId) setIsImpersonating(true);
+            }
+          } catch {}
+        }
+      })
       .catch(() => navigate({ to: "/auth" }))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleReturnToAdmin = async () => {
+    try {
+      const result = await stopImpersonation();
+      document.cookie = `auth_token=${result.token}; path=/; max-age=${7 * 24 * 60 * 60}`;
+      navigate({ to: "/admin" });
+    } catch (err: any) {
+      alert(err.message || "Failed to return to admin");
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -82,6 +107,14 @@ function DashboardLayout() {
               <p className="truncate text-xs font-semibold text-cream">{user?.name}</p>
               <p className="truncate text-[10px] text-cream/50">{user?.referralCode}</p>
             </div>
+            {isImpersonating && (
+              <button
+                onClick={handleReturnToAdmin}
+                className="mb-2 w-full rounded border border-gold/40 bg-gold/10 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-gold transition-colors hover:bg-gold/20"
+              >
+                Return to Admin
+              </button>
+            )}
             <button
               onClick={handleLogout}
               className="w-full rounded border border-cream/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream/60 transition-colors hover:border-gold hover:text-gold"
@@ -101,6 +134,20 @@ function DashboardLayout() {
           </button>
           <Wordmark className="text-sm font-bold uppercase" />
         </header>
+
+        {isImpersonating && (
+          <div className="flex items-center justify-between bg-gold/10 px-4 py-2 text-xs">
+            <span className="text-gold font-semibold">
+              🔍 Viewing as <strong>{user?.name}</strong> ({user?.referralCode})
+            </span>
+            <button
+              onClick={handleReturnToAdmin}
+              className="rounded bg-emerald px-4 py-1 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
+            >
+              Return to Admin
+            </button>
+          </div>
+        )}
 
         <main className="flex-1 p-6 lg:p-8">
           <Outlet />

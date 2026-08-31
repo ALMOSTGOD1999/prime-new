@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getDashboard } from "../../functions/user/dashboard";
 import { activate } from "../../functions/user/activate";
+import { requestWithdrawal, getWithdrawals, getWithdrawalInfo } from "../../functions/user/withdraw";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardIndex,
@@ -12,12 +13,23 @@ function DashboardIndex() {
   const [loading, setLoading] = useState(true);
   const [activating, setActivating] = useState(false);
   const [copied, setCopied] = useState(false);
+  // Withdrawal state
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [withdrawLoading, setWithdrawLoading] = useState(false);
+  const [withdrawHistory, setWithdrawHistory] = useState<any[]>([]);
+  const [withdrawInfo, setWithdrawInfo] = useState<any>(null);
 
   useEffect(() => {
     getDashboard()
       .then(setData)
       .catch(console.error)
       .finally(() => setLoading(false));
+    getWithdrawalInfo()
+      .then(setWithdrawInfo)
+      .catch(() => {});
+    getWithdrawals()
+      .then((d) => setWithdrawHistory(d.withdrawals || []))
+      .catch(() => {});
   }, []);
 
   const handleActivate = async () => {
@@ -38,6 +50,28 @@ function DashboardIndex() {
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleWithdraw = async () => {
+    const amount = parseInt(withdrawAmount, 10);
+    if (!amount || amount <= 0) {
+      alert("Please enter a valid amount");
+      return;
+    }
+    setWithdrawLoading(true);
+    try {
+      const result = await requestWithdrawal({ data: { amount } });
+      alert(`Withdrawal requested! Remaining balance: ₹${result.remainingBalance.toLocaleString("en-IN")}`);
+      setWithdrawAmount("");
+      // Refresh data
+      const [dashData, histData] = await Promise.all([getDashboard(), getWithdrawals()]);
+      setData(dashData);
+      setWithdrawHistory(histData.withdrawals || []);
+    } catch (err: any) {
+      alert(err.message || "Withdrawal failed");
+    } finally {
+      setWithdrawLoading(false);
+    }
   };
 
   if (loading) {
@@ -111,6 +145,87 @@ function DashboardIndex() {
         <StatCard title="Wallet Balance" value={`₹${income.balance.toLocaleString("en-IN")}`} icon="◇" />
         <StatCard title="Total Pairs" value={String(income.totalPairs)} icon="◆" />
         <StatCard title="Today's Pairs" value={`${income.todayPairs} / 3`} icon="○" />
+      </div>
+
+      {/* Withdrawal Section */}
+      <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Withdraw Funds</h3>
+            <p className="mt-1 text-[10px] text-emerald/50">
+              Available 12:00 AM — 12:00 PM IST daily. Missed days carry over.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-emerald/60">Balance:</span>
+            <span className="font-display text-lg text-emerald">₹{income.balance.toLocaleString("en-IN")}</span>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <input
+            type="number"
+            min="1"
+            max={income.balance}
+            placeholder="Enter amount"
+            value={withdrawAmount}
+            onChange={(e) => setWithdrawAmount(e.target.value)}
+            className="flex-1 border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/40 focus:border-gold"
+          />
+          <button
+            onClick={handleWithdraw}
+            disabled={withdrawLoading || !withdrawInfo?.isOpen || income.balance <= 0}
+            className="whitespace-nowrap bg-gold px-6 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-40"
+          >
+            {withdrawLoading
+              ? "Processing..."
+              : !withdrawInfo?.isOpen
+                ? `Opens at 12 AM IST`
+                : "Withdraw"}
+          </button>
+        </div>
+
+        {withdrawHistory.length > 0 && (
+          <div className="mt-6">
+            <h4 className="mb-2 text-[10px] uppercase tracking-widest text-emerald/50">Recent Withdrawals</h4>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/50">
+                    <th className="px-4 py-2 text-left">Amount</th>
+                    <th className="px-4 py-2 text-left">Status</th>
+                    <th className="px-4 py-2 text-right">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {withdrawHistory.map((w: any) => (
+                    <tr key={w.id} className="border-b border-gold/5">
+                      <td className="px-4 py-2 text-xs font-semibold text-emerald">
+                        ₹{w.amount.toLocaleString("en-IN")}
+                      </td>
+                      <td className="px-4 py-2">
+                        <span
+                          className={`inline-block rounded px-2 py-0.5 text-[10px] font-semibold ${
+                            w.status === "approved"
+                              ? "bg-emerald/10 text-emerald"
+                              : w.status === "rejected"
+                                ? "bg-red-50 text-red-600"
+                                : "bg-gold/10 text-gold"
+                          }`}
+                        >
+                          {w.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-right text-[10px] text-emerald/50">
+                        {new Date(w.requestedAt).toLocaleDateString("en-IN")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="rounded border border-gold/20 bg-cream p-6">
