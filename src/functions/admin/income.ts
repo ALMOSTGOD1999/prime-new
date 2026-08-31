@@ -11,7 +11,7 @@ export const getAdminIncome = createServerFn({ method: "GET" })
     if (!token) throw new Error("Not authenticated");
 
     const { verifyJwt } = await import("../../lib/auth");
-    const payload = verifyJwt(token);
+    const payload = await verifyJwt(token);
     if (!payload || typeof payload.userId !== "number") throw new Error("Not authenticated");
 
     const adminCheck = await db.select({ isAdmin: users.isAdmin }).from(users).where(sql`id = ${payload.userId}`);

@@ -18,7 +18,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return computed === hash;
 }
 
-// ── JWT (lightweight, no jsonwebtoken dependency) ──────
+// ── JWT (lightweight, Web Crypto API — no Node.js crypto dependency) ──
 function base64url(data: string): string {
   return btoa(data).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
@@ -29,23 +29,52 @@ function base64urlDecode(data: string): string {
   return atob(str);
 }
 
-export function signJwt(payload: Record<string, unknown>, expiresInSec = 60 * 60 * 24 * 7): string {
+function base64urlBuf(data: string): Uint8Array {
+  return Uint8Array.from(base64urlDecode(data), (c) => c.charCodeAt(0));
+}
+
+async function hmacSign(data: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(JWT_SECRET),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
+  return base64url(String.fromCharCode(...new Uint8Array(sig)));
+}
+
+async function hmacVerify(data: string, signature: string): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(JWT_SECRET),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["verify"],
+  );
+  const sigBuf = Uint8Array.from(base64urlDecode(signature), (c) => c.charCodeAt(0));
+  return crypto.subtle.verify("HMAC", key, sigBuf, encoder.encode(data));
+}
+
+export async function signJwt(payload: Record<string, unknown>, expiresInSec = 60 * 60 * 24 * 7): Promise<string> {
   const header = base64url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
   const now = Math.floor(Date.now() / 1000);
   const body = base64url(JSON.stringify({ ...payload, iat: now, exp: now + expiresInSec }));
   const data = `${header}.${body}`;
-  // HMAC-SHA256 via Web Crypto — sync-ish for small payloads
-  const signature = crypto.createHmac("sha256", JWT_SECRET).update(data).digest("base64url");
+  const signature = await hmacSign(data);
   return `${data}.${signature}`;
 }
 
-export function verifyJwt(token: string): Record<string, unknown> | null {
+export async function verifyJwt(token: string): Promise<Record<string, unknown> | null> {
   try {
     const [header, body, signature] = token.split(".");
     if (!header || !body || !signature) return null;
     const data = `${header}.${body}`;
-    const expected = crypto.createHmac("sha256", JWT_SECRET).update(data).digest("base64url");
-    if (signature !== expected) return null;
+    const valid = await hmacVerify(data, signature);
+    if (!valid) return null;
     const payload = JSON.parse(base64urlDecode(body));
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
     return payload;
@@ -69,10 +98,10 @@ export function getTokenFromRequest(request: Request): string | null {
   return match ? match[1] : null;
 }
 
-export function getUserFromRequest(request: Request) {
+export async function getUserFromRequest(request: Request) {
   const token = getTokenFromRequest(request);
   if (!token) return null;
-  const payload = verifyJwt(token);
+  const payload = await verifyJwt(token);
   if (!payload || typeof payload.userId !== "number") return null;
   return payload;
 }

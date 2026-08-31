@@ -61,7 +61,7 @@ export const signup = createServerFn({ method: "POST" })
     }
 
     // Sign JWT
-    const token = signJwt({
+    const token = await signJwt({
       userId: newUser.id,
       email: newUser.email,
       name: newUser.name,

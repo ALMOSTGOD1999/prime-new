@@ -12,7 +12,7 @@ export const impersonateUser = createServerFn({ method: "POST" })
     if (!token) throw new Error("Not authenticated");
 
     const { verifyJwt } = await import("../../lib/auth");
-    const payload = verifyJwt(token);
+    const payload = await verifyJwt(token);
     if (!payload || typeof payload.userId !== "number") throw new Error("Not authenticated");
 
     // Check admin
@@ -35,7 +35,7 @@ export const impersonateUser = createServerFn({ method: "POST" })
 
     // Create impersonation token with admin info
     const { signJwt } = await import("../../lib/auth");
-    const impersonationToken = signJwt({
+    const impersonationToken = await signJwt({
       userId: targetUser[0].id,
       email: targetUser[0].email,
       name: targetUser[0].name,
@@ -60,7 +60,7 @@ export const stopImpersonation = createServerFn({ method: "POST" })
     if (!token) throw new Error("Not authenticated");
 
     const { verifyJwt } = await import("../../lib/auth");
-    const payload = verifyJwt(token);
+    const payload = await verifyJwt(token);
     if (!payload || typeof payload.userId !== "number") throw new Error("Not authenticated");
 
     const impersonatorId = (payload as any).impersonatorId;
@@ -88,7 +88,7 @@ export const stopImpersonation = createServerFn({ method: "POST" })
 
     // Create admin token
     const { signJwt } = await import("../../lib/auth");
-    const adminToken = signJwt({
+    const adminToken = await signJwt({
       userId: adminUser[0].id,
       email: adminUser[0].email,
       name: adminUser[0].name,

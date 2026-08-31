@@ -8,7 +8,7 @@ export const getTeam = createServerFn({ method: "GET" })
     if (!token) throw new Error("Not authenticated");
 
     const { verifyJwt } = await import("../../lib/auth");
-    const payload = verifyJwt(token);
+    const payload = await verifyJwt(token);
     if (!payload || typeof payload.userId !== "number") throw new Error("Not authenticated");
 
     const tree = await getTeamTree(payload.userId, 4);

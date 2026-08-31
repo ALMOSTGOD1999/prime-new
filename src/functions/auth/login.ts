@@ -29,7 +29,7 @@ export const login = createServerFn({ method: "POST" })
       throw new Error("Invalid credentials");
     }
 
-    const token = signJwt({
+    const token = await signJwt({
       userId: user.id,
       email: user.email,
       name: user.name,
