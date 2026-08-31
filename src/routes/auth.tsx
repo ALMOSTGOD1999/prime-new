@@ -46,31 +46,41 @@ function AuthPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('[Auth] Form submitted, mode:', mode);
     setError("");
     setLoading(true);
 
     try {
       if (mode === "signup") {
+        console.log('[Auth] Calling signup...');
         const result = referralCode
           ? await signup({ data: { name, email, password, referralCode } })
           : await signup({ data: { name, email, password } });
+        console.log('[Auth] Signup result:', result);
         // Set cookie from token
         document.cookie = `auth_token=${result.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
         if (result.user?.isAdmin) {
+          console.log('[Auth] Navigating to /admin');
           navigate({ to: "/admin" });
         } else {
+          console.log('[Auth] Navigating to /dashboard');
           navigate({ to: "/dashboard" });
         }
       } else {
+        console.log('[Auth] Calling login with:', { userId: email, password: '***' });
         const result = await login({ data: { userId: email, password } });
+        console.log('[Auth] Login result:', result);
         document.cookie = `auth_token=${result.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
         if (result.user?.isAdmin) {
+          console.log('[Auth] Navigating to /admin');
           navigate({ to: "/admin" });
         } else {
+          console.log('[Auth] Navigating to /dashboard');
           navigate({ to: "/dashboard" });
         }
       }
     } catch (err: any) {
+      console.error('[Auth] Error:', err);
       setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
