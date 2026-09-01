@@ -21,6 +21,7 @@ RUN npm install --no-save drizzle-kit
 
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/drizzle.config.ts ./
+COPY --from=builder /app/src/lib/db/schema.ts ./src/lib/db/schema.ts
 
 EXPOSE 3333
 
