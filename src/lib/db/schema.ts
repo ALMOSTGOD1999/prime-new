@@ -13,6 +13,9 @@ export const users = pgTable("users", {
   isActive: boolean("is_active").default(false).notNull(),
   isAdmin: boolean("is_admin").default(false).notNull(),
   packageAmount: integer("package_amount").default(0).notNull(),
+  rank: text("rank", { enum: ["bronze", "silver", "gold", "platinum"] }).default("bronze").notNull(),
+  phone: text("phone"),
+  profileImage: text("profile_image"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -59,6 +62,7 @@ export const withdrawals = pgTable("withdrawals", {
   userId: integer("user_id").references(() => users.id).notNull(),
   amount: integer("amount").notNull(),
   status: text("status", { enum: ["pending", "approved", "rejected"] }).default("pending").notNull(),
+  adminNote: text("admin_note"),
   requestedAt: timestamp("requested_at").defaultNow().notNull(),
   processedAt: timestamp("processed_at"),
 });
@@ -72,3 +76,29 @@ export const dailyPairs = pgTable("daily_pairs", {
 }, (table) => ({
   userDateUnique: uniqueIndex("user_date_unique").on(table.userId, table.pairDate),
 }));
+
+// ── Notifications ──────────────────────────────────────
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  type: text("type", { enum: ["referral", "pair_match", "commission", "award", "withdrawal", "kyc", "rank", "general"] }).notNull(),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  isRead: boolean("is_read").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ── KYC Verification ──────────────────────────────────
+export const kyc = pgTable("kyc", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull().unique(),
+  panNumber: text("pan_number"),
+  aadhaarNumber: text("aadhaar_number"),
+  bankName: text("bank_name"),
+  accountNumber: text("account_number"),
+  ifscCode: text("ifsc_code"),
+  status: text("status", { enum: ["pending", "approved", "rejected"] }).default("pending").notNull(),
+  rejectionReason: text("rejection_reason"),
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

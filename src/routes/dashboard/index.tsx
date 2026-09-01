@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { getDashboard } from "../../functions/user/dashboard";
 import { activate } from "../../functions/user/activate";
 import { requestWithdrawal, getWithdrawals, getWithdrawalInfo } from "../../functions/user/withdraw";
+import { getLegBalance } from "../../functions/user/legbalance";
+import { getRankInfo } from "../../functions/user/rank";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardIndex,
@@ -18,6 +20,8 @@ function DashboardIndex() {
   const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [withdrawHistory, setWithdrawHistory] = useState<any[]>([]);
   const [withdrawInfo, setWithdrawInfo] = useState<any>(null);
+  const [legBalance, setLegBalance] = useState<any>(null);
+  const [rankInfo, setRankInfo] = useState<any>(null);
 
   useEffect(() => {
     getDashboard()
@@ -29,6 +33,12 @@ function DashboardIndex() {
       .catch(() => {});
     getWithdrawals()
       .then((d) => setWithdrawHistory(d.withdrawals || []))
+      .catch(() => {});
+    getLegBalance()
+      .then(setLegBalance)
+      .catch(() => {});
+    getRankInfo()
+      .then(setRankInfo)
       .catch(() => {});
   }, []);
 
@@ -151,6 +161,54 @@ function DashboardIndex() {
         <StatCard title="Wallet Balance" value={`₹${income.balance.toLocaleString("en-IN")}`} icon="◇" />
         <StatCard title="Total Pairs" value={String(income.totalPairs)} icon="◆" />
         <StatCard title="Today's Pairs" value={`${income.todayPairs} / 3`} icon="○" />
+      </div>
+
+      {/* Leg Balance + Rank */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {legBalance && (
+          <div className="rounded border border-gold/20 bg-cream p-6">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">Leg Balance</h3>
+            <div className="flex items-center gap-6">
+              <div className="flex-1 rounded-lg border border-emerald/20 bg-emerald/5 p-4 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-emerald/70">Left Leg</p>
+                <p className="mt-1 font-display text-2xl text-emerald">{legBalance.leftTotal}</p>
+                <p className="text-[10px] text-emerald/60">active members</p>
+              </div>
+              <div className="text-xl text-gold/40">vs</div>
+              <div className="flex-1 rounded-lg border border-gold/20 bg-gold/5 p-4 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-gold">Right Leg</p>
+                <p className="mt-1 font-display text-2xl text-gold">{legBalance.rightTotal}</p>
+                <p className="text-[10px] text-emerald/60">active members</p>
+              </div>
+            </div>
+          </div>
+        )}
+        {rankInfo && (
+          <div className="rounded border border-gold/20 bg-cream p-6">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">Your Rank</h3>
+            <div className="flex items-center gap-4">
+              <div className={`rounded-lg border px-4 py-2 text-sm font-bold uppercase ${
+                rankInfo.currentRank === "platinum" ? "border-purple-300 bg-purple-100 text-purple-700" :
+                rankInfo.currentRank === "gold" ? "border-yellow-300 bg-yellow-100 text-yellow-700" :
+                rankInfo.currentRank === "silver" ? "border-gray-300 bg-gray-100 text-gray-700" :
+                "border-orange-300 bg-orange-100 text-orange-700"
+              }`}>
+                {rankInfo.currentRankLabel}
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] text-emerald/70">Team: {rankInfo.teamSize} members</p>
+                {rankInfo.nextRank && (
+                  <>
+                    <div className="mt-1 h-2 rounded-full bg-emerald/10">
+                      <div className="h-2 rounded-full bg-gold transition-all" style={{ width: `${rankInfo.progress}%` }} />
+                    </div>
+                    <p className="mt-1 text-[10px] text-emerald/60">Next: {rankInfo.nextRankLabel}</p>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Withdrawal Section */}

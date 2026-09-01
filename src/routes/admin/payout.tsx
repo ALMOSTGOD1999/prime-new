@@ -1,66 +1,158 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-
-// We'll query withdrawals via a generic admin endpoint or direct DB access.
-// For now, let's create a server function placeholder and build the UI.
+import { getPendingPayouts, processPayout } from "../../functions/admin/payout";
 
 export const Route = createFileRoute("/admin/payout")({
-  component: AdminPayout,
+  component: AdminPayoutPage,
 });
 
-function AdminPayout() {
-  const [data, setData] = useState<any>(null);
+function AdminPayoutPage() {
+  const [payouts, setPayouts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState<number | null>(null);
+  const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
 
   useEffect(() => {
-    // TODO: Create getAdminPayouts server function
-    // For now show placeholder
-    setLoading(false);
+    loadPayouts();
   }, []);
 
+  const loadPayouts = async () => {
+    try {
+      const data = await getPendingPayouts();
+      setPayouts(data.payouts || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProcess = async (id: number, action: "approved" | "rejected") => {
+    const noteInput = action === "rejected" ? prompt("Rejection reason (optional):") : null;
+    if (action === "rejected" && noteInput === null) return;
+
+    setProcessing(id);
+    try {
+      const payload: { withdrawalId: number; action: "approved" | "rejected"; note?: string } = { withdrawalId: id, action };
+      if (noteInput) payload.note = noteInput;
+      await processPayout({ data: payload });
+      await loadPayouts();
+    } catch (err: any) {
+      alert(err.message || "Failed to process");
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  const filtered = filter === "all" ? payouts : payouts.filter((p) => p.status === filter);
+  const pendingCount = payouts.filter((p) => p.status === "pending").length;
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
+        <div className="h-64 animate-pulse rounded border border-gold/20 bg-cream" />
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div>
-        <h1 className="font-display text-4xl tracking-tight">
-          <span className="italic text-gold">Payout</span> Management
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="font-display text-3xl">
+          Payout <span className="italic text-gold">Processing</span>
         </h1>
-        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">
-          Review and process withdrawal requests
-        </p>
+        {pendingCount > 0 && (
+          <span className="rounded bg-gold/10 px-3 py-1 text-xs font-bold text-gold">
+            {pendingCount} pending
+          </span>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <div className="group relative overflow-hidden rounded-xl border border-gold/15 bg-gradient-to-br from-gold/8 to-gold/3 p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/70">Pending Payouts</p>
-          <p className="mt-2 font-display text-3xl tracking-tight text-gold">—</p>
-          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
-        </div>
-        <div className="group relative overflow-hidden rounded-xl border border-emerald/15 bg-gradient-to-br from-emerald/8 to-emerald/3 p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/70">Approved Today</p>
-          <p className="mt-2 font-display text-3xl tracking-tight text-emerald">—</p>
-          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-emerald/20 to-transparent" />
-        </div>
-        <div className="group relative overflow-hidden rounded-xl border border-red-100 bg-gradient-to-br from-red-50/50 to-cream p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/70">Rejected</p>
-          <p className="mt-2 font-display text-3xl tracking-tight text-red-500">—</p>
-          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-red-200 to-transparent" />
-        </div>
+      {/* Filter Tabs */}
+      <div className="flex gap-2">
+        {(["all", "pending", "approved", "rejected"] as const).map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+              filter === f ? "bg-emerald text-cream" : "border border-emerald/40 text-emerald hover:bg-emerald/10"
+            }`}
+          >
+            {f}
+          </button>
+        ))}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gold/10 bg-cream shadow-sm">
-        <div className="flex items-center gap-3 border-b border-gold/10 px-6 py-4">
-          <div className="rounded-lg bg-gold/10 p-2">
-            <svg className="h-5 w-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" /></svg>
+      {/* Payouts Table */}
+      <div className="rounded border border-gold/20 bg-cream">
+        {filtered.length === 0 ? (
+          <div className="p-12 text-center text-xs text-emerald/60">No payouts found</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
+                  <th className="px-6 py-3 text-left">User</th>
+                  <th className="px-6 py-3 text-left">Code</th>
+                  <th className="px-6 py-3 text-right">Amount</th>
+                  <th className="px-6 py-3 text-left">Status</th>
+                  <th className="px-6 py-3 text-left">Note</th>
+                  <th className="px-6 py-3 text-right">Date</th>
+                  <th className="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((p) => (
+                  <tr key={p.id} className="border-b border-gold/5 transition-colors hover:bg-gold/5">
+                    <td className="px-6 py-3 text-xs font-semibold">{p.userName}</td>
+                    <td className="px-6 py-3 text-[10px] text-emerald/70">{p.userReferralCode}</td>
+                    <td className="px-6 py-3 text-right text-xs font-semibold text-emerald">
+                      ₹{p.amount.toLocaleString("en-IN")}
+                    </td>
+                    <td className="px-6 py-3">
+                      <span
+                        className={`inline-block rounded px-2 py-0.5 text-[10px] font-semibold ${
+                          p.status === "approved"
+                            ? "bg-emerald/10 text-emerald"
+                            : p.status === "rejected"
+                              ? "bg-red-50 text-red-600"
+                              : "bg-gold/10 text-gold"
+                        }`}
+                      >
+                        {p.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3 text-[10px] text-emerald/60">{p.adminNote || "-"}</td>
+                    <td className="px-6 py-3 text-right text-[10px] text-emerald/70">
+                      {new Date(p.requestedAt).toLocaleDateString("en-IN")}
+                    </td>
+                    <td className="px-6 py-3 text-right">
+                      {p.status === "pending" && (
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => handleProcess(p.id, "approved")}
+                            disabled={processing === p.id}
+                            className="rounded bg-emerald px-3 py-1 text-[10px] font-semibold text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleProcess(p.id, "rejected")}
+                            disabled={processing === p.id}
+                            className="rounded border border-red-300 px-3 py-1 text-[10px] font-semibold text-red-600 transition-all hover:bg-red-50 disabled:opacity-50"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Withdrawal Requests</h3>
-        </div>
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="rounded-full bg-gold/10 p-4">
-            <svg className="h-8 w-8 text-gold/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" /></svg>
-          </div>
-          <p className="mt-4 text-xs text-emerald/60">Payout management will appear here once users submit withdrawal requests.</p>
-          <p className="mt-1 text-[10px] text-emerald/70">Users can request withdrawals from their dashboard between 12:00 AM — 12:00 PM IST.</p>
-        </div>
+        )}
       </div>
     </div>
   );

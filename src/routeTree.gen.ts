@@ -21,12 +21,20 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminAddUserRouteImport } from './routes/admin/add-user'
 import { Route as AdminHistoryRouteImport } from './routes/admin/history'
 import { Route as AdminIncomeRouteImport } from './routes/admin/income'
+import { Route as AdminKycRouteImport } from './routes/admin/kyc'
 import { Route as AdminPayoutRouteImport } from './routes/admin/payout'
+import { Route as AdminReportsRouteImport } from './routes/admin/reports'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardIncomeRouteImport } from './routes/dashboard/income'
+import { Route as DashboardKycRouteImport } from './routes/dashboard/kyc'
+import { Route as DashboardLeaderboardRouteImport } from './routes/dashboard/leaderboard'
+import { Route as DashboardNotificationsRouteImport } from './routes/dashboard/notifications'
+import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
+import { Route as DashboardReportsRouteImport } from './routes/dashboard/reports'
 import { Route as DashboardTeamRouteImport } from './routes/dashboard/team'
+import { Route as DashboardTreeRouteImport } from './routes/dashboard/tree'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,9 +96,19 @@ const AdminIncomeRoute = AdminIncomeRouteImport.update({
   path: '/income',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminKycRoute = AdminKycRouteImport.update({
+  id: '/kyc',
+  path: '/kyc',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPayoutRoute = AdminPayoutRouteImport.update({
   id: '/payout',
   path: '/payout',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -113,9 +131,39 @@ const DashboardIncomeRoute = DashboardIncomeRouteImport.update({
   path: '/income',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardKycRoute = DashboardKycRouteImport.update({
+  id: '/kyc',
+  path: '/kyc',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardLeaderboardRoute = DashboardLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardNotificationsRoute = DashboardNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardProfileRoute = DashboardProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardReportsRoute = DashboardReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardTeamRoute = DashboardTeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTreeRoute = DashboardTreeRouteImport.update({
+  id: '/tree',
+  path: '/tree',
   getParentRoute: () => DashboardRoute,
 } as any)
 
@@ -131,11 +179,19 @@ export interface FileRoutesByFullPath {
   '/admin/add-user': typeof AdminAddUserRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
+  '/admin/kyc': typeof AdminKycRoute
   '/admin/payout': typeof AdminPayoutRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/dashboard/income': typeof DashboardIncomeRoute
+  '/dashboard/kyc': typeof DashboardKycRoute
+  '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
+  '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/team': typeof DashboardTeamRoute
+  '/dashboard/tree': typeof DashboardTreeRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
@@ -149,11 +205,19 @@ export interface FileRoutesByTo {
   '/admin/add-user': typeof AdminAddUserRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
+  '/admin/kyc': typeof AdminKycRoute
   '/admin/payout': typeof AdminPayoutRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/dashboard/income': typeof DashboardIncomeRoute
+  '/dashboard/kyc': typeof DashboardKycRoute
+  '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
+  '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/team': typeof DashboardTeamRoute
+  '/dashboard/tree': typeof DashboardTreeRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
 }
@@ -170,11 +234,19 @@ export interface FileRoutesById {
   '/admin/add-user': typeof AdminAddUserRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
+  '/admin/kyc': typeof AdminKycRoute
   '/admin/payout': typeof AdminPayoutRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/dashboard/income': typeof DashboardIncomeRoute
+  '/dashboard/kyc': typeof DashboardKycRoute
+  '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
+  '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/team': typeof DashboardTeamRoute
+  '/dashboard/tree': typeof DashboardTreeRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
@@ -192,11 +264,19 @@ export interface FileRouteTypes {
     | '/admin/add-user'
     | '/admin/history'
     | '/admin/income'
+    | '/admin/kyc'
     | '/admin/payout'
+    | '/admin/reports'
     | '/admin/settings'
     | '/admin/users'
     | '/dashboard/income'
+    | '/dashboard/kyc'
+    | '/dashboard/leaderboard'
+    | '/dashboard/notifications'
+    | '/dashboard/profile'
+    | '/dashboard/reports'
     | '/dashboard/team'
+    | '/dashboard/tree'
     | '/admin/'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
@@ -210,11 +290,19 @@ export interface FileRouteTypes {
     | '/admin/add-user'
     | '/admin/history'
     | '/admin/income'
+    | '/admin/kyc'
     | '/admin/payout'
+    | '/admin/reports'
     | '/admin/settings'
     | '/admin/users'
     | '/dashboard/income'
+    | '/dashboard/kyc'
+    | '/dashboard/leaderboard'
+    | '/dashboard/notifications'
+    | '/dashboard/profile'
+    | '/dashboard/reports'
     | '/dashboard/team'
+    | '/dashboard/tree'
     | '/admin'
     | '/dashboard'
   id:
@@ -230,11 +318,19 @@ export interface FileRouteTypes {
     | '/admin/add-user'
     | '/admin/history'
     | '/admin/income'
+    | '/admin/kyc'
     | '/admin/payout'
+    | '/admin/reports'
     | '/admin/settings'
     | '/admin/users'
     | '/dashboard/income'
+    | '/dashboard/kyc'
+    | '/dashboard/leaderboard'
+    | '/dashboard/notifications'
+    | '/dashboard/profile'
+    | '/dashboard/reports'
     | '/dashboard/team'
+    | '/dashboard/tree'
     | '/admin/'
     | '/dashboard/'
   fileRoutesById: FileRoutesById
@@ -336,11 +432,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIncomeRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/kyc': {
+      id: '/admin/kyc'
+      path: '/kyc'
+      fullPath: '/admin/kyc'
+      preLoaderRoute: typeof AdminKycRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/payout': {
       id: '/admin/payout'
       path: '/payout'
       fullPath: '/admin/payout'
       preLoaderRoute: typeof AdminPayoutRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/settings': {
@@ -371,11 +481,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIncomeRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/kyc': {
+      id: '/dashboard/kyc'
+      path: '/kyc'
+      fullPath: '/dashboard/kyc'
+      preLoaderRoute: typeof DashboardKycRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/leaderboard': {
+      id: '/dashboard/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/dashboard/leaderboard'
+      preLoaderRoute: typeof DashboardLeaderboardRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/notifications': {
+      id: '/dashboard/notifications'
+      path: '/notifications'
+      fullPath: '/dashboard/notifications'
+      preLoaderRoute: typeof DashboardNotificationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/profile': {
+      id: '/dashboard/profile'
+      path: '/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof DashboardProfileRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/reports': {
+      id: '/dashboard/reports'
+      path: '/reports'
+      fullPath: '/dashboard/reports'
+      preLoaderRoute: typeof DashboardReportsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/team': {
       id: '/dashboard/team'
       path: '/team'
       fullPath: '/dashboard/team'
       preLoaderRoute: typeof DashboardTeamRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/tree': {
+      id: '/dashboard/tree'
+      path: '/tree'
+      fullPath: '/dashboard/tree'
+      preLoaderRoute: typeof DashboardTreeRouteImport
       parentRoute: typeof DashboardRoute
     }
   }
@@ -385,7 +537,9 @@ interface AdminRouteChildren {
   AdminAddUserRoute: typeof AdminAddUserRoute
   AdminHistoryRoute: typeof AdminHistoryRoute
   AdminIncomeRoute: typeof AdminIncomeRoute
+  AdminKycRoute: typeof AdminKycRoute
   AdminPayoutRoute: typeof AdminPayoutRoute
+  AdminReportsRoute: typeof AdminReportsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -395,7 +549,9 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAddUserRoute: AdminAddUserRoute,
   AdminHistoryRoute: AdminHistoryRoute,
   AdminIncomeRoute: AdminIncomeRoute,
+  AdminKycRoute: AdminKycRoute,
   AdminPayoutRoute: AdminPayoutRoute,
+  AdminReportsRoute: AdminReportsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -405,13 +561,25 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface DashboardRouteChildren {
   DashboardIncomeRoute: typeof DashboardIncomeRoute
+  DashboardKycRoute: typeof DashboardKycRoute
+  DashboardLeaderboardRoute: typeof DashboardLeaderboardRoute
+  DashboardNotificationsRoute: typeof DashboardNotificationsRoute
+  DashboardProfileRoute: typeof DashboardProfileRoute
+  DashboardReportsRoute: typeof DashboardReportsRoute
   DashboardTeamRoute: typeof DashboardTeamRoute
+  DashboardTreeRoute: typeof DashboardTreeRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIncomeRoute: DashboardIncomeRoute,
+  DashboardKycRoute: DashboardKycRoute,
+  DashboardLeaderboardRoute: DashboardLeaderboardRoute,
+  DashboardNotificationsRoute: DashboardNotificationsRoute,
+  DashboardProfileRoute: DashboardProfileRoute,
+  DashboardReportsRoute: DashboardReportsRoute,
   DashboardTeamRoute: DashboardTeamRoute,
+  DashboardTreeRoute: DashboardTreeRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
