@@ -35,9 +35,19 @@ export async function placeInTree(
     .where(eq(users.id, newUserId));
 }
 
-// ── Auto-place in binary tree (fill left first) ────────
-export async function autoPlace(newUserId: number, referrerId: number): Promise<"left" | "right"> {
-  // Count existing children on each side
+// ── Auto-place in binary tree (fill left first, or use preferred leg) ──
+export async function autoPlace(
+  newUserId: number,
+  referrerId: number,
+  preferredLeg?: "left" | "right",
+): Promise<"left" | "right"> {
+  // If a preferred leg is specified, use it
+  if (preferredLeg) {
+    await placeInTree(newUserId, referrerId, preferredLeg);
+    return preferredLeg;
+  }
+
+  // Otherwise auto-fill: smaller leg first; if equal, fill left first
   const leftCount = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(users)
@@ -51,7 +61,6 @@ export async function autoPlace(newUserId: number, referrerId: number): Promise<
   const left = leftCount[0]?.count ?? 0;
   const right = rightCount[0]?.count ?? 0;
 
-  // Fill the smaller leg; if equal, fill left first
   const position = left <= right ? "left" : "right";
   await placeInTree(newUserId, referrerId, position);
   return position;

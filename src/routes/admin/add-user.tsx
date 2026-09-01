@@ -14,6 +14,7 @@ function AdminAddUser() {
     email: "",
     password: "",
     referralCode: "",
+    leg: "left" as "left" | "right",
   });
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -24,13 +25,18 @@ function AdminAddUser() {
     }
     setLoading(true);
     try {
-      const result = await signup({
-        data: form.referralCode
-          ? { name: form.name, email: form.email, password: form.password, referralCode: form.referralCode }
-          : { name: form.name, email: form.email, password: form.password },
-      });
+      const signupData: { name: string; email: string; password: string; referralCode?: string; leg?: "left" | "right" } = {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+      };
+      if (form.referralCode) {
+        signupData.referralCode = form.referralCode;
+        signupData.leg = form.leg;
+      }
+      const result = await signup({ data: signupData });
       alert(`User created! Referral code: ${result.user.referralCode}`);
-      setForm({ name: "", email: "", password: "", referralCode: "" });
+      setForm({ name: "", email: "", password: "", referralCode: "", leg: "left" });
     } catch (err: any) {
       alert(err.message || "Failed to create user");
     } finally {
@@ -39,7 +45,7 @@ function AdminAddUser() {
   };
 
   const inputClass =
-    "w-full rounded-lg border border-gold/15 bg-cream px-4 py-2.5 text-sm outline-none transition-all duration-200 placeholder:text-emerald/30 focus:border-gold/40 focus:ring-2 focus:ring-gold/10";
+    "w-full rounded-lg border border-gold/15 bg-cream px-4 py-2.5 text-sm outline-none transition-all duration-200 placeholder:text-emerald/70 focus:border-gold/40 focus:ring-2 focus:ring-gold/10";
 
   return (
     <div className="mx-auto max-w-lg space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -47,14 +53,14 @@ function AdminAddUser() {
         <h1 className="font-display text-4xl tracking-tight">
           <span className="italic text-gold">Add</span> User
         </h1>
-        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/40">
+        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">
           Register a new member manually
         </p>
       </div>
 
       <form onSubmit={handleAdd} className="space-y-5 rounded-xl border border-gold/10 bg-cream p-6 shadow-sm">
         <div>
-          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/50">Full Name</label>
+          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">Full Name</label>
           <input
             className={inputClass}
             placeholder="e.g. Priya Sharma"
@@ -64,7 +70,7 @@ function AdminAddUser() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/50">Email</label>
+          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">Email</label>
           <input
             className={inputClass}
             type="email"
@@ -75,7 +81,7 @@ function AdminAddUser() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/50">Password</label>
+          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">Password</label>
           <input
             className={inputClass}
             type="password"
@@ -86,8 +92,8 @@ function AdminAddUser() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/50">
-            Referral Code <span className="text-emerald/30">(optional)</span>
+          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">
+            Referral Code <span className="text-emerald/60">(optional)</span>
           </label>
           <input
             className={inputClass}
@@ -95,8 +101,43 @@ function AdminAddUser() {
             value={form.referralCode}
             onChange={(e) => setForm({ ...form, referralCode: e.target.value })}
           />
-          <p className="mt-1 text-[10px] text-emerald/30">Leave blank to create a root user</p>
+          <p className="mt-1 text-[10px] text-emerald/60">Leave blank to create a root user</p>
         </div>
+
+        {form.referralCode && (
+          <div>
+            <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">
+              Placement Leg
+            </label>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, leg: "left" })}
+                className={`flex-1 rounded-lg border px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] transition-all duration-200 ${
+                  form.leg === "left"
+                    ? "border-emerald bg-emerald text-cream shadow-sm"
+                    : "border-gold/20 text-emerald/60 hover:border-gold/40 hover:bg-gold/5"
+                }`}
+              >
+                ← Left Leg
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, leg: "right" })}
+                className={`flex-1 rounded-lg border px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] transition-all duration-200 ${
+                  form.leg === "right"
+                    ? "border-gold bg-gold text-cream shadow-sm"
+                    : "border-gold/20 text-emerald/60 hover:border-gold/40 hover:bg-gold/5"
+                }`}
+              >
+                Right Leg →
+              </button>
+            </div>
+            <p className="mt-1.5 text-[10px] text-emerald/60">
+              User will be placed on the <strong className={form.leg === "left" ? "text-emerald" : "text-gold"}>{form.leg}</strong> leg of the referrer
+            </p>
+          </div>
+        )}
 
         <div className="flex gap-3 pt-2">
           <button

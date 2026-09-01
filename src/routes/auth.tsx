@@ -20,7 +20,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 const inputClass =
-  "w-full border-b border-gold/40 bg-transparent py-3 text-sm outline-none transition-colors placeholder:text-emerald/40 focus:border-gold";
+  "w-full border-b border-gold/40 bg-transparent py-3 text-sm outline-none transition-colors placeholder:text-emerald/60 focus:border-gold";
 
 function AuthPage() {
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -44,6 +44,9 @@ function AuthPage() {
       setReferralCode(ref);
     }
   }, []);
+
+  // Detect leg from referral code suffix
+  const legFromUrl = urlReferral.endsWith("L") ? "Left" : urlReferral.endsWith("R") ? "Right" : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,13 +98,13 @@ function AuthPage() {
         <div className="mb-10 flex space-x-8 text-xs font-semibold uppercase tracking-widest">
           <button
             onClick={() => { setMode("login"); setError(""); }}
-            className={`pb-1 transition-colors ${mode === "login" ? "border-b-2 border-gold text-gold" : "text-emerald/50"}`}
+            className={`pb-1 transition-colors ${mode === "login" ? "border-b-2 border-gold text-gold" : "text-emerald/70"}`}
           >
             Login
           </button>
           <button
             onClick={() => { setMode("signup"); setError(""); }}
-            className={`pb-1 transition-colors ${mode === "signup" ? "border-b-2 border-gold text-gold" : "text-emerald/50"}`}
+            className={`pb-1 transition-colors ${mode === "signup" ? "border-b-2 border-gold text-gold" : "text-emerald/70"}`}
           >
             Sign Up
           </button>
@@ -114,8 +117,13 @@ function AuthPage() {
         )}
 
         {urlReferral && mode === "signup" && (
-          <div className="mb-6 rounded border border-gold/30 bg-gold/5 p-3 text-xs text-gold">
+          <div className="mb-6 rounded border border-gold/30 bg-gold/5 p-3 text-xs text-emerald">
             Joined via referral code: <strong>{urlReferral}</strong>
+            {legFromUrl && (
+              <span className="ml-1">
+                — placed on <strong className={legFromUrl === "Left" ? "text-emerald" : "text-gold"}>{legFromUrl}</strong> leg
+              </span>
+            )}
           </div>
         )}
 
@@ -149,7 +157,7 @@ function AuthPage() {
               type="button"
               tabIndex={-1}
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 px-1 text-emerald/40 transition-colors hover:text-gold"
+              className="absolute right-0 top-1/2 -translate-y-1/2 px-1 text-emerald/60 transition-colors hover:text-gold"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (

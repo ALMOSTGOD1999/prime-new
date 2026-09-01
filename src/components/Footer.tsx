@@ -21,7 +21,7 @@ export function Footer() {
             Contact Us
           </Link>
         </div>
-        <div className="mt-6 text-[10px] uppercase tracking-widest text-emerald/40 md:mt-0">
+        <div className="mt-6 text-[10px] uppercase tracking-widest text-emerald/60 md:mt-0">
           © 2026 Prime Jewellery Ltd. All rights reserved.
         </div>
       </div>

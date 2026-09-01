@@ -22,7 +22,7 @@ export const Route = createFileRoute("/contact")({
 });
 
 const inputClass =
-  "w-full border-b border-gold/40 bg-transparent py-3 text-sm outline-none transition-colors placeholder:text-emerald/40 focus:border-gold";
+  "w-full border-b border-gold/40 bg-transparent py-3 text-sm outline-none transition-colors placeholder:text-emerald/60 focus:border-gold";
 
 function ContactPage() {
   const [sent, setSent] = useState(false);

@@ -59,7 +59,7 @@ function AdminDashboard() {
           <h1 className="font-display text-4xl tracking-tight">
             Admin <span className="italic text-gold">Dashboard</span>
           </h1>
-          <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/40">Platform overview & analytics</p>
+          <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">Platform overview & analytics</p>
         </div>
         <Link
           to="/admin/users"
@@ -79,7 +79,7 @@ function AdminDashboard() {
             style={{ animationDelay: `${i * 80}ms` }}
           >
             <div className="flex items-start justify-between">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/50">{stat.title}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/70">{stat.title}</p>
               <div className={`rounded-lg p-2 ${stat.iconBg} transition-transform duration-300 group-hover:scale-110`}>
                 {stat.icon}
               </div>
@@ -99,14 +99,14 @@ function AdminDashboard() {
             </div>
             <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Recent Users</h3>
           </div>
-          <Link to="/admin/users" className="text-[10px] font-semibold uppercase tracking-[0.15em] text-emerald/50 transition-colors hover:text-emerald">
+          <Link to="/admin/users" className="text-[10px] font-semibold uppercase tracking-[0.15em] text-emerald/70 transition-colors hover:text-emerald">
             View all →
           </Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/40">
+              <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/60">
                 <th className="px-6 py-3 text-left font-semibold">ID</th>
                 <th className="px-6 py-3 text-left font-semibold">Name</th>
                 <th className="px-6 py-3 text-left font-semibold">Email</th>
@@ -122,7 +122,7 @@ function AdminDashboard() {
                   className="border-b border-gold/5 transition-all duration-200 hover:bg-gold/5"
                   style={{ animationDelay: `${i * 30}ms` }}
                 >
-                  <td className="px-6 py-3.5 text-xs text-emerald/40 font-mono">#{user.id}</td>
+                  <td className="px-6 py-3.5 text-xs text-emerald/60 font-mono">#{user.id}</td>
                   <td className="px-6 py-3.5">
                     <div className="flex items-center gap-2.5">
                       <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald/10 text-[10px] font-bold text-emerald">
@@ -145,7 +145,7 @@ function AdminDashboard() {
                       {user.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-6 py-3.5 text-right text-[10px] text-emerald/40">
+                  <td className="px-6 py-3.5 text-right text-[10px] text-emerald/60">
                     {new Date(user.createdAt).toLocaleDateString("en-IN")}
                   </td>
                 </tr>

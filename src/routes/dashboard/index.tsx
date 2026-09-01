@@ -12,7 +12,7 @@ function DashboardIndex() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activating, setActivating] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"" | "left" | "right">("");
   // Withdrawal state
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawLoading, setWithdrawLoading] = useState(false);
@@ -45,11 +45,11 @@ function DashboardIndex() {
     }
   };
 
-  const copyReferral = () => {
-    const url = `${window.location.origin}/auth?ref=${data?.user?.referralCode}`;
+  const copyReferral = (leg: "left" | "right") => {
+    const url = `${window.location.origin}/auth?ref=${data?.user?.referralCode}${leg === "left" ? "L" : "R"}`;
     navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopied(leg);
+    setTimeout(() => setCopied(""), 2000);
   };
 
   const handleWithdraw = async () => {
@@ -98,16 +98,22 @@ function DashboardIndex() {
           <h1 className="font-display text-3xl">
             Welcome, <span className="italic text-gold">{user.name}</span>
           </h1>
-          <p className="mt-1 text-xs uppercase tracking-widest text-emerald/50">
+          <p className="mt-1 text-xs uppercase tracking-widest text-emerald/70">
             Member since {new Date(user.createdAt).toLocaleDateString("en-IN")}
           </p>
         </div>
         <div className="flex gap-3">
           <button
-            onClick={copyReferral}
+            onClick={() => copyReferral("left")}
+            className="border border-emerald/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10"
+          >
+            {copied === "left" ? "Copied!" : "Share Left Leg Link"}
+          </button>
+          <button
+            onClick={() => copyReferral("right")}
             className="border border-gold/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-gold/10"
           >
-            {copied ? "Copied!" : "Share Referral Link"}
+            {copied === "right" ? "Copied!" : "Share Right Leg Link"}
           </button>
           {user.isAdmin && (
             <Link
@@ -152,7 +158,7 @@ function DashboardIndex() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Withdraw Funds</h3>
-            <p className="mt-1 text-[10px] text-emerald/50">
+            <p className="mt-1 text-[10px] text-emerald/70">
               Available 12:00 AM — 12:00 PM IST daily. Missed days carry over.
             </p>
           </div>
@@ -170,7 +176,7 @@ function DashboardIndex() {
             placeholder="Enter amount"
             value={withdrawAmount}
             onChange={(e) => setWithdrawAmount(e.target.value)}
-            className="flex-1 border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/40 focus:border-gold"
+            className="flex-1 border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/60 focus:border-gold"
           />
           <button
             onClick={handleWithdraw}
@@ -187,11 +193,11 @@ function DashboardIndex() {
 
         {withdrawHistory.length > 0 && (
           <div className="mt-6">
-            <h4 className="mb-2 text-[10px] uppercase tracking-widest text-emerald/50">Recent Withdrawals</h4>
+            <h4 className="mb-2 text-[10px] uppercase tracking-widest text-emerald/70">Recent Withdrawals</h4>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/50">
+                  <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
                     <th className="px-4 py-2 text-left">Amount</th>
                     <th className="px-4 py-2 text-left">Status</th>
                     <th className="px-4 py-2 text-right">Date</th>
@@ -216,7 +222,7 @@ function DashboardIndex() {
                           {w.status}
                         </span>
                       </td>
-                      <td className="px-4 py-2 text-right text-[10px] text-emerald/50">
+                      <td className="px-4 py-2 text-right text-[10px] text-emerald/70">
                         {new Date(w.requestedAt).toLocaleDateString("en-IN")}
                       </td>
                     </tr>
@@ -231,12 +237,20 @@ function DashboardIndex() {
       <div className="rounded border border-gold/20 bg-cream p-6">
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-gold">Your Referral Code</h3>
         <p className="font-display text-2xl">{user.referralCode}</p>
-        <p className="mt-2 text-[10px] text-emerald/50">
-          Share this code or link to invite others:
-        </p>
-        <code className="mt-1 block break-all text-[10px] text-emerald/70">
-          {window.location.origin}/auth?ref={user.referralCode}
-        </code>
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="rounded-lg border border-emerald/20 bg-emerald/5 p-3">
+            <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-emerald">Left Leg Link</p>
+            <code className="block break-all text-[10px] text-emerald/70">
+              {window.location.origin}/auth?ref={user.referralCode}L
+            </code>
+          </div>
+          <div className="rounded-lg border border-gold/20 bg-gold/5 p-3">
+            <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-gold">Right Leg Link</p>
+            <code className="block break-all text-[10px] text-emerald/70">
+              {window.location.origin}/auth?ref={user.referralCode}R
+            </code>
+          </div>
+        </div>
       </div>
 
       <div className="rounded border border-gold/20 bg-cream">
@@ -244,14 +258,14 @@ function DashboardIndex() {
           <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Recent Income</h3>
         </div>
         {income.recentIncome.length === 0 ? (
-          <div className="px-6 py-12 text-center text-xs text-emerald/40">
+          <div className="px-6 py-12 text-center text-xs text-emerald/60">
             No income recorded yet. Activate your account and build your team!
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/50">
+                <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
                   <th className="px-6 py-3 text-left">Type</th>
                   <th className="px-6 py-3 text-left">Description</th>
                   <th className="px-6 py-3 text-right">Amount</th>
@@ -278,7 +292,7 @@ function DashboardIndex() {
                     <td className="px-6 py-3 text-right text-xs font-semibold text-emerald">
                       ₹{item.amount.toLocaleString("en-IN")}
                     </td>
-                    <td className="px-6 py-3 text-right text-[10px] text-emerald/50">
+                    <td className="px-6 py-3 text-right text-[10px] text-emerald/70">
                       {new Date(item.createdAt).toLocaleDateString("en-IN")}
                     </td>
                   </tr>
@@ -291,19 +305,19 @@ function DashboardIndex() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded border border-gold/20 bg-cream p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/50">Direct Commission</p>
+          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Direct Commission</p>
           <p className="mt-1 font-display text-2xl text-emerald">₹{income.direct.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-[10px] text-emerald/40">5% one-time per referral</p>
+          <p className="mt-1 text-[10px] text-emerald/60">5% one-time per referral</p>
         </div>
         <div className="rounded border border-gold/20 bg-cream p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/50">Matching Income</p>
+          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Matching Income</p>
           <p className="mt-1 font-display text-2xl text-gold">₹{income.matching.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-[10px] text-emerald/40">20% per pair (3 pairs/day cap)</p>
+          <p className="mt-1 text-[10px] text-emerald/60">20% per pair (3 pairs/day cap)</p>
         </div>
         <div className="rounded border border-gold/20 bg-cream p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/50">Total Earned</p>
+          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Earned</p>
           <p className="mt-1 font-display text-2xl text-emerald">₹{income.totalEarned.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-[10px] text-emerald/40">Lifetime earnings</p>
+          <p className="mt-1 text-[10px] text-emerald/60">Lifetime earnings</p>
         </div>
       </div>
     </div>
@@ -314,7 +328,7 @@ function StatCard({ title, value, icon }: { title: string; value: string; icon: 
   return (
     <div className="rounded border border-gold/20 bg-cream p-6 transition-colors hover:border-gold/40">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-widest text-emerald/50">{title}</p>
+        <p className="text-[10px] uppercase tracking-widest text-emerald/70">{title}</p>
         <span className="text-gold/40">{icon}</span>
       </div>
       <p className="mt-2 font-display text-2xl">{value}</p>

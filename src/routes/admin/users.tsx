@@ -55,7 +55,7 @@ function AdminUsers() {
         <h1 className="font-display text-4xl tracking-tight">
           <span className="italic text-gold">User</span> Management
         </h1>
-        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/40">
+        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">
           {data?.total || 0} registered members
         </p>
       </div>
@@ -63,7 +63,7 @@ function AdminUsers() {
       {/* Search */}
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
           <input
@@ -72,7 +72,7 @@ function AdminUsers() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            className="w-full rounded-lg border border-gold/15 bg-cream py-2.5 pl-10 pr-4 text-sm outline-none transition-all duration-200 placeholder:text-emerald/30 focus:border-gold/40 focus:ring-2 focus:ring-gold/10"
+            className="w-full rounded-lg border border-gold/15 bg-cream py-2.5 pl-10 pr-4 text-sm outline-none transition-all duration-200 placeholder:text-emerald/70 focus:border-gold/40 focus:ring-2 focus:ring-gold/10"
           />
         </div>
         <button
@@ -89,14 +89,14 @@ function AdminUsers() {
         {loading ? (
           <div className="flex items-center justify-center gap-3 py-16">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-gold border-t-transparent" />
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald/40">Loading users...</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald/60">Loading users...</span>
           </div>
         ) : (
           <>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/40">
+                  <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/60">
                     <th className="px-6 py-3 text-left font-semibold">ID</th>
                     <th className="px-6 py-3 text-left font-semibold">Name</th>
                     <th className="px-6 py-3 text-left font-semibold">Email</th>
@@ -115,7 +115,7 @@ function AdminUsers() {
                       key={user.id}
                       className={`border-b border-gold/5 transition-all duration-200 hover:bg-gold/5 ${i % 2 === 0 ? "bg-emerald/[0.02]" : ""}`}
                     >
-                      <td className="px-6 py-3.5 font-mono text-xs text-emerald/40">#{user.id}</td>
+                      <td className="px-6 py-3.5 font-mono text-xs text-emerald/60">#{user.id}</td>
                       <td className="px-6 py-3.5">
                         <div className="flex items-center gap-2.5">
                           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald/10 to-emerald/5 text-[10px] font-bold text-emerald ring-1 ring-emerald/15">
@@ -158,7 +158,7 @@ function AdminUsers() {
                       <td className="px-6 py-3.5 text-right text-xs font-semibold text-emerald/60">
                         ₹{user.packageAmount?.toLocaleString("en-IN") || "0"}
                       </td>
-                      <td className="px-6 py-3.5 text-right text-[10px] text-emerald/40">
+                      <td className="px-6 py-3.5 text-right text-[10px] text-emerald/60">
                         {new Date(user.createdAt).toLocaleDateString("en-IN")}
                       </td>
                       <td className="px-6 py-3.5 text-right">
@@ -185,7 +185,7 @@ function AdminUsers() {
 
             {/* Pagination */}
             <div className="flex items-center justify-between border-t border-gold/10 px-6 py-4">
-              <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-emerald/40">
+              <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-emerald/60">
                 Showing {(page - 1) * 20 + 1}–{Math.min(page * 20, data?.total || 0)} of {data?.total || 0}
               </p>
               <div className="flex items-center gap-2">

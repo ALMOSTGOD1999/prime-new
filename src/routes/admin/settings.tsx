@@ -41,7 +41,7 @@ function AdminSettings() {
         <h1 className="font-display text-4xl tracking-tight">
           <span className="italic text-gold">Settings</span>
         </h1>
-        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/40">Configuration & management</p>
+        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">Configuration & management</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -55,11 +55,11 @@ function AdminSettings() {
           </div>
           <div className="space-y-4">
             <div className="rounded-lg bg-emerald/[0.03] p-4 ring-1 ring-emerald/10">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/40">Email / User ID</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">Email / User ID</p>
               <p className="mt-1 text-sm font-bold">admin</p>
             </div>
             <div className="rounded-lg bg-emerald/[0.03] p-4 ring-1 ring-emerald/10">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/40">Password</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">Password</p>
               <p className="mt-1 font-mono text-sm font-bold tracking-wide">Primenew@1111</p>
             </div>
           </div>
@@ -73,7 +73,7 @@ function AdminSettings() {
             </div>
             <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Seed Admin User</h3>
           </div>
-          <p className="mb-4 text-xs text-emerald/50">
+          <p className="mb-4 text-xs text-emerald/70">
             Run this to create the admin user in the database. Safe to run multiple times.
           </p>
           <button
@@ -117,7 +117,7 @@ function AdminSettings() {
             { label: "Daily Pair Cap", value: "3 pairs", color: "gold" },
           ].map((item) => (
             <div key={item.label} className={`rounded-lg p-4 ring-1 ${item.color === "emerald" ? "bg-emerald/[0.03] ring-emerald/10" : "bg-gold/[0.03] ring-gold/10"}`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/40">{item.label}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">{item.label}</p>
               <p className={`mt-1 font-display text-xl ${item.color === "emerald" ? "text-emerald" : "text-gold"}`}>{item.value}</p>
             </div>
           ))}
@@ -135,7 +135,7 @@ function AdminSettings() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/40">
+              <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/60">
                 <th className="px-6 py-3 text-left font-semibold">Tier</th>
                 <th className="px-6 py-3 text-left font-semibold">Pairs</th>
                 <th className="px-6 py-3 text-left font-semibold">Award</th>

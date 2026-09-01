@@ -29,7 +29,7 @@ function AdminHistory() {
         <h1 className="font-display text-4xl tracking-tight">
           <span className="italic text-gold">Activity</span> History
         </h1>
-        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/40">
+        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">
           Platform activity and event log
         </p>
       </div>
@@ -46,7 +46,7 @@ function AdminHistory() {
             className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] transition-all duration-200 ${
               tab === t.key
                 ? "bg-emerald text-cream shadow-sm shadow-emerald/20"
-                : "border border-gold/15 text-emerald/50 hover:border-gold/30 hover:bg-gold/5"
+                : "border border-gold/15 text-emerald/70 hover:border-gold/30 hover:bg-gold/5"
             }`}
           >
             {t.icon}
@@ -58,7 +58,7 @@ function AdminHistory() {
       {loading ? (
         <div className="flex items-center justify-center gap-3 py-16">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-gold border-t-transparent" />
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald/40">Loading history...</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald/60">Loading history...</span>
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-gold/10 bg-cream shadow-sm">
@@ -66,7 +66,7 @@ function AdminHistory() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/40">
+                  <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/60">
                     <th className="px-6 py-3 text-left font-semibold">ID</th>
                     <th className="px-6 py-3 text-left font-semibold">Name</th>
                     <th className="px-6 py-3 text-left font-semibold">Email</th>
@@ -81,7 +81,7 @@ function AdminHistory() {
                       key={user.id}
                       className={`border-b border-gold/5 transition-all duration-200 hover:bg-gold/5 ${i % 2 === 0 ? "bg-emerald/[0.02]" : ""}`}
                     >
-                      <td className="px-6 py-3.5 font-mono text-xs text-emerald/40">#{user.id}</td>
+                      <td className="px-6 py-3.5 font-mono text-xs text-emerald/60">#{user.id}</td>
                       <td className="px-6 py-3.5">
                         <div className="flex items-center gap-2.5">
                           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald/10 text-[10px] font-bold text-emerald">
@@ -102,7 +102,7 @@ function AdminHistory() {
                           {user.isActive ? "Active" : "Inactive"}
                         </span>
                       </td>
-                      <td className="px-6 py-3.5 text-right text-[10px] text-emerald/40">
+                      <td className="px-6 py-3.5 text-right text-[10px] text-emerald/60">
                         {new Date(user.createdAt).toLocaleDateString("en-IN")}
                       </td>
                     </tr>
@@ -114,7 +114,7 @@ function AdminHistory() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/40">
+                  <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/60">
                     <th className="px-6 py-3 text-left font-semibold">ID</th>
                     <th className="px-6 py-3 text-left font-semibold">User</th>
                     <th className="px-6 py-3 text-left font-semibold">Type</th>
@@ -129,7 +129,7 @@ function AdminHistory() {
                       key={item.id}
                       className={`border-b border-gold/5 transition-all duration-200 hover:bg-gold/5 ${i % 2 === 0 ? "bg-emerald/[0.02]" : ""}`}
                     >
-                      <td className="px-6 py-3.5 font-mono text-xs text-emerald/40">#{item.id}</td>
+                      <td className="px-6 py-3.5 font-mono text-xs text-emerald/60">#{item.id}</td>
                       <td className="px-6 py-3.5 text-xs font-semibold">{item.userName || `User #${item.userId}`}</td>
                       <td className="px-6 py-3.5">
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ${
@@ -144,7 +144,7 @@ function AdminHistory() {
                       <td className="px-6 py-3.5 text-right text-xs font-bold text-emerald">
                         {item.amount > 0 ? `₹${item.amount.toLocaleString("en-IN")}` : "—"}
                       </td>
-                      <td className="px-6 py-3.5 text-right text-[10px] text-emerald/40">
+                      <td className="px-6 py-3.5 text-right text-[10px] text-emerald/60">
                         {new Date(item.createdAt).toLocaleDateString("en-IN")}
                       </td>
                     </tr>

@@ -31,7 +31,7 @@ function TeamPage() {
       <h1 className="font-display text-3xl">
         My <span className="italic text-gold">Team</span>
       </h1>
-      <p className="text-xs text-emerald/50">
+      <p className="text-xs text-emerald/70">
         Your binary tree structure — left and right legs.
       </p>
 
@@ -41,7 +41,7 @@ function TeamPage() {
         </div>
       ) : (
         <div className="rounded border border-gold/20 bg-cream p-12 text-center">
-          <p className="text-xs text-emerald/40">No team data yet. Share your referral code to start building!</p>
+          <p className="text-xs text-emerald/60">No team data yet. Share your referral code to start building!</p>
         </div>
       )}
     </div>
@@ -53,7 +53,7 @@ function TreeNode({ node, depth }: { node: any; depth: number }) {
     return (
       <div className="flex flex-col items-center">
         <div className="rounded border border-dashed border-gold/20 bg-cream/50 px-4 py-3 text-center">
-          <p className="text-[10px] text-emerald/30">Empty</p>
+          <p className="text-[10px] text-emerald/70">Empty</p>
         </div>
       </div>
     );
@@ -69,7 +69,7 @@ function TreeNode({ node, depth }: { node: any; depth: number }) {
         }`}
       >
         <p className="text-xs font-semibold">{node.name}</p>
-        <p className="text-[10px] text-emerald/50">{node.referralCode}</p>
+        <p className="text-[10px] text-emerald/70">{node.referralCode}</p>
         <div className="mt-1 flex items-center justify-center gap-2">
           <span
             className={`inline-block rounded px-1.5 py-0.5 text-[8px] font-semibold uppercase ${
@@ -79,7 +79,7 @@ function TreeNode({ node, depth }: { node: any; depth: number }) {
             {node.isActive ? "Active" : "Inactive"}
           </span>
           {node.position && (
-            <span className="text-[8px] uppercase text-emerald/40">{node.position}</span>
+            <span className="text-[8px] uppercase text-emerald/60">{node.position}</span>
           )}
         </div>
       </div>
@@ -91,13 +91,13 @@ function TreeNode({ node, depth }: { node: any; depth: number }) {
 
           <div className="flex flex-col items-center">
             <div className="h-4 w-px bg-gold/30" />
-            <p className="mb-1 text-[8px] uppercase text-emerald/40">Left</p>
+            <p className="mb-1 text-[8px] uppercase text-emerald/60">Left</p>
             <TreeNode node={node.left} depth={depth + 1} />
           </div>
 
           <div className="flex flex-col items-center">
             <div className="h-4 w-px bg-gold/30" />
-            <p className="mb-1 text-[8px] uppercase text-emerald/40">Right</p>
+            <p className="mb-1 text-[8px] uppercase text-emerald/60">Right</p>
             <TreeNode node={node.right} depth={depth + 1} />
           </div>
         </div>

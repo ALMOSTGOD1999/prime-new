@@ -36,7 +36,7 @@ function AdminLayout() {
       <div className="flex min-h-screen items-center justify-center bg-cream">
         <div className="flex items-center gap-3">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-gold border-t-transparent" />
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald/50">Loading...</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald/70">Loading...</span>
         </div>
       </div>
     );

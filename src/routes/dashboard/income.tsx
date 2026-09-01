@@ -45,25 +45,25 @@ function IncomePage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded border border-emerald/20 bg-emerald/5 p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/50">Direct Commission</p>
+          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Direct Commission</p>
           <p className="mt-2 font-display text-2xl text-emerald">
             ₹{income.direct.toLocaleString("en-IN")}
           </p>
-          <p className="mt-1 text-[10px] text-emerald/40">5% per referral</p>
+          <p className="mt-1 text-[10px] text-emerald/60">5% per referral</p>
         </div>
         <div className="rounded border border-gold/20 bg-gold/5 p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/50">Matching Income</p>
+          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Matching Income</p>
           <p className="mt-2 font-display text-2xl text-gold">
             ₹{income.matching.toLocaleString("en-IN")}
           </p>
-          <p className="mt-1 text-[10px] text-emerald/40">20% per pair</p>
+          <p className="mt-1 text-[10px] text-emerald/60">20% per pair</p>
         </div>
         <div className="rounded border border-gold/20 bg-cream p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/50">Total Earned</p>
+          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Earned</p>
           <p className="mt-2 font-display text-2xl text-emerald">
             ₹{income.totalEarned.toLocaleString("en-IN")}
           </p>
-          <p className="mt-1 text-[10px] text-emerald/40">Lifetime</p>
+          <p className="mt-1 text-[10px] text-emerald/60">Lifetime</p>
         </div>
       </div>
 
@@ -72,7 +72,7 @@ function IncomePage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-gold">Today's Pairs</p>
             <p className="mt-1 font-display text-xl">
-              {income.todayPairs} <span className="text-sm text-emerald/40">/ 3 cap</span>
+              {income.todayPairs} <span className="text-sm text-emerald/60">/ 3 cap</span>
             </p>
           </div>
           <div>
@@ -99,7 +99,7 @@ function IncomePage() {
                 <span className="text-lg text-gold">&#127942;</span>
                 <div>
                   <p className="text-xs font-semibold">{award.awardName}</p>
-                  <p className="text-[10px] text-emerald/40">
+                  <p className="text-[10px] text-emerald/60">
                     At {award.totalPairs} pairs — {new Date(award.awardedAt).toLocaleDateString("en-IN")}
                   </p>
                 </div>
@@ -117,7 +117,7 @@ function IncomePage() {
             className={`rounded px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition-colors ${
               filter === f
                 ? "bg-emerald text-cream"
-                : "border border-gold/20 text-emerald/50 hover:border-gold/40"
+                : "border border-gold/20 text-emerald/70 hover:border-gold/40"
             }`}
           >
             {f}
@@ -129,7 +129,7 @@ function IncomePage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/50">
+              <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
                 <th className="px-6 py-3 text-left">Type</th>
                 <th className="px-6 py-3 text-left">Description</th>
                 <th className="px-6 py-3 text-right">Amount</th>
@@ -139,7 +139,7 @@ function IncomePage() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-xs text-emerald/40">
+                  <td colSpan={4} className="px-6 py-12 text-center text-xs text-emerald/60">
                     No income records found.
                   </td>
                 </tr>
@@ -163,7 +163,7 @@ function IncomePage() {
                     <td className="px-6 py-3 text-right text-xs font-semibold text-emerald">
                       ₹{item.amount.toLocaleString("en-IN")}
                     </td>
-                    <td className="px-6 py-3 text-right text-[10px] text-emerald/50">
+                    <td className="px-6 py-3 text-right text-[10px] text-emerald/70">
                       {new Date(item.createdAt).toLocaleDateString("en-IN")}
                     </td>
                   </tr>

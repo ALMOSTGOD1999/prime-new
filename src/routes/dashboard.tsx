@@ -55,7 +55,7 @@ function DashboardLayout() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-cream">
-        <div className="text-sm uppercase tracking-widest text-emerald/50">Loading...</div>
+        <div className="text-sm uppercase tracking-widest text-emerald/70">Loading...</div>
       </div>
     );
   }
