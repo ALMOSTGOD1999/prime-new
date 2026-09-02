@@ -149,6 +149,11 @@ function AdminLayout() {
 
         <main className="flex-1 p-6 pb-20 lg:p-8 lg:pb-8">
           <Outlet />
+          <div className="mt-12 border-t border-gold/10 pt-6 text-center">
+            <p className="text-[10px] uppercase tracking-widest text-emerald/40">
+              crafted by <a href="https://www.incodent.com/" target="_blank" rel="noopener noreferrer" className="font-bold text-gold transition-colors hover:text-emerald">INCODENT</a>
+            </p>
+          </div>
         </main>
       </div>
       <MobileBottomNav isAdmin={true} />
