@@ -13,6 +13,27 @@ async function getAuthUserId(): Promise<number> {
   return payload["userId"] as number;
 }
 
+// Check if the real user behind the session is admin (handles impersonation)
+async function isRealAdmin(): Promise<boolean> {
+  const token = getCookie("auth_token");
+  if (!token) return false;
+  const { verifyJwt } = await import("../../lib/auth");
+  const payload = await verifyJwt(token);
+  if (!payload) return false;
+
+  // If impersonating, check if the impersonator (real admin) is admin
+  const impersonatorId = payload["impersonatorId"] as number | undefined;
+  if (impersonatorId) {
+    const admin = await db.select({ isAdmin: users.isAdmin }).from(users).where(eq(users.id, impersonatorId));
+    return !!admin[0]?.isAdmin;
+  }
+
+  // Not impersonating — check if current user is admin
+  const userId = payload["userId"] as number;
+  const me = await db.select({ isAdmin: users.isAdmin }).from(users).where(eq(users.id, userId));
+  return !!me[0]?.isAdmin;
+}
+
 type TreeNode = {
   id: number;
   name: string;
@@ -72,13 +93,12 @@ export const getTreeVisualization = createServerFn({ method: "GET" })
   .handler(async () => {
     const userId = await getAuthUserId();
 
-    // Check if admin — admin sees the full tree from root
-    const me = await db.select({ isAdmin: users.isAdmin }).from(users).where(eq(users.id, userId));
-    const isAdmin = me[0]?.isAdmin;
+    // Check if real user is admin (handles impersonation too)
+    const admin = await isRealAdmin();
 
     // Admin sees deep tree (50 levels), users see 3 levels of their downline
-    const depth = isAdmin ? 50 : 3;
-    const rootId = isAdmin ? 1 : userId;
+    const depth = admin ? 50 : 3;
+    const rootId = admin ? 1 : userId;
     const tree = await buildTree(rootId, depth);
     return { tree };
   });
