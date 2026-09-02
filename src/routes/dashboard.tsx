@@ -8,6 +8,7 @@ import { getNotifications } from "../functions/user/notifications";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { OnboardingTour } from "../components/OnboardingTour";
 import { MobileBottomNav } from "../components/MobileBottomNav";
+import { Typewriter } from "../components/Typewriter";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
@@ -229,9 +230,19 @@ function DashboardLayout() {
         <main className="flex-1 p-6 pb-20 lg:p-8 lg:pb-8">
           <Outlet />
           <div className="mt-12 border-t border-gold/10 pt-6 text-center">
-            <p className="text-[10px] uppercase tracking-widest text-emerald/40">
-              crafted by <a href="https://www.incodent.com/" target="_blank" rel="noopener noreferrer" className="font-bold text-gold transition-colors hover:text-emerald">INCODENT</a>
-            </p>
+            <Typewriter
+              className="inline-block text-[10px] uppercase tracking-widest text-emerald/40"
+              speed={90}
+              delay={800}
+              segments={[
+                { text: "crafted by " },
+                {
+                  text: "INCODENT",
+                  className: "font-bold text-gold transition-colors hover:text-emerald",
+                  href: "https://www.incodent.com/",
+                },
+              ]}
+            />
           </div>
         </main>
       </div>
