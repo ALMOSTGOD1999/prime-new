@@ -21,6 +21,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminAddUserRouteImport } from './routes/admin/add-user'
 import { Route as AdminAnnouncementsRouteImport } from './routes/admin/announcements'
 import { Route as AdminBulkRouteImport } from './routes/admin/bulk'
+import { Route as AdminGoldrateRouteImport } from './routes/admin/goldrate'
 import { Route as AdminHistoryRouteImport } from './routes/admin/history'
 import { Route as AdminIncomeRouteImport } from './routes/admin/income'
 import { Route as AdminKycRouteImport } from './routes/admin/kyc'
@@ -100,6 +101,11 @@ const AdminAnnouncementsRoute = AdminAnnouncementsRouteImport.update({
 const AdminBulkRoute = AdminBulkRouteImport.update({
   id: '/bulk',
   path: '/bulk',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGoldrateRoute = AdminGoldrateRouteImport.update({
+  id: '/goldrate',
+  path: '/goldrate',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminHistoryRoute = AdminHistoryRouteImport.update({
@@ -215,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/admin/add-user': typeof AdminAddUserRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/bulk': typeof AdminBulkRoute
+  '/admin/goldrate': typeof AdminGoldrateRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
   '/admin/kyc': typeof AdminKycRoute
@@ -247,6 +254,7 @@ export interface FileRoutesByTo {
   '/admin/add-user': typeof AdminAddUserRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/bulk': typeof AdminBulkRoute
+  '/admin/goldrate': typeof AdminGoldrateRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
   '/admin/kyc': typeof AdminKycRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/admin/add-user': typeof AdminAddUserRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/bulk': typeof AdminBulkRoute
+  '/admin/goldrate': typeof AdminGoldrateRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
   '/admin/kyc': typeof AdminKycRoute
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/admin/add-user'
     | '/admin/announcements'
     | '/admin/bulk'
+    | '/admin/goldrate'
     | '/admin/history'
     | '/admin/income'
     | '/admin/kyc'
@@ -350,6 +360,7 @@ export interface FileRouteTypes {
     | '/admin/add-user'
     | '/admin/announcements'
     | '/admin/bulk'
+    | '/admin/goldrate'
     | '/admin/history'
     | '/admin/income'
     | '/admin/kyc'
@@ -384,6 +395,7 @@ export interface FileRouteTypes {
     | '/admin/add-user'
     | '/admin/announcements'
     | '/admin/bulk'
+    | '/admin/goldrate'
     | '/admin/history'
     | '/admin/income'
     | '/admin/kyc'
@@ -502,6 +514,13 @@ declare module '@tanstack/react-router' {
       path: '/bulk'
       fullPath: '/admin/bulk'
       preLoaderRoute: typeof AdminBulkRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/goldrate': {
+      id: '/admin/goldrate'
+      path: '/goldrate'
+      fullPath: '/admin/goldrate'
+      preLoaderRoute: typeof AdminGoldrateRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/history': {
@@ -651,6 +670,7 @@ interface AdminRouteChildren {
   AdminAddUserRoute: typeof AdminAddUserRoute
   AdminAnnouncementsRoute: typeof AdminAnnouncementsRoute
   AdminBulkRoute: typeof AdminBulkRoute
+  AdminGoldrateRoute: typeof AdminGoldrateRoute
   AdminHistoryRoute: typeof AdminHistoryRoute
   AdminIncomeRoute: typeof AdminIncomeRoute
   AdminKycRoute: typeof AdminKycRoute
@@ -666,6 +686,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAddUserRoute: AdminAddUserRoute,
   AdminAnnouncementsRoute: AdminAnnouncementsRoute,
   AdminBulkRoute: AdminBulkRoute,
+  AdminGoldrateRoute: AdminGoldrateRoute,
   AdminHistoryRoute: AdminHistoryRoute,
   AdminIncomeRoute: AdminIncomeRoute,
   AdminKycRoute: AdminKycRoute,

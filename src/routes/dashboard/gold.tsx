@@ -13,7 +13,6 @@ function GoldPricePage() {
   const [alertPrice, setAlertPrice] = useState("");
   const [alertDirection, setAlertDirection] = useState<"below" | "above">("below");
   const [settingAlert, setSettingAlert] = useState(false);
-  const [history, setHistory] = useState<{ time: string; price: number }[]>([]);
 
   useEffect(() => {
     loadPrice();
@@ -24,10 +23,6 @@ function GoldPricePage() {
     try {
       const data = await getGoldPrice();
       setPriceData(data);
-      setHistory((prev) => {
-        const next = [...prev, { time: new Date().toLocaleTimeString(), price: data.price }];
-        return next.slice(-20);
-      });
     } catch (err) {
       console.error(err);
     } finally {
@@ -64,9 +59,6 @@ function GoldPricePage() {
     } catch {}
   };
 
-  const maxPrice = Math.max(...history.map((h) => h.price), 1);
-  const minPrice = Math.min(...history.map((h) => h.price), 0);
-
   if (loading) {
     return (
       <div className="space-y-4">
@@ -79,47 +71,26 @@ function GoldPricePage() {
   return (
     <div className="space-y-6">
       <h1 className="font-display text-3xl">
-        Gold <span className="italic text-gold">Price Tracker</span>
+        Gold <span className="italic text-gold">Price</span>
       </h1>
 
       {/* Current Price */}
       <div className="rounded border border-gold/20 bg-cream p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-emerald/70">Current Gold Price (XAU/USD)</p>
-            <p className="mt-2 font-display text-4xl text-gold">${priceData?.price?.toLocaleString() || "---"}</p>
-            {priceData?.change !== 0 && (
-              <p className={`mt-1 text-sm font-semibold ${priceData.change > 0 ? "text-emerald" : "text-red-500"}`}>
-                {priceData.change > 0 ? "+" : ""}{priceData.change?.toFixed(2)} ({priceData.changePercent?.toFixed(2)}%)
-              </p>
+            <p className="text-[10px] uppercase tracking-widest text-emerald/70">Today's Gold Rate (XAU/USD)</p>
+            {priceData?.price > 0 ? (
+              <p className="mt-2 font-display text-4xl text-gold">${priceData.price.toLocaleString()}</p>
+            ) : (
+              <p className="mt-2 font-display text-4xl text-emerald/40">Not set yet</p>
             )}
           </div>
           <button onClick={loadPrice} className="border border-emerald/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10">
             Refresh
           </button>
         </div>
-        <p className="mt-3 text-[10px] text-emerald/50">Source: {priceData?.source} • Updated: {priceData?.timestamp ? new Date(priceData.timestamp).toLocaleString() : "N/A"}</p>
+        <p className="mt-3 text-[10px] text-emerald/50">Set by: {priceData?.source} • Updated: {priceData?.timestamp ? new Date(priceData.timestamp).toLocaleString("en-IN") : "N/A"}</p>
       </div>
-
-      {/* Price Chart */}
-      {history.length > 1 && (
-        <div className="rounded border border-gold/20 bg-cream p-6">
-          <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Price History (This Session)</h3>
-          <div className="flex items-end gap-1" style={{ height: "150px" }}>
-            {history.map((h, i) => {
-              const range = maxPrice - minPrice || 1;
-              const height = ((h.price - minPrice) / range) * 130 + 10;
-              return (
-                <div key={i} className="flex flex-1 flex-col items-center gap-1">
-                  <span className="text-[7px] text-emerald/60">${h.price}</span>
-                  <div className="w-full max-w-[30px] rounded-t bg-gold" style={{ height: `${height}px` }} />
-                  <span className="text-[6px] text-emerald/50">{h.time}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Price Alerts */}
       <div className="rounded border border-gold/20 bg-cream p-6">

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "../../lib/db";
-import { users, goldPriceAlerts } from "../../lib/db/schema";
-import { eq, sql, and } from "drizzle-orm";
+import { users, goldPriceAlerts, goldRates } from "../../lib/db/schema";
+import { eq, sql, and, desc } from "drizzle-orm";
 import { getCookie } from "@tanstack/react-start/server";
 
 async function getAuthUserId(): Promise<number> {
@@ -13,34 +13,39 @@ async function getAuthUserId(): Promise<number> {
   return payload["userId"] as number;
 }
 
-// ── Get gold price (from public API) ───────────────────
+// ── Get gold price (admin-set daily rate) ────────────────
 export const getGoldPrice = createServerFn({ method: "GET" })
   .handler(async () => {
-    try {
-      // Use a free gold price API
-      const res = await fetch("https://api.gold-api.com/price/XAU", {
-        headers: { "Accept": "application/json" },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        return {
-          price: data.price || 0,
-          currency: data.currency || "USD",
-          change: data.ch || 0,
-          changePercent: data.chp || 0,
-          source: "gold-api.com",
-          timestamp: new Date().toISOString(),
-        };
-      }
-    } catch {}
+    // Get latest admin-set rate
+    const result = await db
+      .select({
+        id: goldRates.id,
+        price: goldRates.price,
+        createdAt: goldRates.createdAt,
+        setByName: sql<string>`(SELECT name FROM users WHERE id = ${goldRates.setBy})`,
+      })
+      .from(goldRates)
+      .orderBy(desc(goldRates.createdAt))
+      .limit(1);
 
-    // Fallback: return a static price
+    if (result.length > 0) {
+      return {
+        price: result[0].price,
+        currency: "USD",
+        change: 0,
+        changePercent: 0,
+        source: `Admin: ${result[0].setByName}`,
+        timestamp: result[0].createdAt?.toISOString() || new Date().toISOString(),
+      };
+    }
+
+    // Fallback if no rate set yet
     return {
-      price: 3250,
+      price: 0,
       currency: "USD",
       change: 0,
       changePercent: 0,
-      source: "fallback",
+      source: "No rate set yet",
       timestamp: new Date().toISOString(),
     };
   });

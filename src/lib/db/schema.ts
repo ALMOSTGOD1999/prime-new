@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, boolean, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, boolean, timestamp, uniqueIndex, real } from "drizzle-orm/pg-core";
 
 // ── Users ──────────────────────────────────────────────
 export const users = pgTable("users", {
@@ -143,5 +143,13 @@ export const goldPriceAlerts = pgTable("gold_price_alerts", {
   direction: text("direction", { enum: ["below", "above"] }).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   triggeredAt: timestamp("triggered_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ── Gold rates (admin-set daily rates) ─────────────────
+export const goldRates = pgTable("gold_rates", {
+  id: serial("id").primaryKey(),
+  price: real("price").notNull(),
+  setBy: integer("set_by").references(() => users.id).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
