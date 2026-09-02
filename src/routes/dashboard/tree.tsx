@@ -14,6 +14,7 @@ function TreePage() {
   const [dragging, setDragging] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const [collapsed, setCollapsed] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     getTreeVisualization()
@@ -22,9 +23,18 @@ function TreePage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const toggleCollapse = (id: number) => {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
-    setZoom((prev) => Math.min(3, Math.max(0.3, prev + (e.deltaY > 0 ? -0.1 : 0.1))));
+    setZoom((prev) => Math.min(3, Math.max(0.15, prev + (e.deltaY > 0 ? -0.08 : 0.08))));
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -46,6 +56,21 @@ function TreePage() {
 
   const handleMouseUp = useCallback(() => setDragging(false), []);
 
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      lastPos.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      const dx = e.touches[0].clientX - lastPos.current.x;
+      const dy = e.touches[0].clientY - lastPos.current.y;
+      lastPos.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      setPan((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+    }
+  }, []);
+
   const resetView = () => {
     setZoom(1);
     setPan({ x: 0, y: 0 });
@@ -61,133 +86,165 @@ function TreePage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-3xl">
+          <h1 className="font-display text-2xl sm:text-3xl">
             My <span className="italic text-gold">Tree</span>
           </h1>
-          <p className="text-xs text-emerald/70">
-            Interactive binary tree — scroll to zoom, drag to pan.
+          <p className="text-[10px] sm:text-xs text-emerald/70">
+            Scroll to zoom, drag to pan.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setZoom((z) => Math.min(3, z + 0.2))} className="border border-gold/40 px-3 py-1 text-xs font-bold hover:bg-gold/10">+</button>
-          <span className="text-xs text-emerald/60">{Math.round(zoom * 100)}%</span>
-          <button onClick={() => setZoom((z) => Math.max(0.3, z - 0.2))} className="border border-gold/40 px-3 py-1 text-xs font-bold hover:bg-gold/10">−</button>
-          <button onClick={resetView} className="border border-emerald/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest hover:bg-emerald/10">Reset</button>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <button onClick={() => setZoom((z) => Math.min(3, z + 0.15))} className="rounded border border-gold/30 px-2 py-1 text-xs font-bold text-emerald hover:bg-emerald/5">+</button>
+          <span className="min-w-[36px] text-center text-[10px] text-emerald/60">{Math.round(zoom * 100)}%</span>
+          <button onClick={() => setZoom((z) => Math.max(0.15, z - 0.15))} className="rounded border border-gold/30 px-2 py-1 text-xs font-bold text-emerald hover:bg-emerald/5">−</button>
+          <button onClick={resetView} className="rounded border border-emerald/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Reset</button>
         </div>
       </div>
 
       {tree ? (
         <div
           ref={containerRef}
-          className="overflow-hidden rounded border border-gold/20 bg-cream"
-          style={{ cursor: dragging ? "grabbing" : "grab", minHeight: "500px" }}
+          className="overflow-hidden rounded-lg border border-gold/15 bg-white shadow-sm"
+          style={{ cursor: dragging ? "grabbing" : "grab", minHeight: "400px" }}
           onWheel={handleWheel}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
         >
           <div
-            className="origin-center p-8"
+            className="origin-top-left p-4 sm:p-6"
             style={{
               transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
               transition: dragging ? "none" : "transform 0.15s ease-out",
+              transformOrigin: "0 0",
             }}
           >
-            <VisualTree node={tree} isRoot={true} />
+            <TreeNode node={tree} isRoot={true} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={0} />
           </div>
         </div>
       ) : (
-        <div className="rounded border border-gold/20 bg-cream p-12 text-center">
+        <div className="rounded-lg border border-gold/15 bg-white p-12 text-center">
           <p className="text-4xl">🌳</p>
-          <p className="mt-4 text-xs text-emerald/60">No team data yet. Share your referral code to start building!</p>
+          <p className="mt-3 text-xs text-emerald/60">No team data yet. Share your referral code to start building!</p>
         </div>
       )}
     </div>
   );
 }
 
-function VisualTree({ node, isRoot }: { node: any; isRoot?: boolean }) {
+function TreeNode({
+  node,
+  isRoot,
+  collapsed,
+  toggleCollapse,
+  depth,
+}: {
+  node: any;
+  isRoot?: boolean;
+  collapsed: Set<number>;
+  toggleCollapse: (id: number) => void;
+  depth: number;
+}) {
   if (!node) {
     return (
       <div className="flex flex-col items-center">
-        <div className="rounded-lg border-2 border-dashed border-gold/20 px-6 py-4 text-center">
-          <p className="text-[10px] text-emerald/50">Empty</p>
+        <div className="rounded border border-dashed border-gold/15 px-4 py-2 text-center">
+          <p className="text-[9px] text-emerald/40">Empty</p>
         </div>
       </div>
     );
   }
 
-  const rankBadges: Record<string, string> = {
-    bronze: "bg-orange-100 text-orange-700",
-    silver: "bg-gray-100 text-gray-700",
-    gold: "bg-yellow-100 text-yellow-700",
-    platinum: "bg-purple-100 text-purple-700",
+  const hasChildren = node.left || node.right;
+  const isCollapsed = collapsed.has(node.id);
+
+  const rankColors: Record<string, string> = {
+    bronze: "bg-amber-50 text-amber-700 ring-amber-200",
+    silver: "bg-slate-50 text-slate-600 ring-slate-200",
+    gold: "bg-yellow-50 text-yellow-700 ring-yellow-200",
+    platinum: "bg-violet-50 text-violet-700 ring-violet-200",
   };
 
   return (
     <div className="flex flex-col items-center">
-      {/* Node */}
       <div
-        className={`relative rounded-lg border-2 px-6 py-4 text-center transition-all ${
+        className={`group relative flex flex-col items-center rounded-lg border px-3 py-2 sm:px-4 sm:py-2.5 text-center transition-all ${
           isRoot
-            ? "border-gold bg-gold/5 shadow-lg"
+            ? "border-gold/40 bg-gradient-to-b from-gold/8 to-gold/3 shadow-md ring-1 ring-gold/15"
             : node.isActive
-              ? "border-emerald/40 bg-emerald/5"
-              : "border-gold/20 bg-cream"
+              ? "border-emerald/25 bg-emerald/3 hover:border-emerald/40 hover:shadow-sm"
+              : "border-slate-200 bg-slate-50/50 hover:border-slate-300"
         }`}
       >
         {isRoot && (
-          <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded bg-gold px-2 py-0.5 text-[8px] font-bold uppercase text-cream">
+          <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-gold px-2 py-0.5 text-[7px] font-bold uppercase tracking-wider text-cream shadow-sm">
             You
           </span>
         )}
-        <p className="text-sm font-bold">{node.name}</p>
-        <p className="text-[10px] text-emerald/60">{node.referralCode}</p>
-        <div className="mt-2 flex items-center justify-center gap-2">
-          <span
-            className={`rounded px-2 py-0.5 text-[8px] font-bold uppercase ${
-              node.isActive ? "bg-emerald/10 text-emerald" : "bg-red-50 text-red-600"
-            }`}
-          >
+
+        <p className={`text-xs sm:text-sm font-semibold leading-tight ${isRoot ? "text-emerald" : "text-slate-800"}`}>
+          {node.name}
+        </p>
+        <p className="text-[9px] sm:text-[10px] font-mono text-emerald/50 mt-0.5">{node.referralCode}</p>
+
+        <div className="mt-1.5 flex items-center justify-center gap-1">
+          <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[7px] sm:text-[8px] font-semibold ${
+            node.isActive ? "bg-emerald/10 text-emerald-700" : "bg-red-50 text-red-500"
+          }`}>
+            <span className={`mr-0.5 h-1 w-1 rounded-full ${node.isActive ? "bg-emerald-500" : "bg-red-400"}`} />
             {node.isActive ? "Active" : "Inactive"}
           </span>
-          <span className={`rounded px-2 py-0.5 text-[8px] font-bold uppercase ${rankBadges[node.rank] || "bg-gray-100 text-gray-700"}`}>
+          <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[7px] sm:text-[8px] font-semibold ring-1 ring-inset ${rankColors[node.rank] || "bg-slate-50 text-slate-600 ring-slate-200"}`}>
             {node.rank}
           </span>
         </div>
+
+        {hasChildren && (
+          <button
+            onClick={(e) => { e.stopPropagation(); toggleCollapse(node.id); }}
+            className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 z-10 flex h-5 w-5 items-center justify-center rounded-full border border-gold/30 bg-white text-[10px] font-bold text-emerald shadow-sm transition-colors hover:bg-emerald/5 hover:border-emerald/40"
+          >
+            {isCollapsed ? "+" : "−"}
+          </button>
+        )}
       </div>
 
-      {/* Children */}
-      {(node.left || node.right) && (
-        <div className="relative mt-6">
-          {/* Vertical line down */}
-          <div className="absolute left-1/2 top-0 h-6 w-px bg-gold/30" />
-          {/* Horizontal line */}
-          <div className="absolute left-0 right-0 top-6 h-px bg-gold/30" />
+      {hasChildren && !isCollapsed && (
+        <div className="relative mt-5">
+          <div className="absolute left-1/2 top-0 h-2.5 w-px bg-gold/25 -translate-x-px" />
+          {(node.left && node.right) && (
+            <div className="absolute left-[25%] right-[25%] top-2.5 h-px bg-gold/25" />
+          )}
 
-          <div className="flex gap-16 pt-6">
-            {/* Left */}
+          <div className="flex gap-4 sm:gap-8 md:gap-12 pt-2.5">
             <div className="flex flex-col items-center">
-              <div className="absolute h-6 w-px bg-gold/30" style={{ left: "25%" }} />
-              <span className="mb-2 rounded bg-emerald/10 px-2 py-0.5 text-[8px] font-bold uppercase text-emerald">
-                Left Leg
+              {node.left && <div className="absolute h-2.5 w-px bg-gold/25" style={{ left: "25%" }} />}
+              <span className="mb-1.5 rounded-full bg-emerald/8 px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider text-emerald/70 ring-1 ring-emerald/10">
+                L
               </span>
-              <VisualTree node={node.left} />
+              <TreeNode node={node.left} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
             </div>
 
-            {/* Right */}
             <div className="flex flex-col items-center">
-              <div className="absolute h-6 w-px bg-gold/30" style={{ left: "75%" }} />
-              <span className="mb-2 rounded bg-gold/10 px-2 py-0.5 text-[8px] font-bold uppercase text-gold">
-                Right Leg
+              {node.right && <div className="absolute h-2.5 w-px bg-gold/25" style={{ left: "75%" }} />}
+              <span className="mb-1.5 rounded-full bg-gold/8 px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider text-gold/70 ring-1 ring-gold/10">
+                R
               </span>
-              <VisualTree node={node.right} />
+              <TreeNode node={node.right} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
             </div>
           </div>
+        </div>
+      )}
+
+      {hasChildren && isCollapsed && (
+        <div className="mt-3 rounded-full border border-dashed border-gold/30 bg-gold/5 px-3 py-1 text-[9px] text-gold/70">
+          +{(node.left ? 1 : 0) + (node.right ? 1 : 0)} hidden
         </div>
       )}
     </div>
