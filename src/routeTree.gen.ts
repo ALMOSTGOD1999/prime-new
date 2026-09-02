@@ -29,6 +29,7 @@ import { Route as AdminPayoutRouteImport } from './routes/admin/payout'
 import { Route as AdminReportsRouteImport } from './routes/admin/reports'
 import { Route as AdminRevenueRouteImport } from './routes/admin/revenue'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminTreeRouteImport } from './routes/admin/tree'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAddUserRouteImport } from './routes/dashboard/add-user'
@@ -144,6 +145,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTreeRoute = AdminTreeRouteImport.update({
+  id: '/tree',
+  path: '/tree',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -235,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tree': typeof AdminTreeRoute
   '/admin/users': typeof AdminUsersRoute
   '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
@@ -269,6 +276,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tree': typeof AdminTreeRoute
   '/admin/users': typeof AdminUsersRoute
   '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
@@ -306,6 +314,7 @@ export interface FileRoutesById {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tree': typeof AdminTreeRoute
   '/admin/users': typeof AdminUsersRoute
   '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
@@ -344,6 +353,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/revenue'
     | '/admin/settings'
+    | '/admin/tree'
     | '/admin/users'
     | '/dashboard/add-user'
     | '/dashboard/badges'
@@ -378,6 +388,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/revenue'
     | '/admin/settings'
+    | '/admin/tree'
     | '/admin/users'
     | '/dashboard/add-user'
     | '/dashboard/badges'
@@ -414,6 +425,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/revenue'
     | '/admin/settings'
+    | '/admin/tree'
     | '/admin/users'
     | '/dashboard/add-user'
     | '/dashboard/badges'
@@ -584,6 +596,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/tree': {
+      id: '/admin/tree'
+      path: '/tree'
+      fullPath: '/admin/tree'
+      preLoaderRoute: typeof AdminTreeRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -697,6 +716,7 @@ interface AdminRouteChildren {
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRevenueRoute: typeof AdminRevenueRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTreeRoute: typeof AdminTreeRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -713,6 +733,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminReportsRoute: AdminReportsRoute,
   AdminRevenueRoute: AdminRevenueRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminTreeRoute: AdminTreeRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

@@ -67,10 +67,18 @@ async function buildTree(userId: number, depth: number): Promise<TreeNode | null
   };
 }
 
-// ── Get tree visualization ──────────────────────────────
+// ── Get tree visualization (admin: full tree, users: their downline only) ──
 export const getTreeVisualization = createServerFn({ method: "GET" })
   .handler(async () => {
     const userId = await getAuthUserId();
-    const tree = await buildTree(userId, 3);
+
+    // Check if admin — admin sees the full tree from root
+    const me = await db.select({ isAdmin: users.isAdmin }).from(users).where(eq(users.id, userId));
+    const isAdmin = me[0]?.isAdmin;
+
+    // Admin sees deep tree (50 levels), users see 3 levels of their downline
+    const depth = isAdmin ? 50 : 3;
+    const rootId = isAdmin ? 1 : userId;
+    const tree = await buildTree(rootId, depth);
     return { tree };
   });
