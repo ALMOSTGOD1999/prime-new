@@ -26,6 +26,7 @@ export function MobileBottomNav({ isAdmin = false, unreadCount = 0 }: MobileBott
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-gold/20 bg-cream/95 backdrop-blur-sm sm:hidden">
       <div className="flex items-center justify-around py-2">
         <NavLink href="/dashboard" icon="🏠" label="Home" />
+        <NavLink href="/dashboard/add-user" icon="➕" label="Add" />
         <NavLink href="/dashboard/tree" icon="🌳" label="Tree" />
         <NavLink
           href="/dashboard/notifications"
@@ -33,7 +34,6 @@ export function MobileBottomNav({ isAdmin = false, unreadCount = 0 }: MobileBott
           label="Alerts"
           badge={unreadCount}
         />
-        <NavLink href="/dashboard/gold" icon="📈" label="Gold" />
         <NavLink href="/dashboard/profile" icon="👤" label="Profile" />
       </div>
     </nav>

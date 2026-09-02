@@ -31,6 +31,7 @@ import { Route as AdminRevenueRouteImport } from './routes/admin/revenue'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardAddUserRouteImport } from './routes/dashboard/add-user'
 import { Route as DashboardBadgesRouteImport } from './routes/dashboard/badges'
 import { Route as DashboardCalculatorRouteImport } from './routes/dashboard/calculator'
 import { Route as DashboardGoldRouteImport } from './routes/dashboard/gold'
@@ -153,6 +154,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardAddUserRoute = DashboardAddUserRouteImport.update({
+  id: '/add-user',
+  path: '/add-user',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardBadgesRoute = DashboardBadgesRouteImport.update({
   id: '/badges',
   path: '/badges',
@@ -230,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
   '/dashboard/gold': typeof DashboardGoldRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
   '/dashboard/gold': typeof DashboardGoldRoute
@@ -299,6 +307,7 @@ export interface FileRoutesById {
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
   '/dashboard/gold': typeof DashboardGoldRoute
@@ -336,6 +345,7 @@ export interface FileRouteTypes {
     | '/admin/revenue'
     | '/admin/settings'
     | '/admin/users'
+    | '/dashboard/add-user'
     | '/dashboard/badges'
     | '/dashboard/calculator'
     | '/dashboard/gold'
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/admin/revenue'
     | '/admin/settings'
     | '/admin/users'
+    | '/dashboard/add-user'
     | '/dashboard/badges'
     | '/dashboard/calculator'
     | '/dashboard/gold'
@@ -404,6 +415,7 @@ export interface FileRouteTypes {
     | '/admin/revenue'
     | '/admin/settings'
     | '/admin/users'
+    | '/dashboard/add-user'
     | '/dashboard/badges'
     | '/dashboard/calculator'
     | '/dashboard/gold'
@@ -586,6 +598,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/add-user': {
+      id: '/dashboard/add-user'
+      path: '/add-user'
+      fullPath: '/dashboard/add-user'
+      preLoaderRoute: typeof DashboardAddUserRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/badges': {
       id: '/dashboard/badges'
       path: '/badges'
@@ -701,6 +720,7 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface DashboardRouteChildren {
+  DashboardAddUserRoute: typeof DashboardAddUserRoute
   DashboardBadgesRoute: typeof DashboardBadgesRoute
   DashboardCalculatorRoute: typeof DashboardCalculatorRoute
   DashboardGoldRoute: typeof DashboardGoldRoute
@@ -716,6 +736,7 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAddUserRoute: DashboardAddUserRoute,
   DashboardBadgesRoute: DashboardBadgesRoute,
   DashboardCalculatorRoute: DashboardCalculatorRoute,
   DashboardGoldRoute: DashboardGoldRoute,

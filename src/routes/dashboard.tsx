@@ -109,6 +109,7 @@ function DashboardLayout() {
   const navLinks = [
     { to: "/dashboard", label: "Dashboard", icon: "◈" },
     { to: "/dashboard/team", label: "My Team", icon: "◇" },
+    { to: "/dashboard/add-user", label: "Add User", icon: "➕" },
     { to: "/dashboard/tree", label: "Tree View", icon: "🌳" },
     { to: "/dashboard/income", label: "Income", icon: "◆" },
     { to: "/dashboard/gold", label: "Gold Price", icon: "📈" },
