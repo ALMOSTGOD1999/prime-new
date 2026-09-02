@@ -78,9 +78,9 @@ function GoldPricePage() {
       <div className="rounded border border-gold/20 bg-cream p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-emerald/70">Today's Gold Rate (XAU/USD)</p>
+            <p className="text-[10px] uppercase tracking-widest text-emerald/70">Today's Gold Rate (per gram)</p>
             {priceData?.price > 0 ? (
-              <p className="mt-2 font-display text-4xl text-gold">${priceData.price.toLocaleString()}</p>
+              <p className="mt-2 font-display text-4xl text-gold">₹{priceData.price.toLocaleString("en-IN")}</p>
             ) : (
               <p className="mt-2 font-display text-4xl text-emerald/40">Not set yet</p>
             )}

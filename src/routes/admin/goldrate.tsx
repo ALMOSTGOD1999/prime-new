@@ -29,7 +29,7 @@ function AdminGoldRatePage() {
 
   const handleSetRate = async () => {
     const p = parseFloat(price);
-    if (!p || p <= 0) return alert("Enter a valid price in USD");
+    if (!p || p <= 0) return alert("Enter a valid price in INR");
     setSaving(true);
     try {
       await setGoldRate({ data: { price: p } });
@@ -57,7 +57,7 @@ function AdminGoldRatePage() {
         Gold <span className="italic text-gold">Rate</span>
       </h1>
       <p className="text-xs text-emerald/70">
-        Set the daily gold rate (XAU/USD) that all users will see.
+        Set the daily gold rate (per gram) that all users will see.
       </p>
 
       {/* Set Rate */}
@@ -65,16 +65,16 @@ function AdminGoldRatePage() {
         <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Set Today's Gold Rate</h3>
         <div className="flex flex-col gap-3 sm:flex-row">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-emerald">$</span>
+            <span className="text-sm font-semibold text-emerald">₹</span>
             <input
               type="number"
               step="0.01"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              placeholder="e.g. 3250.00"
+              placeholder="e.g. 6500.00"
               className="w-48 border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/60 focus:border-gold"
             />
-            <span className="text-xs text-emerald/60">USD per ounce</span>
+            <span className="text-xs text-emerald/60">INR per gram</span>
           </div>
           <button
             onClick={handleSetRate}
@@ -86,7 +86,7 @@ function AdminGoldRatePage() {
         </div>
         {history.length > 0 && (
           <p className="mt-3 text-[10px] text-emerald/50">
-            Current rate: <span className="font-display text-sm text-gold">${history[0].price}</span> — set by {history[0].setByName} at {new Date(history[0].createdAt).toLocaleString("en-IN")}
+            Current rate: <span className="font-display text-sm text-gold">₹{history[0].price.toLocaleString("en-IN")}</span> — set by {history[0].setByName} at {new Date(history[0].createdAt).toLocaleString("en-IN")}
           </p>
         )}
       </div>
@@ -104,7 +104,7 @@ function AdminGoldRatePage() {
               <thead>
                 <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
                   <th className="px-6 py-3 text-left">Date & Time</th>
-                  <th className="px-6 py-3 text-left">Rate (USD)</th>
+                  <th className="px-6 py-3 text-left">Rate (INR)</th>
                   <th className="px-6 py-3 text-left">Set By</th>
                 </tr>
               </thead>
@@ -112,7 +112,7 @@ function AdminGoldRatePage() {
                 {history.map((h) => (
                   <tr key={h.id} className="border-b border-gold/5 hover:bg-gold/5">
                     <td className="px-6 py-3 text-xs">{new Date(h.createdAt).toLocaleString("en-IN")}</td>
-                    <td className="px-6 py-3 font-display text-sm text-gold">${h.price}</td>
+                    <td className="px-6 py-3 font-display text-sm text-gold">₹{h.price.toLocaleString("en-IN")}</td>
                     <td className="px-6 py-3 text-xs text-emerald/70">{h.setByName}</td>
                   </tr>
                 ))}
