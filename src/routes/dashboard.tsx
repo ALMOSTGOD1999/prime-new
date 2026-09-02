@@ -5,6 +5,9 @@ import { getMe } from "../functions/auth/me";
 import { logout } from "../functions/auth/logout";
 import { stopImpersonation } from "../functions/admin/impersonate";
 import { getNotifications } from "../functions/user/notifications";
+import { DarkModeToggle } from "../components/DarkModeToggle";
+import { OnboardingTour } from "../components/OnboardingTour";
+import { MobileBottomNav } from "../components/MobileBottomNav";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
@@ -107,15 +110,19 @@ function DashboardLayout() {
     { to: "/dashboard/team", label: "My Team", icon: "◇" },
     { to: "/dashboard/tree", label: "Tree View", icon: "🌳" },
     { to: "/dashboard/income", label: "Income", icon: "◆" },
+    { to: "/dashboard/gold", label: "Gold Price", icon: "📈" },
+    { to: "/dashboard/calculator", label: "Calculator", icon: "🧮" },
     { to: "/dashboard/reports", label: "Reports", icon: "📊" },
     { to: "/dashboard/leaderboard", label: "Leaderboard", icon: "🏆" },
+    { to: "/dashboard/badges", label: "Badges", icon: "🎖️" },
     { to: "/dashboard/profile", label: "Profile", icon: "👤" },
     { to: "/dashboard/kyc", label: "KYC", icon: "📋" },
     { to: "/dashboard/notifications", label: "Notifications", icon: "🔔", badge: unreadCount },
   ];
 
   return (
-    <div className="flex min-h-screen bg-cream">
+    <div className="flex min-h-screen bg-cream dark:bg-emerald/5">
+      <OnboardingTour />
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 bg-black/30 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
@@ -181,7 +188,7 @@ function DashboardLayout() {
       </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-gold/20 bg-cream/90 px-4 py-3 backdrop-blur-md lg:hidden">
+        <header className="flex items-center justify-between border-b border-gold/20 bg-cream/90 px-4 py-3 backdrop-blur-md lg:hidden dark:bg-emerald/10">
           <div className="flex items-center">
             <button onClick={() => setSidebarOpen(true)} className="mr-4 text-emerald">
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +197,9 @@ function DashboardLayout() {
             </button>
             <Wordmark className="text-sm font-bold uppercase" />
           </div>
-          <Link to="/dashboard/notifications" className="relative text-emerald">
+          <div className="flex items-center gap-2">
+            <DarkModeToggle />
+            <Link to="/dashboard/notifications" className="relative text-emerald">
             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
@@ -200,6 +209,7 @@ function DashboardLayout() {
               </span>
             )}
           </Link>
+          </div>
         </header>
 
         {isImpersonating && (
@@ -216,10 +226,11 @@ function DashboardLayout() {
           </div>
         )}
 
-        <main className="flex-1 p-6 lg:p-8">
+        <main className="flex-1 p-6 pb-20 lg:p-8 lg:pb-8">
           <Outlet />
         </main>
       </div>
+      <MobileBottomNav unreadCount={unreadCount} />
     </div>
   );
 }

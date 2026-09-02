@@ -16,6 +16,8 @@ export const users = pgTable("users", {
   rank: text("rank", { enum: ["bronze", "silver", "gold", "platinum"] }).default("bronze").notNull(),
   phone: text("phone"),
   profileImage: text("profile_image"),
+  onboardingDone: boolean("onboarding_done").default(false).notNull(),
+  darkMode: boolean("dark_mode").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -71,7 +73,7 @@ export const withdrawals = pgTable("withdrawals", {
 export const dailyPairs = pgTable("daily_pairs", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  pairDate: text("pair_date").notNull(), // YYYY-MM-DD
+  pairDate: text("pair_date").notNull(),
   pairsCount: integer("pairs_count").default(0).notNull(),
 }, (table) => ({
   userDateUnique: uniqueIndex("user_date_unique").on(table.userId, table.pairDate),
@@ -81,7 +83,7 @@ export const dailyPairs = pgTable("daily_pairs", {
 export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  type: text("type", { enum: ["referral", "pair_match", "commission", "award", "withdrawal", "kyc", "rank", "general"] }).notNull(),
+  type: text("type", { enum: ["referral", "pair_match", "commission", "award", "withdrawal", "kyc", "rank", "general", "announcement"] }).notNull(),
   title: text("title").notNull(),
   message: text("message").notNull(),
   isRead: boolean("is_read").default(false).notNull(),
@@ -100,5 +102,46 @@ export const kyc = pgTable("kyc", {
   status: text("status", { enum: ["pending", "approved", "rejected"] }).default("pending").notNull(),
   rejectionReason: text("rejection_reason"),
   verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ── Share tracking ─────────────────────────────────────
+export const shareClicks = pgTable("share_clicks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  platform: text("platform", { enum: ["whatsapp", "copy", "other"] }).notNull(),
+  leg: text("leg", { enum: ["left", "right"] }),
+  clickedAt: timestamp("clicked_at").defaultNow().notNull(),
+});
+
+// ── Achievements ───────────────────────────────────────
+export const achievements = pgTable("achievements", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  badge: text("badge").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull(),
+  earnedAt: timestamp("earned_at").defaultNow().notNull(),
+});
+
+// ── Announcements ──────────────────────────────────────
+export const announcements = pgTable("announcements", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  priority: text("priority", { enum: ["normal", "important", "urgent"] }).default("normal").notNull(),
+  createdBy: integer("created_by").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ── Gold price alerts ──────────────────────────────────
+export const goldPriceAlerts = pgTable("gold_price_alerts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  targetPrice: integer("target_price").notNull(),
+  direction: text("direction", { enum: ["below", "above"] }).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  triggeredAt: timestamp("triggered_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

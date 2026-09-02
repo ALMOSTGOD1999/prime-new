@@ -19,14 +19,20 @@ import { Route as GoldRouteImport } from './routes/gold'
 import { Route as SilverRouteImport } from './routes/silver'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminAddUserRouteImport } from './routes/admin/add-user'
+import { Route as AdminAnnouncementsRouteImport } from './routes/admin/announcements'
+import { Route as AdminBulkRouteImport } from './routes/admin/bulk'
 import { Route as AdminHistoryRouteImport } from './routes/admin/history'
 import { Route as AdminIncomeRouteImport } from './routes/admin/income'
 import { Route as AdminKycRouteImport } from './routes/admin/kyc'
 import { Route as AdminPayoutRouteImport } from './routes/admin/payout'
 import { Route as AdminReportsRouteImport } from './routes/admin/reports'
+import { Route as AdminRevenueRouteImport } from './routes/admin/revenue'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardBadgesRouteImport } from './routes/dashboard/badges'
+import { Route as DashboardCalculatorRouteImport } from './routes/dashboard/calculator'
+import { Route as DashboardGoldRouteImport } from './routes/dashboard/gold'
 import { Route as DashboardIncomeRouteImport } from './routes/dashboard/income'
 import { Route as DashboardKycRouteImport } from './routes/dashboard/kyc'
 import { Route as DashboardLeaderboardRouteImport } from './routes/dashboard/leaderboard'
@@ -86,6 +92,16 @@ const AdminAddUserRoute = AdminAddUserRouteImport.update({
   path: '/add-user',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAnnouncementsRoute = AdminAnnouncementsRouteImport.update({
+  id: '/announcements',
+  path: '/announcements',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBulkRoute = AdminBulkRouteImport.update({
+  id: '/bulk',
+  path: '/bulk',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHistoryRoute = AdminHistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -111,6 +127,11 @@ const AdminReportsRoute = AdminReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRevenueRoute = AdminRevenueRouteImport.update({
+  id: '/revenue',
+  path: '/revenue',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -124,6 +145,21 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardBadgesRoute = DashboardBadgesRouteImport.update({
+  id: '/badges',
+  path: '/badges',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCalculatorRoute = DashboardCalculatorRouteImport.update({
+  id: '/calculator',
+  path: '/calculator',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardGoldRoute = DashboardGoldRouteImport.update({
+  id: '/gold',
+  path: '/gold',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardIncomeRoute = DashboardIncomeRouteImport.update({
@@ -177,13 +213,19 @@ export interface FileRoutesByFullPath {
   '/gold': typeof GoldRoute
   '/silver': typeof SilverRoute
   '/admin/add-user': typeof AdminAddUserRoute
+  '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/bulk': typeof AdminBulkRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/payout': typeof AdminPayoutRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/dashboard/badges': typeof DashboardBadgesRoute
+  '/dashboard/calculator': typeof DashboardCalculatorRoute
+  '/dashboard/gold': typeof DashboardGoldRoute
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
@@ -203,13 +245,19 @@ export interface FileRoutesByTo {
   '/gold': typeof GoldRoute
   '/silver': typeof SilverRoute
   '/admin/add-user': typeof AdminAddUserRoute
+  '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/bulk': typeof AdminBulkRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/payout': typeof AdminPayoutRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/dashboard/badges': typeof DashboardBadgesRoute
+  '/dashboard/calculator': typeof DashboardCalculatorRoute
+  '/dashboard/gold': typeof DashboardGoldRoute
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
@@ -232,13 +280,19 @@ export interface FileRoutesById {
   '/gold': typeof GoldRoute
   '/silver': typeof SilverRoute
   '/admin/add-user': typeof AdminAddUserRoute
+  '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/bulk': typeof AdminBulkRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/payout': typeof AdminPayoutRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/dashboard/badges': typeof DashboardBadgesRoute
+  '/dashboard/calculator': typeof DashboardCalculatorRoute
+  '/dashboard/gold': typeof DashboardGoldRoute
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
@@ -262,13 +316,19 @@ export interface FileRouteTypes {
     | '/gold'
     | '/silver'
     | '/admin/add-user'
+    | '/admin/announcements'
+    | '/admin/bulk'
     | '/admin/history'
     | '/admin/income'
     | '/admin/kyc'
     | '/admin/payout'
     | '/admin/reports'
+    | '/admin/revenue'
     | '/admin/settings'
     | '/admin/users'
+    | '/dashboard/badges'
+    | '/dashboard/calculator'
+    | '/dashboard/gold'
     | '/dashboard/income'
     | '/dashboard/kyc'
     | '/dashboard/leaderboard'
@@ -288,13 +348,19 @@ export interface FileRouteTypes {
     | '/gold'
     | '/silver'
     | '/admin/add-user'
+    | '/admin/announcements'
+    | '/admin/bulk'
     | '/admin/history'
     | '/admin/income'
     | '/admin/kyc'
     | '/admin/payout'
     | '/admin/reports'
+    | '/admin/revenue'
     | '/admin/settings'
     | '/admin/users'
+    | '/dashboard/badges'
+    | '/dashboard/calculator'
+    | '/dashboard/gold'
     | '/dashboard/income'
     | '/dashboard/kyc'
     | '/dashboard/leaderboard'
@@ -316,13 +382,19 @@ export interface FileRouteTypes {
     | '/gold'
     | '/silver'
     | '/admin/add-user'
+    | '/admin/announcements'
+    | '/admin/bulk'
     | '/admin/history'
     | '/admin/income'
     | '/admin/kyc'
     | '/admin/payout'
     | '/admin/reports'
+    | '/admin/revenue'
     | '/admin/settings'
     | '/admin/users'
+    | '/dashboard/badges'
+    | '/dashboard/calculator'
+    | '/dashboard/gold'
     | '/dashboard/income'
     | '/dashboard/kyc'
     | '/dashboard/leaderboard'
@@ -418,6 +490,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAddUserRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/announcements': {
+      id: '/admin/announcements'
+      path: '/announcements'
+      fullPath: '/admin/announcements'
+      preLoaderRoute: typeof AdminAnnouncementsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/bulk': {
+      id: '/admin/bulk'
+      path: '/bulk'
+      fullPath: '/admin/bulk'
+      preLoaderRoute: typeof AdminBulkRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/history': {
       id: '/admin/history'
       path: '/history'
@@ -453,6 +539,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReportsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/revenue': {
+      id: '/admin/revenue'
+      path: '/revenue'
+      fullPath: '/admin/revenue'
+      preLoaderRoute: typeof AdminRevenueRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -472,6 +565,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/badges': {
+      id: '/dashboard/badges'
+      path: '/badges'
+      fullPath: '/dashboard/badges'
+      preLoaderRoute: typeof DashboardBadgesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/calculator': {
+      id: '/dashboard/calculator'
+      path: '/calculator'
+      fullPath: '/dashboard/calculator'
+      preLoaderRoute: typeof DashboardCalculatorRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/gold': {
+      id: '/dashboard/gold'
+      path: '/gold'
+      fullPath: '/dashboard/gold'
+      preLoaderRoute: typeof DashboardGoldRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/income': {
@@ -535,11 +649,14 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAddUserRoute: typeof AdminAddUserRoute
+  AdminAnnouncementsRoute: typeof AdminAnnouncementsRoute
+  AdminBulkRoute: typeof AdminBulkRoute
   AdminHistoryRoute: typeof AdminHistoryRoute
   AdminIncomeRoute: typeof AdminIncomeRoute
   AdminKycRoute: typeof AdminKycRoute
   AdminPayoutRoute: typeof AdminPayoutRoute
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminRevenueRoute: typeof AdminRevenueRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -547,11 +664,14 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAddUserRoute: AdminAddUserRoute,
+  AdminAnnouncementsRoute: AdminAnnouncementsRoute,
+  AdminBulkRoute: AdminBulkRoute,
   AdminHistoryRoute: AdminHistoryRoute,
   AdminIncomeRoute: AdminIncomeRoute,
   AdminKycRoute: AdminKycRoute,
   AdminPayoutRoute: AdminPayoutRoute,
   AdminReportsRoute: AdminReportsRoute,
+  AdminRevenueRoute: AdminRevenueRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -560,6 +680,9 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface DashboardRouteChildren {
+  DashboardBadgesRoute: typeof DashboardBadgesRoute
+  DashboardCalculatorRoute: typeof DashboardCalculatorRoute
+  DashboardGoldRoute: typeof DashboardGoldRoute
   DashboardIncomeRoute: typeof DashboardIncomeRoute
   DashboardKycRoute: typeof DashboardKycRoute
   DashboardLeaderboardRoute: typeof DashboardLeaderboardRoute
@@ -572,6 +695,9 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardBadgesRoute: DashboardBadgesRoute,
+  DashboardCalculatorRoute: DashboardCalculatorRoute,
+  DashboardGoldRoute: DashboardGoldRoute,
   DashboardIncomeRoute: DashboardIncomeRoute,
   DashboardKycRoute: DashboardKycRoute,
   DashboardLeaderboardRoute: DashboardLeaderboardRoute,

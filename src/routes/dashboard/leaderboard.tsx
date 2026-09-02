@@ -9,13 +9,23 @@ export const Route = createFileRoute("/dashboard/leaderboard")({
 function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState<"all" | "week" | "month">("all");
 
   useEffect(() => {
-    getLeaderboard()
-      .then((d) => setLeaderboard(d.leaderboard || []))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+    loadLeaderboard();
+  }, [period]);
+
+  const loadLeaderboard = async () => {
+    setLoading(true);
+    try {
+      const d = await getLeaderboard({ data: { period } });
+      setLeaderboard(d.leaderboard || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const rankColors: Record<string, string> = {
     bronze: "bg-orange-100 text-orange-700",
@@ -37,12 +47,29 @@ function LeaderboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl">
-        Top <span className="italic text-gold">Performers</span>
-      </h1>
-      <p className="text-xs text-emerald/70">
-        Leaderboard ranked by total matching pairs earned.
-      </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl">
+            Top <span className="italic text-gold">Performers</span>
+          </h1>
+          <p className="text-xs text-emerald/70">
+            Leaderboard ranked by total matching pairs earned.
+          </p>
+        </div>
+        <div className="flex rounded border border-gold/20 bg-cream overflow-hidden">
+          {(["all", "week", "month"] as const).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPeriod(p)}
+              className={`px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+                period === p ? "bg-emerald text-cream" : "text-emerald/60 hover:bg-emerald/5"
+              }`}
+            >
+              {p === "all" ? "All Time" : p === "week" ? "This Week" : "This Month"}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {leaderboard.length === 0 ? (
         <div className="rounded border border-gold/20 bg-cream p-12 text-center">

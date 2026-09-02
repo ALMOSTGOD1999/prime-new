@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { getTreeVisualization } from "../../functions/user/tree";
 
 export const Route = createFileRoute("/dashboard/tree")({
@@ -9,6 +9,11 @@ export const Route = createFileRoute("/dashboard/tree")({
 function TreePage() {
   const [tree, setTree] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const lastPos = useRef({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     getTreeVisualization()
@@ -16,6 +21,35 @@ function TreePage() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    setZoom((prev) => Math.min(3, Math.max(0.3, prev + (e.deltaY > 0 ? -0.1 : 0.1))));
+  }, []);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    setDragging(true);
+    lastPos.current = { x: e.clientX, y: e.clientY };
+  }, []);
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastPos.current.x;
+      const dy = e.clientY - lastPos.current.y;
+      lastPos.current = { x: e.clientX, y: e.clientY };
+      setPan((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+    },
+    [dragging]
+  );
+
+  const handleMouseUp = useCallback(() => setDragging(false), []);
+
+  const resetView = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
 
   if (loading) {
     return (
@@ -27,17 +61,44 @@ function TreePage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="font-display text-3xl">
-        My <span className="italic text-gold">Tree</span>
-      </h1>
-      <p className="text-xs text-emerald/70">
-        Visual binary tree — 3 levels deep from your position.
-      </p>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl">
+            My <span className="italic text-gold">Tree</span>
+          </h1>
+          <p className="text-xs text-emerald/70">
+            Interactive binary tree — scroll to zoom, drag to pan.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setZoom((z) => Math.min(3, z + 0.2))} className="border border-gold/40 px-3 py-1 text-xs font-bold hover:bg-gold/10">+</button>
+          <span className="text-xs text-emerald/60">{Math.round(zoom * 100)}%</span>
+          <button onClick={() => setZoom((z) => Math.max(0.3, z - 0.2))} className="border border-gold/40 px-3 py-1 text-xs font-bold hover:bg-gold/10">−</button>
+          <button onClick={resetView} className="border border-emerald/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest hover:bg-emerald/10">Reset</button>
+        </div>
+      </div>
 
       {tree ? (
-        <div className="overflow-x-auto rounded border border-gold/20 bg-cream p-6">
-          <VisualTree node={tree} isRoot={true} />
+        <div
+          ref={containerRef}
+          className="overflow-hidden rounded border border-gold/20 bg-cream"
+          style={{ cursor: dragging ? "grabbing" : "grab", minHeight: "500px" }}
+          onWheel={handleWheel}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          <div
+            className="origin-center p-8"
+            style={{
+              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+              transition: dragging ? "none" : "transform 0.15s ease-out",
+            }}
+          >
+            <VisualTree node={tree} isRoot={true} />
+          </div>
         </div>
       ) : (
         <div className="rounded border border-gold/20 bg-cream p-12 text-center">
