@@ -56,8 +56,15 @@ export const signup = createServerFn({ method: "POST" })
       })
       .returning();
 
-    // Update referral code to be based on user id
-    const code = generateReferralCode(newUser.id);
+    // Generate unique random referral code
+    let code: string;
+    let attempts = 0;
+    do {
+      code = generateReferralCode(newUser.id);
+      const dupe = await db.select({ id: users.id }).from(users).where(eq(users.referralCode, code));
+      if (dupe.length === 0) break;
+      attempts++;
+    } while (attempts < 10);
     await db.update(users).set({ referralCode: code }).where(eq(users.id, newUser.id));
 
     // Create wallet

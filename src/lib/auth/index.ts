@@ -106,9 +106,10 @@ export async function getUserFromRequest(request: Request) {
   return payload;
 }
 
-// ── Generate referral code ─────────────────────────────
-export function generateReferralCode(userId: number): string {
-  return `PR${String(userId).padStart(4, "0")}`;
+// ── Generate random referral code ──────────────────────
+export function generateReferralCode(_userId: number): string {
+  const num = Math.floor(1000 + Math.random() * 9000); // random 4-digit: 1000-9999
+  return `PR${num}`;
 }
 
 // ── Seed admin ─────────────────────────────────────────
