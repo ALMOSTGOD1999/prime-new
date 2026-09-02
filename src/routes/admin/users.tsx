@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getAdminUsers } from "../../functions/admin/users";
 import { impersonateUser } from "../../functions/admin/impersonate";
+import { deleteUser } from "../../functions/admin/deleteuser";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsers,
@@ -13,6 +14,9 @@ function AdminUsers() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [impersonating, setImpersonating] = useState<number | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null);
+  const [deleteKey, setDeleteKey] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
 
   const fetchUsers = (s: string, p: number) => {
@@ -43,6 +47,22 @@ function AdminUsers() {
       alert(err.message || "Impersonation failed");
     } finally {
       setImpersonating(null);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget || deleteKey !== "DELETE") return;
+    setDeleting(true);
+    try {
+      await deleteUser({ data: { userId: deleteTarget.id, confirmKey: deleteKey } });
+      alert(`${deleteTarget.name} has been deleted`);
+      setDeleteTarget(null);
+      setDeleteKey("");
+      fetchUsers(search, page);
+    } catch (err: any) {
+      alert(err.message || "Delete failed");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -163,18 +183,27 @@ function AdminUsers() {
                       </td>
                       <td className="px-6 py-3.5 text-right">
                         {!user.isAdmin && (
-                          <button
-                            onClick={() => handleImpersonate(user.id, user.name)}
-                            disabled={impersonating === user.id}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-gold/25 bg-gold/5 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-gold transition-all duration-200 hover:bg-gold/10 hover:border-gold/40 hover:shadow-sm disabled:opacity-40"
-                          >
-                            {impersonating === user.id ? (
-                              <div className="h-3 w-3 animate-spin rounded-full border border-gold border-t-transparent" />
-                            ) : (
-                              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" /></svg>
-                            )}
-                            {impersonating === user.id ? "..." : "Login"}
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleImpersonate(user.id, user.name)}
+                              disabled={impersonating === user.id}
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-gold/25 bg-gold/5 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-gold transition-all duration-200 hover:bg-gold/10 hover:border-gold/40 hover:shadow-sm disabled:opacity-40"
+                            >
+                              {impersonating === user.id ? (
+                                <div className="h-3 w-3 animate-spin rounded-full border border-gold border-t-transparent" />
+                              ) : (
+                                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" /></svg>
+                              )}
+                              {impersonating === user.id ? "..." : "Login"}
+                            </button>
+                            <button
+                              onClick={() => { setDeleteTarget({ id: user.id, name: user.name }); setDeleteKey(""); }}
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-600 transition-all duration-200 hover:bg-red-100 hover:border-red-300"
+                            >
+                              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+                              Delete
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -213,6 +242,50 @@ function AdminUsers() {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg border border-red-200 bg-cream shadow-2xl">
+            <div className="border-b border-red-100 px-6 py-4">
+              <h3 className="font-display text-lg text-red-600">Delete User</h3>
+            </div>
+            <div className="px-6 py-4">
+              <p className="text-sm text-emerald/70">
+                Are you sure you want to delete <strong className="text-emerald">{deleteTarget.name}</strong>?
+                This action cannot be undone.
+              </p>
+              <p className="mt-2 text-xs text-emerald/50">
+                Type <strong className="text-red-600">DELETE</strong> to confirm:
+              </p>
+              <input
+                type="text"
+                value={deleteKey}
+                onChange={(e) => setDeleteKey(e.target.value)}
+                placeholder="Type DELETE"
+                className="mt-2 w-full rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm outline-none transition-all placeholder:text-emerald/40 focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                autoFocus
+                onKeyDown={(e) => { if (e.key === "Enter" && deleteKey === "DELETE") handleDelete(); }}
+              />
+            </div>
+            <div className="flex items-center justify-end gap-3 border-t border-red-100 px-6 py-4">
+              <button
+                onClick={() => { setDeleteTarget(null); setDeleteKey(""); }}
+                className="rounded-lg border border-gold/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleteKey !== "DELETE" || deleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-white transition-all hover:bg-red-700 disabled:opacity-40 disabled:hover:bg-red-600"
+              >
+                {deleting ? "Deleting..." : "Delete User"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
