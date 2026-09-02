@@ -15,7 +15,7 @@ export const signup = createServerFn({ method: "POST" })
     }
 
     // Check if email already exists
-    const existing = await db.select().from(users).where(eq(users.email, email));
+    const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email));
     if (existing.length > 0) {
       throw new Error("Email already registered");
     }
@@ -37,7 +37,7 @@ export const signup = createServerFn({ method: "POST" })
         preferredLeg = suffix === "L" ? "left" : "right";
       }
 
-      const referrer = await db.select().from(users).where(eq(users.referralCode, cleanCode));
+      const referrer = await db.select({ id: users.id }).from(users).where(eq(users.referralCode, cleanCode));
       if (referrer.length === 0) {
         throw new Error("Invalid referral code");
       }

@@ -22,7 +22,9 @@ RUN npm install --no-save drizzle-kit
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/drizzle.config.ts ./
 COPY --from=builder /app/src/lib/db/schema.ts ./src/lib/db/schema.ts
+COPY start.sh ./start.sh
+RUN chmod +x ./start.sh
 
 EXPOSE 3333
 
-CMD ["sh", "-c", "npx drizzle-kit push --force || echo 'DB migration failed, starting server anyway...'; exec node .output/server/index.mjs"]
+CMD ["./start.sh"]

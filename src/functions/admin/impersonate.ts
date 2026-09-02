@@ -26,7 +26,7 @@ export const impersonateUser = createServerFn({ method: "POST" })
 
     // Verify target user exists
     const targetUser = await db
-      .select()
+      .select({ id: users.id, email: users.email, name: users.name, isAdmin: users.isAdmin, referralCode: users.referralCode })
       .from(users)
       .where(eq(users.id, data.targetUserId));
     if (targetUser.length === 0) {
@@ -79,7 +79,7 @@ export const stopImpersonation = createServerFn({ method: "POST" })
 
     // Get admin info for the restored token
     const adminUser = await db
-      .select()
+      .select({ id: users.id, email: users.email, name: users.name, referralCode: users.referralCode })
       .from(users)
       .where(eq(users.id, impersonatorId));
     if (adminUser.length === 0) {

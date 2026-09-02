@@ -15,7 +15,15 @@ export const login = createServerFn({ method: "POST" })
 
     // Look up by email OR referral code
     const result = await db
-      .select()
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        referralCode: users.referralCode,
+        passwordHash: users.passwordHash,
+        isAdmin: users.isAdmin,
+        isActive: users.isActive,
+      })
       .from(users)
       .where(or(eq(users.email, userId), eq(users.referralCode, userId)));
 
@@ -23,7 +31,7 @@ export const login = createServerFn({ method: "POST" })
       throw new Error("Invalid credentials");
     }
 
-    const user = result[0];
+    const user = result[0]!;
     const valid = await verifyPassword(password, user.passwordHash);
     if (!valid) {
       throw new Error("Invalid credentials");
