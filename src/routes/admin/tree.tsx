@@ -92,7 +92,7 @@ function AdminTreePage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-96 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-96 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -125,7 +125,7 @@ function AdminTreePage() {
       {tree ? (
         <div
           ref={containerRef}
-          className="overflow-hidden rounded-lg border border-gold/15 bg-white shadow-sm"
+          className="overflow-hidden rounded-lg border border-gold/15 bg-card shadow-sm"
           style={{ cursor: dragging ? "grabbing" : "grab", minHeight: "500px" }}
           onWheel={handleWheel}
           onMouseDown={handleMouseDown}
@@ -147,7 +147,7 @@ function AdminTreePage() {
           </div>
         </div>
       ) : (
-        <div className="rounded-lg border border-gold/15 bg-white p-12 text-center">
+        <div className="rounded-lg border border-gold/15 bg-card p-12 text-center">
           <p className="text-4xl">🌳</p>
           <p className="mt-3 text-xs text-emerald/60">No organization data yet.</p>
         </div>
@@ -217,7 +217,7 @@ function TreeNode({
         {/* Status + Rank badges */}
         <div className="mt-1.5 flex items-center justify-center gap-1">
           <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[7px] sm:text-[8px] font-semibold ${
-            node.isActive ? "bg-emerald/10 text-emerald-700" : "bg-red-50 text-red-500"
+            node.isActive ? "bg-emerald/10 text-emerald-700" : "bg-destructive/10 text-red-500"
           }`}>
             <span className={`mr-0.5 h-1 w-1 rounded-full ${node.isActive ? "bg-emerald-500" : "bg-red-400"}`} />
             {node.isActive ? "Active" : "Inactive"}
@@ -231,7 +231,7 @@ function TreeNode({
         {hasChildren && (
           <button
             onClick={(e) => { e.stopPropagation(); toggleCollapse(node.id); }}
-            className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 z-10 flex h-5 w-5 items-center justify-center rounded-full border border-gold/30 bg-white text-[10px] font-bold text-emerald shadow-sm transition-colors hover:bg-emerald/5 hover:border-emerald/40"
+            className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 z-10 flex h-5 w-5 items-center justify-center rounded-full border border-gold/30 bg-card text-[10px] font-bold text-emerald shadow-sm transition-colors hover:bg-emerald/5 hover:border-emerald/40"
           >
             {isCollapsed ? "+" : "−"}
           </button>

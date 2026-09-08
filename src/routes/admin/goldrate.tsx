@@ -46,7 +46,7 @@ function AdminGoldRatePage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-48 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-48 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -61,7 +61,7 @@ function AdminGoldRatePage() {
       </p>
 
       {/* Set Rate */}
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Set Today's Gold Rate</h3>
         <div className="flex flex-col gap-3 sm:flex-row">
           <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ function AdminGoldRatePage() {
       </div>
 
       {/* Rate History */}
-      <div className="rounded border border-gold/20 bg-cream">
+      <div className="rounded border border-gold/20 bg-background">
         <div className="border-b border-gold/10 px-6 py-4">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Rate History</h3>
         </div>

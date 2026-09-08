@@ -61,7 +61,7 @@ function AdminHistory() {
           <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald/60">Loading history...</span>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-gold/10 bg-cream shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-gold/10 bg-background shadow-sm">
           {tab === "users" ? (
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -96,7 +96,7 @@ function AdminHistory() {
                       </td>
                       <td className="px-6 py-3.5">
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ${
-                          user.isActive ? "bg-emerald/5 text-emerald ring-emerald/20" : "bg-red-50 text-red-600 ring-red-100"
+                          user.isActive ? "bg-emerald/5 text-emerald ring-emerald/20" : "bg-destructive/10 text-red-600 ring-destructive/20"
                         }`}>
                           <span className={`h-1 w-1 rounded-full ${user.isActive ? "bg-emerald" : "bg-red-400"}`} />
                           {user.isActive ? "Active" : "Inactive"}

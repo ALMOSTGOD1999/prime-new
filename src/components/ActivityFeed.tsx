@@ -49,7 +49,7 @@ export function ActivityFeed({ limit = 10 }: { limit?: number }) {
     matching_income: "border-gold/40 bg-gold/5",
     award: "border-yellow-300 bg-yellow-50",
     rank: "border-purple-300 bg-purple-50",
-    withdrawal: "border-red-300 bg-red-50",
+    withdrawal: "border-red-300 bg-destructive/10",
     login: "border-gray-300 bg-gray-50",
   };
 
@@ -57,7 +57,7 @@ export function ActivityFeed({ limit = 10 }: { limit?: number }) {
     return (
       <div className="space-y-2">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-10 animate-pulse rounded border border-gold/10 bg-cream" />
+          <div key={i} className="h-10 animate-pulse rounded border border-gold/10 bg-background" />
         ))}
       </div>
     );
@@ -72,7 +72,7 @@ export function ActivityFeed({ limit = 10 }: { limit?: number }) {
       {activities.map((a) => (
         <div
           key={a.id}
-          className={`flex items-start gap-2 rounded border p-2 text-xs ${typeColors[a.type] || "border-gold/10 bg-cream/50"}`}
+          className={`flex items-start gap-2 rounded border p-2 text-xs ${typeColors[a.type] || "border-gold/10 bg-background/50"}`}
         >
           <span className="mt-0.5 text-sm">{typeIcons[a.type] || "📌"}</span>
           <div className="flex-1 min-w-0">

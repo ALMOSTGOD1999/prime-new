@@ -38,7 +38,12 @@ export const getAdminUsers = createServerFn({ method: "GET" })
     }).from(users);
 
     if (search) {
-      query = query.where(sql`${users.name} ILIKE ${`%${search}%`} OR ${users.email} ILIKE ${`%${search}%`}`);
+      const numId = Number(search.replace(/^#/, ""));
+      if (!isNaN(numId) && numId > 0) {
+        query = query.where(sql`${users.id} = ${numId} OR ${users.referralCode} ILIKE ${`%${search}%`} OR ${users.name} ILIKE ${`%${search}%`} OR ${users.email} ILIKE ${`%${search}%`}`);
+      } else {
+        query = query.where(sql`${users.referralCode} ILIKE ${`%${search}%`} OR ${users.name} ILIKE ${`%${search}%`} OR ${users.email} ILIKE ${`%${search}%`}`);
+      }
     }
 
     const allUsers = await query.limit(limit).offset(offset);

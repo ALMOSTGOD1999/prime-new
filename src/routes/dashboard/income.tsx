@@ -24,7 +24,7 @@ function IncomePage() {
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
         <div className="grid grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded border border-gold/20 bg-cream" />
+            <div key={i} className="h-24 animate-pulse rounded border border-gold/20 bg-background" />
           ))}
         </div>
       </div>
@@ -58,7 +58,7 @@ function IncomePage() {
           </p>
           <p className="mt-1 text-[10px] text-emerald/60">20% per pair</p>
         </div>
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Earned</p>
           <p className="mt-2 font-display text-2xl text-emerald">
             ₹{income.totalEarned.toLocaleString("en-IN")}
@@ -67,7 +67,7 @@ function IncomePage() {
         </div>
       </div>
 
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-gold">Today's Pairs</p>
@@ -89,7 +89,7 @@ function IncomePage() {
       </div>
 
       {income.awards && income.awards.length > 0 && (
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">
             Matching Awards
           </h3>
@@ -125,7 +125,7 @@ function IncomePage() {
         ))}
       </div>
 
-      <div className="rounded border border-gold/20 bg-cream">
+      <div className="rounded border border-gold/20 bg-background">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>

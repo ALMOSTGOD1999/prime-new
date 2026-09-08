@@ -40,7 +40,7 @@ function LeaderboardPage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-64 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-64 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -56,7 +56,7 @@ function LeaderboardPage() {
             Leaderboard ranked by total matching pairs earned.
           </p>
         </div>
-        <div className="flex rounded border border-gold/20 bg-cream overflow-hidden">
+        <div className="flex rounded border border-gold/20 bg-background overflow-hidden">
           {(["all", "week", "month"] as const).map((p) => (
             <button
               key={p}
@@ -72,12 +72,12 @@ function LeaderboardPage() {
       </div>
 
       {leaderboard.length === 0 ? (
-        <div className="rounded border border-gold/20 bg-cream p-12 text-center">
+        <div className="rounded border border-gold/20 bg-background p-12 text-center">
           <p className="text-4xl">🏆</p>
           <p className="mt-4 text-xs text-emerald/60">No data yet. Start building your team!</p>
         </div>
       ) : (
-        <div className="rounded border border-gold/20 bg-cream">
+        <div className="rounded border border-gold/20 bg-background">
           {/* Top 3 Podium */}
           {leaderboard.length >= 3 && (
             <div className="flex items-end justify-center gap-4 border-b border-gold/10 px-6 py-8">

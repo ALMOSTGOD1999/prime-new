@@ -68,7 +68,7 @@ function DashboardAddUser() {
           <p className="mt-1 text-xs text-emerald/70">{created.name} ({created.referralCode})</p>
         </div>
 
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">Share Referral Links</h3>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <button
@@ -118,7 +118,7 @@ function DashboardAddUser() {
         </p>
       </div>
 
-      <form onSubmit={handleAdd} className="space-y-5 rounded border border-gold/20 bg-cream p-6">
+      <form onSubmit={handleAdd} className="space-y-5 rounded border border-gold/20 bg-background p-6">
         <div>
           <label className="mb-1.5 block text-[10px] uppercase tracking-widest text-emerald/70">Full Name</label>
           <input

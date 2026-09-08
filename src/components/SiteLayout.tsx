@@ -4,7 +4,7 @@ import { Footer } from "./Footer";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-cream font-sans text-emerald">
+    <div className="min-h-screen bg-background font-sans text-emerald">
       <Navbar />
       <main>{children}</main>
       <Footer />

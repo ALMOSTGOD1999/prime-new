@@ -111,7 +111,7 @@ function AdminBulkPage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-64 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-64 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -156,7 +156,7 @@ function AdminBulkPage() {
 
       {/* Notify Form */}
       {action === "notify" && (
-        <div className="rounded border border-gold/20 bg-cream p-4">
+        <div className="rounded border border-gold/20 bg-background p-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <input
               type="text"
@@ -184,7 +184,7 @@ function AdminBulkPage() {
       )}
 
       {/* Users Table */}
-      <div className="rounded border border-gold/20 bg-cream">
+      <div className="rounded border border-gold/20 bg-background">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -214,7 +214,7 @@ function AdminBulkPage() {
                   <td className="px-4 py-3 text-xs font-semibold">{u.name}</td>
                   <td className="px-4 py-3 text-[10px] text-emerald/70">{u.referralCode}</td>
                   <td className="px-4 py-3">
-                    <span className={`rounded px-2 py-0.5 text-[10px] font-bold ${u.isActive ? "bg-emerald/10 text-emerald" : "bg-red-50 text-red-600"}`}>
+                    <span className={`rounded px-2 py-0.5 text-[10px] font-bold ${u.isActive ? "bg-emerald/10 text-emerald" : "bg-destructive/10 text-red-600"}`}>
                       {u.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>

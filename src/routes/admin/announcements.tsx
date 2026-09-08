@@ -57,14 +57,14 @@ function AdminAnnouncementsPage() {
   const priorityColors: Record<string, string> = {
     normal: "bg-blue-100 text-blue-700",
     important: "bg-orange-100 text-orange-700",
-    urgent: "bg-red-100 text-red-700",
+    urgent: "bg-destructive/20 text-red-700",
   };
 
   if (loading) {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-48 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-48 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -76,7 +76,7 @@ function AdminAnnouncementsPage() {
       </h1>
 
       {/* Create Announcement */}
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Send New Announcement</h3>
         <div className="space-y-4">
           <div>
@@ -124,7 +124,7 @@ function AdminAnnouncementsPage() {
       </div>
 
       {/* Announcement History */}
-      <div className="rounded border border-gold/20 bg-cream">
+      <div className="rounded border border-gold/20 bg-background">
         <div className="border-b border-gold/10 px-6 py-4">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">History</h3>
         </div>

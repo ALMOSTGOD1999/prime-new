@@ -34,7 +34,7 @@ export function WelcomeIntro() {
   return (
     <div
       aria-hidden
-      className="intro-screen fixed inset-0 z-[60] flex items-center justify-center overflow-hidden bg-cream"
+      className="intro-screen fixed inset-0 z-[60] flex items-center justify-center overflow-hidden bg-background"
     >
       {/* Floating jewellery & diamond background */}
       <div className="absolute inset-0">

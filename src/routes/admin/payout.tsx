@@ -51,7 +51,7 @@ function AdminPayoutPage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-64 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-64 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -85,7 +85,7 @@ function AdminPayoutPage() {
       </div>
 
       {/* Payouts Table */}
-      <div className="rounded border border-gold/20 bg-cream">
+      <div className="rounded border border-gold/20 bg-background">
         {filtered.length === 0 ? (
           <div className="p-12 text-center text-xs text-emerald/60">No payouts found</div>
         ) : (
@@ -116,7 +116,7 @@ function AdminPayoutPage() {
                           p.status === "approved"
                             ? "bg-emerald/10 text-emerald"
                             : p.status === "rejected"
-                              ? "bg-red-50 text-red-600"
+                              ? "bg-destructive/10 text-red-600"
                               : "bg-gold/10 text-gold"
                         }`}
                       >
@@ -140,7 +140,7 @@ function AdminPayoutPage() {
                           <button
                             onClick={() => handleProcess(p.id, "rejected")}
                             disabled={processing === p.id}
-                            className="rounded border border-red-300 px-3 py-1 text-[10px] font-semibold text-red-600 transition-all hover:bg-red-50 disabled:opacity-50"
+                            className="rounded border border-red-300 px-3 py-1 text-[10px] font-semibold text-red-600 transition-all hover:bg-destructive/10 disabled:opacity-50"
                           >
                             Reject
                           </button>

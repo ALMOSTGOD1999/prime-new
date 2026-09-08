@@ -45,7 +45,7 @@ function AdminAddUser() {
   };
 
   const inputClass =
-    "w-full rounded-lg border border-gold/15 bg-cream px-4 py-2.5 text-sm outline-none transition-all duration-200 placeholder:text-emerald/70 focus:border-gold/40 focus:ring-2 focus:ring-gold/10";
+    "w-full rounded-lg border border-gold/15 bg-background px-4 py-2.5 text-sm outline-none transition-all duration-200 placeholder:text-emerald/70 focus:border-gold/40 focus:ring-2 focus:ring-gold/10";
 
   return (
     <div className="mx-auto max-w-lg space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -58,7 +58,7 @@ function AdminAddUser() {
         </p>
       </div>
 
-      <form onSubmit={handleAdd} className="space-y-5 rounded-xl border border-gold/10 bg-cream p-6 shadow-sm">
+      <form onSubmit={handleAdd} className="space-y-5 rounded-xl border border-gold/10 bg-background p-6 shadow-sm">
         <div>
           <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">Full Name</label>
           <input

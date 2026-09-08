@@ -23,7 +23,7 @@ function BadgesPage() {
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-32 animate-pulse rounded border border-gold/20 bg-cream" />
+            <div key={i} className="h-32 animate-pulse rounded border border-gold/20 bg-background" />
           ))}
         </div>
       </div>
@@ -43,7 +43,7 @@ function BadgesPage() {
       </div>
 
       {/* Progress Bar */}
-      <div className="rounded border border-gold/20 bg-cream p-4">
+      <div className="rounded border border-gold/20 bg-background p-4">
         <div className="h-3 rounded-full bg-emerald/10">
           <div
             className="h-3 rounded-full bg-gradient-to-r from-gold to-emerald transition-all"
@@ -60,7 +60,7 @@ function BadgesPage() {
             className={`rounded border p-6 transition-all ${
               badge.earned
                 ? "border-gold/40 bg-gold/5 shadow-sm"
-                : "border-gold/10 bg-cream/50 opacity-50"
+                : "border-gold/10 bg-background/50 opacity-50"
             }`}
           >
             <div className="flex items-start gap-4">

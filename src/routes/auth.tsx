@@ -111,7 +111,7 @@ function AuthPage() {
         </div>
 
         {error && (
-          <div className="mb-6 rounded border border-red-300 bg-red-50 p-3 text-xs text-red-700">
+          <div className="mb-6 rounded border border-red-300 bg-destructive/10 p-3 text-xs text-red-700">
             {error}
           </div>
         )}

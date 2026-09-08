@@ -84,7 +84,7 @@ function ProfilePage() {
     return (
       <div className="space-y-6">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-64 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-64 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -96,7 +96,7 @@ function ProfilePage() {
       </h1>
 
       {/* Profile Card */}
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3">
@@ -170,7 +170,7 @@ function ProfilePage() {
       </div>
 
       {/* Rank Card */}
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Rank & Progress</h3>
         <div className="flex items-center gap-4">
           <div className={`rounded-lg border px-4 py-2 text-sm font-bold uppercase ${rankColors[rankInfo?.currentRank || "bronze"]}`}>
@@ -192,7 +192,7 @@ function ProfilePage() {
       </div>
 
       {/* Change Password */}
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Change Password</h3>
         <div className="space-y-4">
           <div>

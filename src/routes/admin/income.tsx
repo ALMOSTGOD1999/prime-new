@@ -119,7 +119,7 @@ function AdminIncome() {
       </div>
 
       {/* Income Table */}
-      <div className="overflow-hidden rounded-xl border border-gold/10 bg-cream shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-gold/10 bg-background shadow-sm">
         {loading ? (
           <div className="flex items-center justify-center gap-3 py-16">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-gold border-t-transparent" />

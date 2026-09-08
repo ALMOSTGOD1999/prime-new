@@ -66,7 +66,7 @@ function CalculatorPage() {
       </p>
 
       {/* Input Controls */}
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div>
             <label className="mb-2 block text-[10px] uppercase tracking-widest text-emerald/70">
@@ -134,7 +134,7 @@ function CalculatorPage() {
 
       {/* Chart */}
       {monthlyData.length > 0 && (
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Cumulative Earnings</h3>
           <div className="flex items-end gap-2" style={{ height: "200px" }}>
             {monthlyData.map((d, i) => {
@@ -152,7 +152,7 @@ function CalculatorPage() {
       )}
 
       {/* Disclaimer */}
-      <div className="rounded border border-gold/10 bg-cream/50 p-4">
+      <div className="rounded border border-gold/10 bg-background/50 p-4">
         <p className="text-[10px] text-emerald/60">
           ⚠️ This is a projection tool only. Actual earnings depend on team activity, pair matching, and daily caps.
           Income is not guaranteed. Binary MLM involves building a network and matching active members on both legs.

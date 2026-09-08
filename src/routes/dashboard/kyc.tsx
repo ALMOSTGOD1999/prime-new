@@ -61,14 +61,14 @@ function KycPage() {
     not_submitted: "bg-gray-100 text-gray-700",
     pending: "bg-yellow-100 text-yellow-700",
     approved: "bg-emerald/10 text-emerald",
-    rejected: "bg-red-50 text-red-600",
+    rejected: "bg-destructive/10 text-red-600",
   };
 
   if (loading) {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-64 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-64 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -80,7 +80,7 @@ function KycPage() {
       </h1>
 
       {/* Status Banner */}
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <div className="flex items-center gap-3">
           <span className="text-2xl">📋</span>
           <div>
@@ -97,7 +97,7 @@ function KycPage() {
 
       {/* KYC Form */}
       {status !== "approved" && (
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">
             {status === "pending" ? "Update KYC Details" : "Submit KYC Details"}
           </h3>
@@ -171,7 +171,7 @@ function KycPage() {
       )}
 
       {/* KYC Info */}
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">Why KYC?</h3>
         <ul className="space-y-2 text-xs text-emerald/70">
           <li className="flex items-start gap-2">

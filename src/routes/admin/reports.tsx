@@ -23,7 +23,7 @@ function AdminReportsPage() {
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
         <div className="grid grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded border border-gold/20 bg-cream" />
+            <div key={i} className="h-24 animate-pulse rounded border border-gold/20 bg-background" />
           ))}
         </div>
       </div>
@@ -38,19 +38,19 @@ function AdminReportsPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Users</p>
           <p className="mt-2 font-display text-3xl text-emerald">{data?.totalUsers || 0}</p>
         </div>
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Active Users</p>
           <p className="mt-2 font-display text-3xl text-gold">{data?.activeUsers || 0}</p>
         </div>
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Income Paid</p>
           <p className="mt-2 font-display text-3xl text-emerald">₹{(data?.totalIncomePaid || 0).toLocaleString("en-IN")}</p>
         </div>
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Withdrawals</p>
           <p className="mt-2 font-display text-3xl text-gold">₹{(data?.totalWithdrawals || 0).toLocaleString("en-IN")}</p>
         </div>
@@ -58,7 +58,7 @@ function AdminReportsPage() {
 
       {/* Daily Signups Chart */}
       {data?.dailySignups && data.dailySignups.length > 0 && (
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Daily Signups (Last 30 Days)</h3>
           <div className="flex items-end gap-1" style={{ height: "150px" }}>
             {data.dailySignups.slice(0, 30).reverse().map((day: any, i: number) => {
@@ -82,7 +82,7 @@ function AdminReportsPage() {
 
       {/* Top Earners */}
       {data?.topEarners && data.topEarners.length > 0 && (
-        <div className="rounded border border-gold/20 bg-cream">
+        <div className="rounded border border-gold/20 bg-background">
           <div className="border-b border-gold/10 px-6 py-4">
             <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Top 10 Earners</h3>
           </div>

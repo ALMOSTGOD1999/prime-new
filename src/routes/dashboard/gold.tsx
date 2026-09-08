@@ -63,7 +63,7 @@ function GoldPricePage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-48 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-48 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -75,7 +75,7 @@ function GoldPricePage() {
       </h1>
 
       {/* Current Price */}
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[10px] uppercase tracking-widest text-emerald/70">Today's Gold Rate (per gram)</p>
@@ -93,7 +93,7 @@ function GoldPricePage() {
       </div>
 
       {/* Price Alerts */}
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Price Alerts</h3>
         <div className="flex flex-col gap-3 sm:flex-row">
           <select

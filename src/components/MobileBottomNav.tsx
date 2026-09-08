@@ -10,7 +10,7 @@ interface MobileBottomNavProps {
 export function MobileBottomNav({ isAdmin = false, unreadCount = 0 }: MobileBottomNavProps) {
   if (isAdmin) {
     return (
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-gold/20 bg-cream/95 backdrop-blur-sm sm:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-gold/20 bg-background/95 backdrop-blur-sm sm:hidden">
         <div className="flex items-center justify-around py-2">
           <NavLink href="/admin" icon="📊" label="Home" />
           <NavLink href="/admin/users" icon="👥" label="Users" />
@@ -23,7 +23,7 @@ export function MobileBottomNav({ isAdmin = false, unreadCount = 0 }: MobileBott
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-gold/20 bg-cream/95 backdrop-blur-sm sm:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-gold/20 bg-background/95 backdrop-blur-sm sm:hidden">
       <div className="flex items-center justify-around py-2">
         <NavLink href="/dashboard" icon="🏠" label="Home" />
         <NavLink href="/dashboard/add-user" icon="➕" label="Add" />

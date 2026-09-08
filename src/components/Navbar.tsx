@@ -32,7 +32,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gold/15 bg-cream/95 backdrop-blur-md shadow-sm shadow-gold/5">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gold/15 bg-background/95 backdrop-blur-md shadow-sm shadow-gold/5">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link to="/" className="text-emerald transition-opacity hover:opacity-80">
           <Wordmark className="text-xl font-bold uppercase" />
@@ -108,7 +108,7 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="border-t border-gold/10 bg-cream/98 px-6 py-4 shadow-lg backdrop-blur-md md:hidden">
+        <div className="border-t border-gold/10 bg-background/98 px-6 py-4 shadow-lg backdrop-blur-md md:hidden">
           <div className="flex flex-col gap-2">
             {links.map((link) => (
               <Link

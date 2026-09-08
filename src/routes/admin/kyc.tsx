@@ -51,7 +51,7 @@ function AdminKycPage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-64 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-64 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -87,12 +87,12 @@ function AdminKycPage() {
       {/* KYC List */}
       <div className="space-y-4">
         {filtered.length === 0 ? (
-          <div className="rounded border border-gold/20 bg-cream p-12 text-center text-xs text-emerald/60">
+          <div className="rounded border border-gold/20 bg-background p-12 text-center text-xs text-emerald/60">
             No KYC submissions found
           </div>
         ) : (
           filtered.map((k) => (
-            <div key={k.id} className="rounded border border-gold/20 bg-cream p-6">
+            <div key={k.id} className="rounded border border-gold/20 bg-background p-6">
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-sm font-bold">{k.userName}</h3>
@@ -103,7 +103,7 @@ function AdminKycPage() {
                     k.status === "approved"
                       ? "bg-emerald/10 text-emerald"
                       : k.status === "rejected"
-                        ? "bg-red-50 text-red-600"
+                        ? "bg-destructive/10 text-red-600"
                         : "bg-gold/10 text-gold"
                   }`}
                 >
@@ -154,7 +154,7 @@ function AdminKycPage() {
                   <button
                     onClick={() => handleProcess(k.id, "rejected")}
                     disabled={processing === k.id}
-                    className="rounded border border-red-300 px-4 py-2 text-[10px] font-semibold text-red-600 transition-all hover:bg-red-50 disabled:opacity-50"
+                    className="rounded border border-red-300 px-4 py-2 text-[10px] font-semibold text-red-600 transition-all hover:bg-destructive/10 disabled:opacity-50"
                   >
                     Reject
                   </button>

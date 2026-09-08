@@ -35,7 +35,7 @@ function AdminLayout() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex items-center gap-3">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-gold border-t-transparent" />
           <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald/70">Loading...</span>
@@ -62,7 +62,7 @@ function AdminLayout() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-cream">
+    <div className="flex min-h-screen bg-background">
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity lg:hidden"
@@ -97,8 +97,8 @@ function AdminLayout() {
                 activeOptions={{ exact: link.to === "/admin" }}
                 className={`group flex items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold uppercase tracking-[0.15em] transition-all duration-200 ${
                   isActive
-                    ? "bg-cream/15 text-gold shadow-sm ring-1 ring-gold/20"
-                    : "text-cream/60 hover:bg-cream/5 hover:text-cream"
+                    ? "bg-background/15 text-gold shadow-sm ring-1 ring-gold/20"
+                    : "text-cream/60 hover:bg-background/5 hover:text-cream"
                 }`}
                 onClick={() => setSidebarOpen(false)}
               >
@@ -116,7 +116,7 @@ function AdminLayout() {
 
         {/* User + Logout */}
         <div className="border-t border-cream/10 p-4">
-          <div className="mb-4 flex items-center gap-3 rounded-lg bg-cream/5 px-4 py-3">
+          <div className="mb-4 flex items-center gap-3 rounded-lg bg-background/5 px-4 py-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-[11px] font-bold text-gold ring-1 ring-gold/30">
               {user?.name?.charAt(0)?.toUpperCase() || "A"}
             </div>
@@ -138,7 +138,7 @@ function AdminLayout() {
       {/* Main content */}
       <div className="flex flex-1 flex-col">
         {/* Mobile header */}
-        <header className="flex items-center border-b border-gold/10 bg-cream/80 px-4 py-3 backdrop-blur-md lg:hidden">
+        <header className="flex items-center border-b border-gold/10 bg-background/80 px-4 py-3 backdrop-blur-md lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
             className="mr-4 rounded-lg p-1.5 text-emerald transition-colors hover:bg-emerald/5"

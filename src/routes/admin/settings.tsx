@@ -46,7 +46,7 @@ function AdminSettings() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Admin Credentials */}
-        <div className="rounded-xl border border-gold/10 bg-cream p-6 shadow-sm">
+        <div className="rounded-xl border border-gold/10 bg-background p-6 shadow-sm">
           <div className="mb-5 flex items-center gap-3">
             <div className="rounded-lg bg-emerald/10 p-2">
               <svg className="h-5 w-5 text-emerald" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" /></svg>
@@ -66,7 +66,7 @@ function AdminSettings() {
         </div>
 
         {/* Seed Admin */}
-        <div className="rounded-xl border border-gold/10 bg-cream p-6 shadow-sm">
+        <div className="rounded-xl border border-gold/10 bg-background p-6 shadow-sm">
           <div className="mb-5 flex items-center gap-3">
             <div className="rounded-lg bg-gold/10 p-2">
               <svg className="h-5 w-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" /></svg>
@@ -102,7 +102,7 @@ function AdminSettings() {
       </div>
 
       {/* MLM Configuration */}
-      <div className="rounded-xl border border-gold/10 bg-cream p-6 shadow-sm">
+      <div className="rounded-xl border border-gold/10 bg-background p-6 shadow-sm">
         <div className="mb-5 flex items-center gap-3">
           <div className="rounded-lg bg-gold/10 p-2">
             <svg className="h-5 w-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" /></svg>
@@ -125,7 +125,7 @@ function AdminSettings() {
       </div>
 
       {/* Matching Awards */}
-      <div className="overflow-hidden rounded-xl border border-gold/10 bg-cream shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-gold/10 bg-background shadow-sm">
         <div className="flex items-center gap-3 border-b border-gold/10 px-6 py-4">
           <div className="rounded-lg bg-gold/10 p-2">
             <svg className="h-5 w-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M18.75 4.236c.982.143 1.954.317 2.916.52A6.003 6.003 0 0 1 16.27 9.728M18.75 4.236V4.5c0 2.108-.966 3.99-2.48 5.228m0 0a6.015 6.015 0 0 1-2.27.466 6.015 6.015 0 0 1-2.27-.466" /></svg>
@@ -152,7 +152,7 @@ function AdminSettings() {
                       row.tier === 1 ? "bg-emerald/10 text-emerald" :
                       row.tier === 2 ? "bg-gold/15 text-gold" :
                       row.tier === 3 ? "bg-amber-100 text-amber-700" :
-                      "bg-red-50 text-red-600"
+                      "bg-destructive/10 text-red-600"
                     }`}>
                       T{row.tier}
                     </span>

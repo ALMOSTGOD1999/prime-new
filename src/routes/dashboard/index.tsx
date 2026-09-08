@@ -90,7 +90,7 @@ function DashboardIndex() {
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded border border-gold/20 bg-cream p-6" />
+            <div key={i} className="h-28 animate-pulse rounded border border-gold/20 bg-background p-6" />
           ))}
         </div>
       </div>
@@ -166,7 +166,7 @@ function DashboardIndex() {
       {/* Leg Balance + Rank */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {legBalance && (
-          <div className="rounded border border-gold/20 bg-cream p-6">
+          <div className="rounded border border-gold/20 bg-background p-6">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">Leg Balance</h3>
             <div className="flex items-center gap-6">
               <div className="flex-1 rounded-lg border border-emerald/20 bg-emerald/5 p-4 text-center">
@@ -184,7 +184,7 @@ function DashboardIndex() {
           </div>
         )}
         {rankInfo && (
-          <div className="rounded border border-gold/20 bg-cream p-6">
+          <div className="rounded border border-gold/20 bg-background p-6">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">Your Rank</h3>
             <div className="flex items-center gap-4">
               <div className={`rounded-lg border px-4 py-2 text-sm font-bold uppercase ${
@@ -212,7 +212,7 @@ function DashboardIndex() {
       </div>
 
       {/* Withdrawal Section */}
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Withdraw Funds</h3>
@@ -273,7 +273,7 @@ function DashboardIndex() {
                             w.status === "approved"
                               ? "bg-emerald/10 text-emerald"
                               : w.status === "rejected"
-                                ? "bg-red-50 text-red-600"
+                                ? "bg-destructive/10 text-red-600"
                                 : "bg-gold/10 text-gold"
                           }`}
                         >
@@ -292,7 +292,7 @@ function DashboardIndex() {
         )}
       </div>
 
-      <div className="rounded border border-gold/20 bg-cream p-6">
+      <div className="rounded border border-gold/20 bg-background p-6">
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-gold">Your Referral Code</h3>
         <p className="font-display text-2xl">{user.referralCode}</p>
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -311,7 +311,7 @@ function DashboardIndex() {
         </div>
       </div>
 
-      <div className="rounded border border-gold/20 bg-cream">
+      <div className="rounded border border-gold/20 bg-background">
         <div className="border-b border-gold/10 px-6 py-4">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Recent Income</h3>
         </div>
@@ -362,17 +362,17 @@ function DashboardIndex() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Direct Commission</p>
           <p className="mt-1 font-display text-2xl text-emerald">₹{income.direct.toLocaleString("en-IN")}</p>
           <p className="mt-1 text-[10px] text-emerald/60">5% one-time per referral</p>
         </div>
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Matching Income</p>
           <p className="mt-1 font-display text-2xl text-gold">₹{income.matching.toLocaleString("en-IN")}</p>
           <p className="mt-1 text-[10px] text-emerald/60">20% per pair (3 pairs/day cap)</p>
         </div>
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Earned</p>
           <p className="mt-1 font-display text-2xl text-emerald">₹{income.totalEarned.toLocaleString("en-IN")}</p>
           <p className="mt-1 text-[10px] text-emerald/60">Lifetime earnings</p>
@@ -384,7 +384,7 @@ function DashboardIndex() {
 
 function StatCard({ title, value, icon }: { title: string; value: string; icon: string }) {
   return (
-    <div className="rounded border border-gold/20 bg-cream p-6 transition-colors hover:border-gold/40">
+    <div className="rounded border border-gold/20 bg-background p-6 transition-colors hover:border-gold/40">
       <div className="flex items-center justify-between">
         <p className="text-[10px] uppercase tracking-widest text-emerald/70">{title}</p>
         <span className="text-gold/40">{icon}</span>

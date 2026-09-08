@@ -28,10 +28,10 @@ function AdminDashboard() {
         <div className="h-9 w-56 animate-pulse rounded-lg bg-gradient-to-r from-gold/10 to-gold/5" />
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-32 animate-pulse rounded-xl border border-gold/10 bg-cream shadow-sm" />
+            <div key={i} className="h-32 animate-pulse rounded-xl border border-gold/10 bg-background shadow-sm" />
           ))}
         </div>
-        <div className="h-64 animate-pulse rounded-xl border border-gold/10 bg-cream shadow-sm" />
+        <div className="h-64 animate-pulse rounded-xl border border-gold/10 bg-background shadow-sm" />
       </div>
     );
   }
@@ -91,7 +91,7 @@ function AdminDashboard() {
       </div>
 
       {/* Recent Users Table */}
-      <div className="overflow-hidden rounded-xl border border-gold/10 bg-cream shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-gold/10 bg-background shadow-sm">
         <div className="flex items-center justify-between border-b border-gold/10 px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-gold/10 p-2">
@@ -139,7 +139,7 @@ function AdminDashboard() {
                     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ${
                       user.isActive
                         ? "bg-emerald/5 text-emerald ring-emerald/20"
-                        : "bg-red-50 text-red-600 ring-red-100"
+                        : "bg-destructive/10 text-red-600 ring-destructive/20"
                     }`}>
                       <span className={`h-1 w-1 rounded-full ${user.isActive ? "bg-emerald" : "bg-red-400"}`} />
                       {user.isActive ? "Active" : "Inactive"}

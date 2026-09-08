@@ -21,7 +21,7 @@ function TeamPage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-64 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-64 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -36,11 +36,11 @@ function TeamPage() {
       </p>
 
       {tree ? (
-        <div className="overflow-x-auto rounded border border-gold/20 bg-cream p-6">
+        <div className="overflow-x-auto rounded border border-gold/20 bg-background p-6">
           <TreeNode node={tree} depth={0} />
         </div>
       ) : (
-        <div className="rounded border border-gold/20 bg-cream p-12 text-center">
+        <div className="rounded border border-gold/20 bg-background p-12 text-center">
           <p className="text-xs text-emerald/60">No team data yet. Share your referral code to start building!</p>
         </div>
       )}
@@ -52,7 +52,7 @@ function TreeNode({ node, depth }: { node: any; depth: number }) {
   if (!node) {
     return (
       <div className="flex flex-col items-center">
-        <div className="rounded border border-dashed border-gold/20 bg-cream/50 px-4 py-3 text-center">
+        <div className="rounded border border-dashed border-gold/20 bg-background/50 px-4 py-3 text-center">
           <p className="text-[10px] text-emerald/70">Empty</p>
         </div>
       </div>
@@ -65,7 +65,7 @@ function TreeNode({ node, depth }: { node: any; depth: number }) {
         className={`rounded border px-4 py-3 text-center transition-colors ${
           node.isActive
             ? "border-emerald/30 bg-emerald/5"
-            : "border-gold/20 bg-cream"
+            : "border-gold/20 bg-background"
         }`}
       >
         <p className="text-xs font-semibold">{node.name}</p>
@@ -73,7 +73,7 @@ function TreeNode({ node, depth }: { node: any; depth: number }) {
         <div className="mt-1 flex items-center justify-center gap-2">
           <span
             className={`inline-block rounded px-1.5 py-0.5 text-[8px] font-semibold uppercase ${
-              node.isActive ? "bg-emerald/10 text-emerald" : "bg-red-50 text-red-600"
+              node.isActive ? "bg-emerald/10 text-emerald" : "bg-destructive/10 text-red-600"
             }`}
           >
             {node.isActive ? "Active" : "Inactive"}

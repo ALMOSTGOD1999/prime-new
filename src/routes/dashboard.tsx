@@ -100,7 +100,7 @@ function DashboardLayout() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-sm uppercase tracking-widest text-emerald/70">Loading...</div>
       </div>
     );
@@ -123,7 +123,7 @@ function DashboardLayout() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-cream dark:bg-emerald/5">
+    <div className="flex min-h-screen bg-background dark:bg-emerald/5">
       <OnboardingTour />
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 bg-black/30 lg:hidden" onClick={() => setSidebarOpen(false)} />
@@ -148,8 +148,8 @@ function DashboardLayout() {
                 key={link.to}
                 to={link.to}
                 activeOptions={{ exact: link.to === "/dashboard" }}
-                activeProps={{ className: "bg-cream/10 text-gold" }}
-                className="flex items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-cream/70 transition-colors hover:bg-cream/5 hover:text-cream"
+                activeProps={{ className: "bg-background/10 text-gold" }}
+                className="flex items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-cream/70 transition-colors hover:bg-background/5 hover:text-cream"
                 onClick={() => setSidebarOpen(false)}
               >
                 <div className="flex items-center space-x-3">
@@ -190,7 +190,7 @@ function DashboardLayout() {
       </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-gold/20 bg-cream/90 px-4 py-3 backdrop-blur-md lg:hidden dark:bg-emerald/10">
+        <header className="flex items-center justify-between border-b border-gold/20 bg-background/90 px-4 py-3 backdrop-blur-md lg:hidden dark:bg-emerald/10">
           <div className="flex items-center">
             <button onClick={() => setSidebarOpen(true)} className="mr-4 text-emerald">
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

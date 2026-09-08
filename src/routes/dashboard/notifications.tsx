@@ -91,7 +91,7 @@ function NotificationsPage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-64 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-64 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
   }
@@ -118,7 +118,7 @@ function NotificationsPage() {
       </div>
 
       {notifications.length === 0 ? (
-        <div className="rounded border border-gold/20 bg-cream p-12 text-center">
+        <div className="rounded border border-gold/20 bg-background p-12 text-center">
           <p className="text-4xl">🔔</p>
           <p className="mt-4 text-xs text-emerald/60">No notifications yet</p>
         </div>
@@ -130,8 +130,8 @@ function NotificationsPage() {
               onClick={() => !n.isRead && handleMarkRead(n.id)}
               className={`flex items-start gap-4 rounded border p-4 transition-all ${
                 n.isRead
-                  ? "border-gold/10 bg-cream/50"
-                  : "border-gold/30 bg-cream cursor-pointer hover:border-gold/50"
+                  ? "border-gold/10 bg-background/50"
+                  : "border-gold/30 bg-background cursor-pointer hover:border-gold/50"
               }`}
             >
               <span className="text-2xl">{typeIcons[n.type] || "📢"}</span>

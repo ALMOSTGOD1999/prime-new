@@ -88,11 +88,11 @@ function AdminUsers() {
           </svg>
           <input
             type="text"
-            placeholder="Search by name or email..."
+            placeholder="Search by ID, name, code or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            className="w-full rounded-lg border border-gold/15 bg-cream py-2.5 pl-10 pr-4 text-sm outline-none transition-all duration-200 placeholder:text-emerald/70 focus:border-gold/40 focus:ring-2 focus:ring-gold/10"
+            className="w-full rounded-lg border border-gold/15 bg-background py-2.5 pl-10 pr-4 text-sm outline-none transition-all duration-200 placeholder:text-emerald/70 focus:border-gold/40 focus:ring-2 focus:ring-gold/10"
           />
         </div>
         <button
@@ -105,7 +105,7 @@ function AdminUsers() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-gold/10 bg-cream shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-gold/10 bg-background shadow-sm">
         {loading ? (
           <div className="flex items-center justify-center gap-3 py-16">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-gold border-t-transparent" />
@@ -161,7 +161,7 @@ function AdminUsers() {
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ${
                           user.isActive
                             ? "bg-emerald/5 text-emerald ring-emerald/20"
-                            : "bg-red-50 text-red-600 ring-red-100"
+                            : "bg-destructive/10 text-red-600 ring-destructive/20"
                         }`}>
                           <span className={`h-1 w-1 rounded-full ${user.isActive ? "bg-emerald" : "bg-red-400"}`} />
                           {user.isActive ? "Active" : "Inactive"}
@@ -198,7 +198,7 @@ function AdminUsers() {
                             </button>
                             <button
                               onClick={() => { setDeleteTarget({ id: user.id, name: user.name }); setDeleteKey(""); }}
-                              className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-600 transition-all duration-200 hover:bg-red-100 hover:border-red-300"
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-600 transition-all duration-200 hover:bg-destructive/20 hover:border-red-300"
                             >
                               <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
                               Delete
@@ -246,8 +246,8 @@ function AdminUsers() {
       {/* Delete Confirmation Modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-lg border border-red-200 bg-cream shadow-2xl">
-            <div className="border-b border-red-100 px-6 py-4">
+          <div className="w-full max-w-md rounded-lg border border-destructive/30 bg-background shadow-2xl">
+            <div className="border-b border-destructive/20 px-6 py-4">
               <h3 className="font-display text-lg text-red-600">Delete User</h3>
             </div>
             <div className="px-6 py-4">
@@ -263,12 +263,12 @@ function AdminUsers() {
                 value={deleteKey}
                 onChange={(e) => setDeleteKey(e.target.value)}
                 placeholder="Type DELETE"
-                className="mt-2 w-full rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm outline-none transition-all placeholder:text-emerald/40 focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                className="mt-2 w-full rounded-lg border border-destructive/30 bg-card px-4 py-2.5 text-sm outline-none transition-all placeholder:text-emerald/40 focus:border-red-400 focus:ring-2 focus:ring-destructive/20"
                 autoFocus
                 onKeyDown={(e) => { if (e.key === "Enter" && deleteKey === "DELETE") handleDelete(); }}
               />
             </div>
-            <div className="flex items-center justify-end gap-3 border-t border-red-100 px-6 py-4">
+            <div className="flex items-center justify-end gap-3 border-t border-destructive/20 px-6 py-4">
               <button
                 onClick={() => { setDeleteTarget(null); setDeleteKey(""); }}
                 className="rounded-lg border border-gold/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"

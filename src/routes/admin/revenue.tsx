@@ -23,7 +23,7 @@ function AdminRevenuePage() {
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
         <div className="grid grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded border border-gold/20 bg-cream" />
+            <div key={i} className="h-24 animate-pulse rounded border border-gold/20 bg-background" />
           ))}
         </div>
       </div>
@@ -40,17 +40,17 @@ function AdminRevenuePage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Revenue</p>
           <p className="mt-2 font-display text-3xl text-gold">₹{(data?.totalRevenue || 0).toLocaleString("en-IN")}</p>
           <p className="text-[10px] text-emerald/60">from activations</p>
         </div>
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Active Users</p>
           <p className="mt-2 font-display text-3xl text-emerald">{data?.activeUsers || 0} / {data?.totalUsers || 0}</p>
           <p className="text-[10px] text-emerald/60">{activeRatio}% activation rate</p>
         </div>
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Activation Rate</p>
           <div className="mt-2 flex items-end gap-2">
             <span className="font-display text-3xl text-gold">{activeRatio}%</span>
@@ -59,7 +59,7 @@ function AdminRevenuePage() {
             <div className="h-2 rounded-full bg-gold" style={{ width: `${activeRatio}%` }} />
           </div>
         </div>
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Avg Revenue/User</p>
           <p className="mt-2 font-display text-3xl text-emerald">
             ₹{data?.activeUsers > 0 ? Math.round((data?.totalRevenue || 0) / data.activeUsers).toLocaleString("en-IN") : "0"}
@@ -69,7 +69,7 @@ function AdminRevenuePage() {
 
       {/* Daily Activations Chart */}
       {data?.dailyActivations && data.dailyActivations.length > 0 && (
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Daily Activations (Last 30 Days)</h3>
           <div className="flex items-end gap-1" style={{ height: "150px" }}>
             {data.dailyActivations.slice(0, 30).reverse().map((day: any, i: number) => {
@@ -90,7 +90,7 @@ function AdminRevenuePage() {
 
       {/* Daily Income Chart */}
       {data?.dailyIncome && data.dailyIncome.length > 0 && (
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Daily Income Paid (Last 30 Days)</h3>
           <div className="flex items-end gap-1" style={{ height: "150px" }}>
             {data.dailyIncome.slice(0, 30).reverse().map((day: any, i: number) => {

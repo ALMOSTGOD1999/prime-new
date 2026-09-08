@@ -58,15 +58,15 @@ function ReportsPage() {
       {/* Summary Cards */}
       {data?.totals && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded border border-gold/20 bg-cream p-6">
+          <div className="rounded border border-gold/20 bg-background p-6">
             <p className="text-[10px] uppercase tracking-widest text-emerald/70">Direct Commission</p>
             <p className="mt-2 font-display text-2xl text-emerald">₹{data.totals.direct.toLocaleString("en-IN")}</p>
           </div>
-          <div className="rounded border border-gold/20 bg-cream p-6">
+          <div className="rounded border border-gold/20 bg-background p-6">
             <p className="text-[10px] uppercase tracking-widest text-emerald/70">Matching Income</p>
             <p className="mt-2 font-display text-2xl text-gold">₹{data.totals.matching.toLocaleString("en-IN")}</p>
           </div>
-          <div className="rounded border border-gold/20 bg-cream p-6">
+          <div className="rounded border border-gold/20 bg-background p-6">
             <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Earned</p>
             <p className="mt-2 font-display text-2xl text-emerald">₹{data.totals.total.toLocaleString("en-IN")}</p>
           </div>
@@ -75,9 +75,9 @@ function ReportsPage() {
 
       {/* Bar Chart */}
       {loading ? (
-        <div className="h-64 animate-pulse rounded border border-gold/20 bg-cream" />
+        <div className="h-64 animate-pulse rounded border border-gold/20 bg-background" />
       ) : data?.days ? (
-        <div className="rounded border border-gold/20 bg-cream p-6">
+        <div className="rounded border border-gold/20 bg-background p-6">
           <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Daily Income</h3>
           <div className="flex items-end gap-1" style={{ height: "200px" }}>
             {data.days.map((day: any, i: number) => (
@@ -119,14 +119,14 @@ function ReportsPage() {
           </div>
         </div>
       ) : (
-        <div className="rounded border border-gold/20 bg-cream p-12 text-center">
+        <div className="rounded border border-gold/20 bg-background p-12 text-center">
           <p className="text-xs text-emerald/60">No income data for this period</p>
         </div>
       )}
 
       {/* Daily Breakdown Table */}
       {data?.days && data.days.length > 0 && (
-        <div className="rounded border border-gold/20 bg-cream">
+        <div className="rounded border border-gold/20 bg-background">
           <div className="border-b border-gold/10 px-6 py-4">
             <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Detailed Breakdown</h3>
           </div>

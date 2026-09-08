@@ -86,7 +86,7 @@ export function OnboardingTour() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="w-full max-w-md rounded-lg border border-gold/30 bg-cream shadow-2xl">
+      <div className="w-full max-w-md rounded-lg border border-gold/30 bg-background shadow-2xl">
         {/* Progress */}
         <div className="flex gap-1 px-6 pt-4">
           {steps.map((_, i) => (
