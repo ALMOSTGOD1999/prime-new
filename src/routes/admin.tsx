@@ -4,6 +4,7 @@ import { Wordmark } from "../components/Wordmark";
 import { getMe } from "../functions/auth/me";
 import { logout } from "../functions/auth/logout";
 import { MobileBottomNav } from "../components/MobileBottomNav";
+import { DarkModeToggle } from "../components/DarkModeToggle";
 import { Typewriter } from "../components/Typewriter";
 
 export const Route = createFileRoute("/admin")({
@@ -124,6 +125,9 @@ function AdminLayout() {
               <p className="truncate text-xs font-semibold text-cream">{user?.name}</p>
               <p className="truncate text-[10px] text-cream/40">{user?.referralCode}</p>
             </div>
+          </div>
+          <div className="mb-3">
+            <DarkModeToggle />
           </div>
           <button
             onClick={handleLogout}

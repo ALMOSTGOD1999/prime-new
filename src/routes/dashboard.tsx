@@ -171,6 +171,9 @@ function DashboardLayout() {
               <p className="truncate text-xs font-semibold text-cream">{user?.name}</p>
               <p className="truncate text-[10px] text-cream/50">{user?.referralCode}</p>
             </div>
+            <div className="mb-3 px-4">
+              <DarkModeToggle />
+            </div>
             {isImpersonating && (
               <button
                 onClick={handleReturnToAdmin}
