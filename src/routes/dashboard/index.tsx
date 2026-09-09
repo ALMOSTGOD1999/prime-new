@@ -105,30 +105,30 @@ function DashboardIndex() {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-3xl">
+          <h1 className="font-display text-2xl sm:text-3xl">
             Welcome, <span className="italic text-gold">{user.name}</span>
           </h1>
-          <p className="mt-1 text-xs uppercase tracking-widest text-emerald/70">
+          <p className="mt-1 text-[10px] sm:text-xs uppercase tracking-widest text-emerald/70">
             Member since {new Date(user.createdAt).toLocaleDateString("en-IN")}
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           <button
             onClick={() => copyReferral("left")}
-            className="border border-emerald/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10"
+            className="border border-emerald/40 px-3 sm:px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10"
           >
             {copied === "left" ? "Copied!" : "Share Left Leg Link"}
           </button>
           <button
             onClick={() => copyReferral("right")}
-            className="border border-gold/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-gold/10"
+            className="border border-gold/40 px-3 sm:px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-gold/10"
           >
             {copied === "right" ? "Copied!" : "Share Right Leg Link"}
           </button>
           {user.isAdmin && (
             <Link
               to="/admin"
-              className="bg-emerald px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
+              className="bg-emerald px-3 sm:px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
             >
               Admin Panel
             </Link>
