@@ -45,7 +45,8 @@ export const income = pgTable("income", {
 export const wallet = pgTable("wallet", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull().unique(),
-  balance: integer("balance").default(0).notNull(),
+  incomeBalance: integer("income_balance").default(0).notNull(),
+  workingBalance: integer("working_balance").default(0).notNull(),
   totalEarned: integer("total_earned").default(0).notNull(),
 });
 

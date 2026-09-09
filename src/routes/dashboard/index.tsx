@@ -158,8 +158,8 @@ function DashboardIndex() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Total Income" value={`₹${income.totalIncome.toLocaleString("en-IN")}`} icon="◈" />
-        <StatCard title="Wallet Balance" value={`₹${income.balance.toLocaleString("en-IN")}`} icon="◇" />
-        <StatCard title="Total Pairs" value={String(income.totalPairs)} icon="◆" />
+        <StatCard title="Income Wallet" value={`₹${income.incomeBalance.toLocaleString("en-IN")}`} icon="◇" subtitle="Withdrawable 12AM–12PM" />
+        <StatCard title="Working Wallet" value={`₹${income.workingBalance.toLocaleString("en-IN")}`} icon="◆" subtitle="Commissions & awards" />
         <StatCard title="Today's Pairs" value={`${income.todayPairs} / 3`} icon="○" />
       </div>
 
@@ -211,18 +211,18 @@ function DashboardIndex() {
         )}
       </div>
 
-      {/* Withdrawal Section */}
+      {/* Withdrawal Section — from Income Wallet only */}
       <div className="rounded border border-gold/20 bg-background p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Withdraw Funds</h3>
             <p className="mt-1 text-[10px] text-emerald/70">
-              Available 12:00 AM — 12:00 PM IST daily. Missed days carry over.
+              From Income Wallet. Available 12:00 AM — 12:00 PM IST daily. Missed days carry over.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-emerald/60">Balance:</span>
-            <span className="font-display text-lg text-emerald">₹{income.balance.toLocaleString("en-IN")}</span>
+            <span className="text-xs text-emerald/60">Income Wallet:</span>
+            <span className="font-display text-lg text-emerald">₹{income.incomeBalance.toLocaleString("en-IN")}</span>
           </div>
         </div>
 
@@ -230,7 +230,7 @@ function DashboardIndex() {
           <input
             type="number"
             min="1"
-            max={income.balance}
+            max={income.incomeBalance}
             placeholder="Enter amount"
             value={withdrawAmount}
             onChange={(e) => setWithdrawAmount(e.target.value)}
@@ -238,7 +238,7 @@ function DashboardIndex() {
           />
           <button
             onClick={handleWithdraw}
-            disabled={withdrawLoading || !withdrawInfo?.isOpen || income.balance <= 0}
+            disabled={withdrawLoading || !withdrawInfo?.isOpen || income.incomeBalance <= 0}
             className="whitespace-nowrap bg-gold px-6 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-40"
           >
             {withdrawLoading
@@ -365,12 +365,12 @@ function DashboardIndex() {
         <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Direct Commission</p>
           <p className="mt-1 font-display text-2xl text-emerald">₹{income.direct.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-[10px] text-emerald/60">5% one-time per referral</p>
+          <p className="mt-1 text-[10px] text-emerald/60">5% one-time → Working Wallet</p>
         </div>
         <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Matching Income</p>
           <p className="mt-1 font-display text-2xl text-gold">₹{income.matching.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-[10px] text-emerald/60">20% per pair (3 pairs/day cap)</p>
+          <p className="mt-1 text-[10px] text-emerald/60">20% per pair → Income Wallet</p>
         </div>
         <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Earned</p>
@@ -382,7 +382,7 @@ function DashboardIndex() {
   );
 }
 
-function StatCard({ title, value, icon }: { title: string; value: string; icon: string }) {
+function StatCard({ title, value, icon, subtitle }: { title: string; value: string; icon: string; subtitle?: string }) {
   return (
     <div className="rounded border border-gold/20 bg-background p-6 transition-colors hover:border-gold/40">
       <div className="flex items-center justify-between">
@@ -390,6 +390,7 @@ function StatCard({ title, value, icon }: { title: string; value: string; icon: 
         <span className="text-gold/40">{icon}</span>
       </div>
       <p className="mt-2 font-display text-2xl">{value}</p>
+      {subtitle && <p className="mt-1 text-[10px] text-emerald/50">{subtitle}</p>}
     </div>
   );
 }

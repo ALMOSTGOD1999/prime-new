@@ -77,18 +77,18 @@ export async function payDirectCommission(newUserId: number, referrerId: number)
     description: `Direct commission for referring user #${newUserId}`,
   });
 
-  // Credit wallet
+  // Credit working wallet (direct commission → working wallet)
   const existing = await db.select().from(wallet).where(eq(wallet.userId, referrerId));
   if (existing.length > 0) {
     await db
       .update(wallet)
       .set({
-        balance: existing[0].balance + amount,
+        workingBalance: existing[0].workingBalance + amount,
         totalEarned: existing[0].totalEarned + amount,
       })
       .where(eq(wallet.userId, referrerId));
   } else {
-    await db.insert(wallet).values({ userId: referrerId, balance: amount, totalEarned: amount });
+    await db.insert(wallet).values({ userId: referrerId, workingBalance: amount, totalEarned: amount });
   }
 
   return amount;
@@ -208,18 +208,18 @@ export async function calculateMatchingIncome(newUserId: number) {
           description: `Matching income pair #${totalPairs + 1}`,
         });
 
-        // Credit wallet
+        // Credit income wallet (matching income → income wallet)
         const walletRow = await db.select().from(wallet).where(eq(wallet.userId, currentUserId));
         if (walletRow.length > 0) {
           await db
             .update(wallet)
             .set({
-              balance: walletRow[0].balance + amount,
+              incomeBalance: walletRow[0].incomeBalance + amount,
               totalEarned: walletRow[0].totalEarned + amount,
             })
             .where(eq(wallet.userId, currentUserId));
         } else {
-          await db.insert(wallet).values({ userId: currentUserId, balance: amount, totalEarned: amount });
+          await db.insert(wallet).values({ userId: currentUserId, incomeBalance: amount, totalEarned: amount });
         }
 
         // Increment daily pairs
@@ -280,7 +280,7 @@ export async function activateUser(userId: number) {
   // Create wallet
   const existingWallet = await db.select().from(wallet).where(eq(wallet.userId, userId));
   if (existingWallet.length === 0) {
-    await db.insert(wallet).values({ userId, balance: 0, totalEarned: 0 });
+    await db.insert(wallet).values({ userId, incomeBalance: 0, workingBalance: 0, totalEarned: 0 });
   }
 
   // Pay direct commission to referrer
@@ -334,7 +334,8 @@ export async function getIncomeSummary(userId: number) {
     direct,
     matching,
     totalIncome: direct + matching,
-    balance: walletRow[0]?.balance ?? 0,
+    incomeBalance: walletRow[0]?.incomeBalance ?? 0,
+    workingBalance: walletRow[0]?.workingBalance ?? 0,
     totalEarned: walletRow[0]?.totalEarned ?? 0,
     totalPairs: (await getTotalPairs(userId)),
     todayPairs: (await getTodayPairs(userId)),

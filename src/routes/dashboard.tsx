@@ -9,6 +9,7 @@ import { DarkModeToggle } from "../components/DarkModeToggle";
 import { OnboardingTour } from "../components/OnboardingTour";
 import { MobileBottomNav } from "../components/MobileBottomNav";
 import { Typewriter } from "../components/Typewriter";
+import { adminResetPassword } from "../functions/admin/reset-password";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
@@ -19,6 +20,9 @@ function DashboardLayout() {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isImpersonating, setIsImpersonating] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const prevUnreadRef = useRef(0);
   const navigate = useNavigate();
@@ -89,6 +93,24 @@ function DashboardLayout() {
       navigate({ to: "/admin" });
     } catch (err: any) {
       alert(err.message || "Failed to return to admin");
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+    setResetLoading(true);
+    try {
+      await adminResetPassword({ data: { targetUserId: user.id, newPassword } });
+      alert("Password reset successfully!");
+      setShowResetPassword(false);
+      setNewPassword("");
+    } catch (err: any) {
+      alert(err.message || "Failed to reset password");
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -218,16 +240,24 @@ function DashboardLayout() {
         </header>
 
         {isImpersonating && (
-          <div className="flex items-center justify-between bg-gold/10 px-4 py-2 text-xs">
+          <div className="flex flex-wrap items-center gap-2 bg-gold/10 px-4 py-2 text-xs">
             <span className="font-semibold text-gold">
               Viewing as <strong>{user?.name}</strong> ({user?.referralCode})
             </span>
-            <button
-              onClick={handleReturnToAdmin}
-              className="rounded bg-emerald px-4 py-1 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
-            >
-              Return to Admin
-            </button>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                onClick={() => setShowResetPassword(true)}
+                className="rounded border border-gold/40 bg-gold/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-gold transition-all hover:bg-gold/20"
+              >
+                Reset Password
+              </button>
+              <button
+                onClick={handleReturnToAdmin}
+                className="rounded bg-emerald px-4 py-1 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
+              >
+                Return to Admin
+              </button>
+            </div>
           </div>
         )}
 
@@ -251,6 +281,45 @@ function DashboardLayout() {
         </main>
       </div>
       <MobileBottomNav unreadCount={unreadCount} />
+
+      {/* Reset Password Modal (admin impersonation only) */}
+      {showResetPassword && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg border border-gold/20 bg-background shadow-2xl">
+            <div className="border-b border-gold/10 px-6 py-4">
+              <h3 className="font-display text-lg text-emerald">Reset Password</h3>
+              <p className="mt-1 text-[10px] text-emerald/60">Set a new password for {user?.name}</p>
+            </div>
+            <div className="px-6 py-4">
+              <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Min 6 characters"
+                className="w-full rounded-lg border border-gold/20 bg-card px-4 py-2.5 text-sm outline-none transition-all placeholder:text-emerald/40 focus:border-gold/40 focus:ring-2 focus:ring-gold/10"
+                autoFocus
+                onKeyDown={(e) => { if (e.key === "Enter" && newPassword.length >= 6) handleResetPassword(); }}
+              />
+            </div>
+            <div className="flex items-center justify-end gap-3 border-t border-gold/10 px-6 py-4">
+              <button
+                onClick={() => { setShowResetPassword(false); setNewPassword(""); }}
+                className="rounded-lg border border-gold/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleResetPassword}
+                disabled={resetLoading || newPassword.length < 6}
+                className="rounded-lg bg-emerald px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-cream transition-all hover:bg-emerald/80 disabled:opacity-40"
+              >
+                {resetLoading ? "Resetting..." : "Reset Password"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

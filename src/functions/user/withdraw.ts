@@ -37,20 +37,20 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
       throw new Error("Withdrawals are only allowed between 12:00 AM and 12:00 PM");
     }
 
-    // Check user wallet balance
+    // Check user income wallet balance (withdrawals only from income wallet)
     const walletRow = await db
       .select()
       .from(wallet)
       .where(eq(wallet.userId, payload.userId));
 
-    if (walletRow.length === 0 || walletRow[0].balance < amount) {
-      throw new Error("Insufficient wallet balance");
+    if (walletRow.length === 0 || walletRow[0].incomeBalance < amount) {
+      throw new Error("Insufficient income wallet balance");
     }
 
-    // Deduct from wallet and create withdrawal record
+    // Deduct from income wallet and create withdrawal record
     await db
       .update(wallet)
-      .set({ balance: walletRow[0].balance - amount })
+      .set({ incomeBalance: walletRow[0].incomeBalance - amount })
       .where(eq(wallet.userId, payload.userId));
 
     const [withdrawal] = await db
@@ -65,7 +65,7 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
     return {
       success: true,
       withdrawalId: withdrawal.id,
-      remainingBalance: walletRow[0].balance - amount,
+      remainingBalance: walletRow[0].incomeBalance - amount,
     };
   });
 
