@@ -92,13 +92,74 @@ async function buildTree(userId: number, depth: number): Promise<TreeNode | null
 export const getTreeVisualization = createServerFn({ method: "GET" })
   .handler(async () => {
     const userId = await getAuthUserId();
-
-    // Check if real user is admin (handles impersonation too)
     const admin = await isRealAdmin();
-
-    // Admin sees deep tree (50 levels), users see 3 levels of their downline
     const depth = admin ? 50 : 3;
     const rootId = admin ? 1 : userId;
     const tree = await buildTree(rootId, depth);
     return { tree };
+  });
+
+// ── Get level tree (users organized by depth level) ──
+type LevelUser = {
+  id: number;
+  name: string;
+  referralCode: string;
+  isActive: boolean;
+  rank: string;
+  position: string | null;
+  parentId: number | null;
+};
+
+export const getLevelTree = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const userId = await getAuthUserId();
+    const admin = await isRealAdmin();
+    const rootId = admin ? 1 : userId;
+
+    // BFS to collect all users by level
+    const levels: LevelUser[][] = [];
+    let queue: number[] = [rootId];
+
+    const maxDepth = admin ? 20 : 5;
+
+    for (let depth = 0; depth < maxDepth && queue.length > 0; depth++) {
+      const currentLevel: LevelUser[] = [];
+
+      for (const id of queue) {
+        const result = await db
+          .select({
+            id: users.id,
+            name: users.name,
+            referralCode: users.referralCode,
+            isActive: users.isActive,
+            rank: users.rank,
+            position: users.position,
+            parentId: users.parentId,
+          })
+          .from(users)
+          .where(eq(users.id, id));
+
+        if (result.length > 0) {
+          currentLevel.push(result[0]!);
+        }
+      }
+
+      if (currentLevel.length === 0) break;
+      levels.push(currentLevel);
+
+      // Find children of all current-level users
+      const nextQueue: number[] = [];
+      for (const user of currentLevel) {
+        const children = await db
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.parentId, user.id));
+        for (const child of children) {
+          nextQueue.push(child.id);
+        }
+      }
+      queue = nextQueue;
+    }
+
+    return { levels, rootId };
   });

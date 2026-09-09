@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { getTreeVisualization } from "../../functions/user/tree";
+import { getTreeVisualization, getLevelTree } from "../../functions/user/tree";
+import { LevelTreeView } from "../../components/LevelTreeView";
 
 export const Route = createFileRoute("/dashboard/tree")({
   component: TreePage,
@@ -8,7 +9,9 @@ export const Route = createFileRoute("/dashboard/tree")({
 
 function TreePage() {
   const [tree, setTree] = useState<any>(null);
+  const [levelData, setLevelData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"binary" | "level">("binary");
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
@@ -17,8 +20,11 @@ function TreePage() {
   const [collapsed, setCollapsed] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    getTreeVisualization()
-      .then((d) => setTree(d.tree))
+    Promise.all([getTreeVisualization(), getLevelTree()])
+      .then(([treeData, levelTreeData]) => {
+        setTree(treeData.tree);
+        setLevelData(levelTreeData);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -87,52 +93,90 @@ function TreePage() {
 
   return (
     <div className="space-y-3 sm:space-y-4">
+      {/* Header + Toggle */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl sm:text-3xl">
             My <span className="italic text-gold">Tree</span>
           </h1>
           <p className="text-[10px] sm:text-xs text-emerald/70">
-            Scroll to zoom, drag to pan.
+            {viewMode === "binary" ? "Scroll to zoom, drag to pan." : "Members organized by level."}
           </p>
         </div>
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <button onClick={() => setZoom((z) => Math.min(3, z + 0.15))} className="rounded border border-gold/30 px-2 py-1 text-xs font-bold text-emerald hover:bg-emerald/5">+</button>
-          <span className="min-w-[36px] text-center text-[10px] text-emerald/60">{Math.round(zoom * 100)}%</span>
-          <button onClick={() => setZoom((z) => Math.max(0.15, z - 0.15))} className="rounded border border-gold/30 px-2 py-1 text-xs font-bold text-emerald hover:bg-emerald/5">−</button>
-          <button onClick={resetView} className="rounded border border-emerald/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Reset</button>
+        <div className="flex items-center gap-2">
+          {/* View Mode Toggle */}
+          <div className="flex rounded-lg border border-gold/20 bg-background p-0.5">
+            <button
+              onClick={() => setViewMode("binary")}
+              className={`rounded-md px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-all ${
+                viewMode === "binary"
+                  ? "bg-emerald text-cream shadow-sm"
+                  : "text-emerald/60 hover:text-emerald"
+              }`}
+            >
+              Binary
+            </button>
+            <button
+              onClick={() => setViewMode("level")}
+              className={`rounded-md px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-all ${
+                viewMode === "level"
+                  ? "bg-emerald text-cream shadow-sm"
+                  : "text-emerald/60 hover:text-emerald"
+              }`}
+            >
+              Level
+            </button>
+          </div>
+
+          {/* Zoom controls (binary only) */}
+          {viewMode === "binary" && (
+            <div className="flex items-center gap-1.5">
+              <button onClick={() => setZoom((z) => Math.min(3, z + 0.15))} className="rounded border border-gold/30 px-2 py-1 text-xs font-bold text-emerald hover:bg-emerald/5">+</button>
+              <span className="min-w-[36px] text-center text-[10px] text-emerald/60">{Math.round(zoom * 100)}%</span>
+              <button onClick={() => setZoom((z) => Math.max(0.15, z - 0.15))} className="rounded border border-gold/30 px-2 py-1 text-xs font-bold text-emerald hover:bg-emerald/5">−</button>
+              <button onClick={resetView} className="rounded border border-emerald/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Reset</button>
+            </div>
+          )}
         </div>
       </div>
 
-      {tree ? (
-        <div
-          ref={containerRef}
-          className="overflow-hidden rounded-lg border border-gold/15 bg-card shadow-sm"
-          style={{ cursor: dragging ? "grabbing" : "grab", minHeight: "400px" }}
-          onWheel={handleWheel}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-        >
+      {/* Binary Tree View */}
+      {viewMode === "binary" && (
+        tree ? (
           <div
-            className="origin-top-left p-4 sm:p-6"
-            style={{
-              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-              transition: dragging ? "none" : "transform 0.15s ease-out",
-              transformOrigin: "0 0",
-            }}
+            ref={containerRef}
+            className="overflow-hidden rounded-lg border border-gold/15 bg-card shadow-sm"
+            style={{ cursor: dragging ? "grabbing" : "grab", minHeight: "400px" }}
+            onWheel={handleWheel}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
           >
-            <TreeNode node={tree} isRoot={true} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={0} />
+            <div
+              className="origin-top-left p-4 sm:p-6"
+              style={{
+                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                transition: dragging ? "none" : "transform 0.15s ease-out",
+                transformOrigin: "0 0",
+              }}
+            >
+              <TreeNode node={tree} isRoot={true} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={0} />
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="rounded-lg border border-gold/15 bg-card p-12 text-center">
-          <p className="text-4xl">🌳</p>
-          <p className="mt-3 text-xs text-emerald/60">No team data yet. Share your referral code to start building!</p>
-        </div>
+        ) : (
+          <div className="rounded-lg border border-gold/15 bg-card p-12 text-center">
+            <p className="text-4xl">🌳</p>
+            <p className="mt-3 text-xs text-emerald/60">No team data yet. Share your referral code to start building!</p>
+          </div>
+        )
+      )}
+
+      {/* Level Tree View */}
+      {viewMode === "level" && levelData && (
+        <LevelTreeView levels={levelData.levels} rootId={levelData.rootId} />
       )}
     </div>
   );
