@@ -148,9 +148,11 @@ async function fetchAllUsersInTree(rootId: number): Promise<FlatUser[]> {
     }
   }
 
-  // BFS from rootId to collect all descendants
-  const result: FlatUser[] = [];
-  const visited = new Set<number>();
+  // BFS from rootId to collect all descendants (including root itself)
+  const rootUser = userMap.get(rootId);
+  if (!rootUser) return [];
+  const result: FlatUser[] = [rootUser];
+  const visited = new Set<number>([rootId]);
   let queue = [rootId];
 
   while (queue.length > 0) {
