@@ -12,7 +12,7 @@ function AdminTreePage() {
   const [levelData, setLevelData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"binary" | "level">("binary");
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(0.4);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
@@ -40,7 +40,7 @@ function AdminTreePage() {
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
-    setZoom((prev) => Math.min(3, Math.max(0.15, prev + (e.deltaY > 0 ? -0.08 : 0.08))));
+    setZoom((prev) => Math.min(3, Math.max(0.1, prev + (e.deltaY > 0 ? -0.08 : 0.08))));
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -78,7 +78,7 @@ function AdminTreePage() {
   }, []);
 
   const resetView = () => {
-    setZoom(1);
+    setZoom(0.4);
     setPan({ x: 0, y: 0 });
   };
 
@@ -87,6 +87,7 @@ function AdminTreePage() {
     const ids = new Set<number>();
     const collect = (n: any) => { if (n?.id) { ids.add(n.id); if (n.left) collect(n.left); if (n.right) collect(n.right); } };
     if (tree) collect(tree);
+    ids.delete(tree?.id); // Keep root expanded
     setCollapsed(ids);
   };
 
@@ -108,7 +109,7 @@ function AdminTreePage() {
             Full <span className="italic text-gold">Tree</span>
           </h1>
           <p className="text-[10px] sm:text-xs text-emerald/70">
-            {viewMode === "binary" ? "Complete org tree — pinch/scroll to zoom, drag to pan." : "Members organized by level."}
+            {viewMode === "binary" ? "Complete org tree — scroll to zoom, drag to pan." : "Members organized by level."}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -136,7 +137,7 @@ function AdminTreePage() {
             </button>
           </div>
 
-          {/* Expand/Collapse (binary only) */}
+          {/* Expand/Collapse + Zoom (binary only) */}
           {viewMode === "binary" && (
             <>
               <button onClick={expandAll} className="rounded border border-emerald/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Expand</button>
@@ -144,7 +145,7 @@ function AdminTreePage() {
               <div className="flex items-center gap-1 rounded border border-gold/30 px-1.5 py-0.5">
                 <button onClick={() => setZoom((z) => Math.min(3, z + 0.15))} className="px-1.5 py-0.5 text-xs font-bold text-emerald hover:bg-emerald/10 rounded">+</button>
                 <span className="min-w-[36px] text-center text-[10px] text-emerald/60">{Math.round(zoom * 100)}%</span>
-                <button onClick={() => setZoom((z) => Math.max(0.15, z - 0.15))} className="px-1.5 py-0.5 text-xs font-bold text-emerald hover:bg-emerald/10 rounded">−</button>
+                <button onClick={() => setZoom((z) => Math.max(0.1, z - 0.15))} className="px-1.5 py-0.5 text-xs font-bold text-emerald hover:bg-emerald/10 rounded">−</button>
               </div>
               <button onClick={resetView} className="rounded border border-emerald/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Reset</button>
             </>

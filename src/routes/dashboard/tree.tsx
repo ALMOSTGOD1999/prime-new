@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { getTreeVisualization, getLevelTree } from "../../functions/user/tree";
+import { getTreeVisualization, getLevelTree, getTeamStats } from "../../functions/user/tree";
 import { LevelTreeView } from "../../components/LevelTreeView";
 
 export const Route = createFileRoute("/dashboard/tree")({
@@ -10,24 +10,51 @@ export const Route = createFileRoute("/dashboard/tree")({
 function TreePage() {
   const [tree, setTree] = useState<any>(null);
   const [levelData, setLevelData] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"binary" | "level">("binary");
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(0.5);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  const [collapsed, setCollapsed] = useState<Set<number>>(new Set());
+  // Start with root expanded (level 0) — rest collapsed
+  const [collapsed, setCollapsed] = useState<Set<number>>(() => {
+    const all = new Set<number>();
+    // We'll populate with all IDs once tree loads; for now start with root NOT collapsed
+    return all;
+  });
+  const [treeInitialized, setTreeInitialized] = useState(false);
 
   useEffect(() => {
-    Promise.all([getTreeVisualization(), getLevelTree()])
-      .then(([treeData, levelTreeData]) => {
+    Promise.all([getTreeVisualization(), getLevelTree(), getTeamStats()])
+      .then(([treeData, levelTreeData, statsData]) => {
         setTree(treeData.tree);
         setLevelData(levelTreeData);
+        setStats(statsData);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  // Once tree loads, collapse all nodes except root
+  useEffect(() => {
+    if (tree && !treeInitialized) {
+      const allIds = new Set<number>();
+      const collect = (n: any) => {
+        if (n?.id) {
+          allIds.add(n.id);
+          if (n.left) collect(n.left);
+          if (n.right) collect(n.right);
+        }
+      };
+      collect(tree);
+      // Remove root so it starts expanded
+      allIds.delete(tree.id);
+      setCollapsed(allIds);
+      setTreeInitialized(true);
+    }
+  }, [tree, treeInitialized]);
 
   const toggleCollapse = (id: number) => {
     setCollapsed((prev) => {
@@ -40,7 +67,7 @@ function TreePage() {
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
-    setZoom((prev) => Math.min(3, Math.max(0.15, prev + (e.deltaY > 0 ? -0.08 : 0.08))));
+    setZoom((prev) => Math.min(3, Math.max(0.1, prev + (e.deltaY > 0 ? -0.08 : 0.08))));
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -78,14 +105,28 @@ function TreePage() {
   }, []);
 
   const resetView = () => {
-    setZoom(1);
+    setZoom(0.5);
     setPan({ x: 0, y: 0 });
+  };
+
+  const expandAll = () => setCollapsed(new Set());
+  const collapseAll = () => {
+    const ids = new Set<number>();
+    const collect = (n: any) => { if (n?.id) { ids.add(n.id); if (n.left) collect(n.left); if (n.right) collect(n.right); } };
+    if (tree) collect(tree);
+    ids.delete(tree?.id); // Keep root expanded
+    setCollapsed(ids);
   };
 
   if (loading) {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-20 animate-pulse rounded-lg border border-gold/20 bg-card" />
+          ))}
+        </div>
         <div className="h-64 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
@@ -128,17 +169,31 @@ function TreePage() {
             </button>
           </div>
 
-          {/* Zoom controls (binary only) */}
+          {/* Zoom + expand/collapse controls (binary only) */}
           {viewMode === "binary" && (
             <div className="flex items-center gap-1.5">
-              <button onClick={() => setZoom((z) => Math.min(3, z + 0.15))} className="rounded border border-gold/30 px-2 py-1 text-xs font-bold text-emerald hover:bg-emerald/5">+</button>
-              <span className="min-w-[36px] text-center text-[10px] text-emerald/60">{Math.round(zoom * 100)}%</span>
-              <button onClick={() => setZoom((z) => Math.max(0.15, z - 0.15))} className="rounded border border-gold/30 px-2 py-1 text-xs font-bold text-emerald hover:bg-emerald/5">−</button>
+              <button onClick={expandAll} className="rounded border border-emerald/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Expand</button>
+              <button onClick={collapseAll} className="rounded border border-gold/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-gold hover:bg-gold/5">Collapse</button>
+              <div className="flex items-center gap-1 rounded border border-gold/30 px-1.5 py-0.5">
+                <button onClick={() => setZoom((z) => Math.min(3, z + 0.15))} className="px-1.5 py-0.5 text-xs font-bold text-emerald hover:bg-emerald/10 rounded">+</button>
+                <span className="min-w-[36px] text-center text-[10px] text-emerald/60">{Math.round(zoom * 100)}%</span>
+                <button onClick={() => setZoom((z) => Math.max(0.1, z - 0.15))} className="px-1.5 py-0.5 text-xs font-bold text-emerald hover:bg-emerald/10 rounded">−</button>
+              </div>
               <button onClick={resetView} className="rounded border border-emerald/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Reset</button>
             </div>
           )}
         </div>
       </div>
+
+      {/* Team Stats */}
+      {stats && (
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          <StatCard label="Direct Team" value={stats.directTeam} sub={`L: ${stats.leftCount} · R: ${stats.rightCount}`} icon="👥" />
+          <StatCard label="Total Team" value={stats.totalTeam} sub={`${stats.activeTeam} active`} icon="🌐" />
+          <StatCard label="Total Business" value={`₹${stats.totalBusiness.toLocaleString("en-IN")}`} sub="Package value" icon="💰" />
+          <StatCard label="Active Rate" value={stats.totalTeam > 0 ? `${Math.round((stats.activeTeam / stats.totalTeam) * 100)}%` : "—"} sub="Team activity" icon="📊" />
+        </div>
+      )}
 
       {/* Binary Tree View */}
       {viewMode === "binary" && (
@@ -146,7 +201,7 @@ function TreePage() {
           <div
             ref={containerRef}
             className="overflow-hidden rounded-lg border border-gold/15 bg-card shadow-sm"
-            style={{ cursor: dragging ? "grabbing" : "grab", minHeight: "400px" }}
+            style={{ cursor: dragging ? "grabbing" : "grab", minHeight: "500px" }}
             onWheel={handleWheel}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
@@ -178,6 +233,21 @@ function TreePage() {
       {viewMode === "level" && levelData && (
         <LevelTreeView levels={levelData.levels} rootId={levelData.rootId} />
       )}
+    </div>
+  );
+}
+
+function StatCard({ label, value, sub, icon }: { label: string; value: string | number; sub: string; icon: string }) {
+  return (
+    <div className="rounded-lg border border-gold/15 bg-card p-3 sm:p-4">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald/50">{label}</p>
+          <p className="mt-1 text-xl sm:text-2xl font-bold text-emerald">{value}</p>
+          <p className="text-[9px] sm:text-[10px] text-emerald/40">{sub}</p>
+        </div>
+        <span className="text-lg">{icon}</span>
+      </div>
     </div>
   );
 }

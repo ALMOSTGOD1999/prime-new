@@ -17,8 +17,11 @@ const rankColors: Record<string, string> = {
   platinum: "bg-violet-50 text-violet-700 ring-violet-200",
 };
 
-export function LevelTreeView({ levels, rootId }: { levels: LevelUser[][]; rootId: number }) {
-  const [expandedLevels, setExpandedLevels] = useState<Set<number>>(new Set([0]));
+export function LevelTreeView({ levels, rootId, startExpanded = false }: { levels: LevelUser[][]; rootId: number; startExpanded?: boolean }) {
+  const [expandedLevels, setExpandedLevels] = useState<Set<number>>(() => {
+    if (startExpanded) return new Set(levels.map((_, i) => i));
+    return new Set<number>(); // All collapsed by default
+  });
 
   const toggleLevel = (level: number) => {
     setExpandedLevels((prev) => {
