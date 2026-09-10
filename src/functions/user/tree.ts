@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "../../lib/db";
 import { users } from "../../lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 import { getCookie } from "@tanstack/react-start/server";
 
 async function getAuthUserId(): Promise<number> {
@@ -258,12 +258,27 @@ function buildLevelTree(rootId: number, descendants: FlatUser[]): LevelUser[][] 
 // Server Functions
 // ══════════════════════════════════════════════════════════
 
+// Find the root of the org tree: user with no parentId, or user 1, or the earliest user
+async function findOrgRoot(): Promise<number> {
+  // Try user 1 first
+  const u1 = await db.select({ id: users.id }).from(users).where(eq(users.id, 1));
+  if (u1.length > 0) return 1;
+
+  // Find user with no parent (the actual root)
+  const root = await db.select({ id: users.id }).from(users).where(isNull(users.parentId)).limit(1);
+  if (root.length > 0) return root[0]!.id;
+
+  // Fallback: earliest user
+  const first = await db.select({ id: users.id }).from(users).orderBy(users.id).limit(1);
+  return first[0]?.id ?? 1;
+}
+
 // ── Get binary tree visualization ──
 export const getTreeVisualization = createServerFn({ method: "GET" })
   .handler(async () => {
     const userId = await getAuthUserId();
     const admin = await isRealAdmin();
-    const rootId = admin ? 1 : userId;
+    const rootId = admin ? await findOrgRoot() : userId;
     const descendants = await fetchAllUsersInTree(rootId);
     const tree = buildTreeFromFlat(rootId, descendants);
     return { tree };
@@ -274,7 +289,7 @@ export const getLevelTree = createServerFn({ method: "GET" })
   .handler(async () => {
     const userId = await getAuthUserId();
     const admin = await isRealAdmin();
-    const rootId = admin ? 1 : userId;
+    const rootId = admin ? await findOrgRoot() : userId;
     const descendants = await fetchAllUsersInTree(rootId);
     const levels = buildLevelTree(rootId, descendants);
     return { levels, rootId };
