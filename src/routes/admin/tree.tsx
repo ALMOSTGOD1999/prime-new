@@ -12,7 +12,7 @@ function AdminTreePage() {
   const [levelData, setLevelData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"binary" | "level">("binary");
-  const [zoom, setZoom] = useState(0.4);
+  const [zoom, setZoom] = useState(0.75);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
@@ -24,6 +24,20 @@ function AdminTreePage() {
       .then(([treeData, levelTreeData]) => {
         setTree(treeData.tree);
         setLevelData(levelTreeData);
+        // Initially collapse ALL nodes (so only root shows its L/R slots as empty)
+        if (treeData.tree) {
+          const allIds = new Set<number>();
+          const collect = (n: any) => {
+            if (n?.id) {
+              allIds.add(n.id);
+              if (n.left) collect(n.left);
+              if (n.right) collect(n.right);
+            }
+          };
+          collect(treeData.tree);
+          allIds.delete(treeData.tree.id);
+          setCollapsed(allIds);
+        }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -211,8 +225,8 @@ function TreeNode({
   if (!node) {
     return (
       <div className="flex flex-col items-center">
-        <div className="rounded border border-dashed border-gold/15 px-4 py-2 text-center">
-          <p className="text-[9px] text-emerald/40">Empty</p>
+        <div className="rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 px-6 py-4 text-center min-w-[120px]">
+          <p className="text-xs text-slate-400 font-medium">Empty</p>
         </div>
       </div>
     );
@@ -224,51 +238,56 @@ function TreeNode({
   const isCollapsed = collapsed.has(node.id);
 
   const rankColors: Record<string, string> = {
-    bronze: "bg-amber-50 text-amber-700 ring-amber-200",
-    silver: "bg-slate-50 text-slate-600 ring-slate-200",
-    gold: "bg-yellow-50 text-yellow-700 ring-yellow-200",
-    platinum: "bg-violet-50 text-violet-700 ring-violet-200",
+    bronze: "bg-amber-100 text-amber-800 ring-amber-300",
+    silver: "bg-slate-100 text-slate-700 ring-slate-300",
+    gold: "bg-yellow-100 text-yellow-800 ring-yellow-300",
+    platinum: "bg-violet-100 text-violet-800 ring-violet-300",
   };
 
   return (
     <div className="flex flex-col items-center">
       {/* Node card */}
       <div
-        className={`group relative flex flex-col items-center rounded-lg border px-3 py-2 sm:px-4 sm:py-2.5 text-center transition-all ${
+        className={`group relative flex flex-col items-center rounded-xl border-2 px-5 py-3 sm:px-6 sm:py-4 text-center transition-all min-w-[140px] ${
           isRoot
-            ? "border-gold/40 bg-gradient-to-b from-gold/8 to-gold/3 shadow-md ring-1 ring-gold/15"
+            ? "border-gold/50 bg-gradient-to-b from-gold/10 to-gold/5 shadow-lg ring-2 ring-gold/20"
             : node.isActive
-              ? "border-emerald/25 bg-emerald/3 hover:border-emerald/40 hover:shadow-sm"
-              : "border-slate-200 bg-slate-50/50 hover:border-slate-300"
+              ? "border-emerald/30 bg-emerald/5 hover:border-emerald/50 hover:shadow-md"
+              : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:shadow-sm"
         }`}
       >
         {isRoot && (
-          <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-gold px-2 py-0.5 text-[7px] font-bold uppercase tracking-wider text-cream shadow-sm">
+          <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gold px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-cream shadow-md">
             Root
           </span>
         )}
 
-        <p className={`text-xs sm:text-sm font-semibold leading-tight ${isRoot ? "text-emerald" : "text-slate-800"}`}>
+        <p className={`text-sm sm:text-base font-bold leading-tight ${isRoot ? "text-emerald" : "text-slate-800"}`}>
           {node.name}
         </p>
-        <p className="text-[9px] sm:text-[10px] font-mono text-emerald/50 mt-0.5">{node.referralCode}</p>
+        <p className="text-[11px] sm:text-xs font-mono text-emerald/50 mt-1">{node.referralCode}</p>
 
-        <div className="mt-1.5 flex items-center justify-center gap-1">
-          <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[7px] sm:text-[8px] font-semibold ${
-            node.isActive ? "bg-emerald/10 text-emerald-700" : "bg-destructive/10 text-red-500"
+        <div className="mt-2 flex items-center justify-center gap-1.5">
+          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold ${
+            node.isActive ? "bg-emerald/15 text-emerald-700" : "bg-red-50 text-red-600"
           }`}>
-            <span className={`mr-0.5 h-1 w-1 rounded-full ${node.isActive ? "bg-emerald-500" : "bg-red-400"}`} />
+            <span className={`mr-1 h-1.5 w-1.5 rounded-full ${node.isActive ? "bg-emerald-500" : "bg-red-400"}`} />
             {node.isActive ? "Active" : "Inactive"}
           </span>
-          <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[7px] sm:text-[8px] font-semibold ring-1 ring-inset ${rankColors[node.rank] || "bg-slate-50 text-slate-600 ring-slate-200"}`}>
+          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold ring-1 ring-inset ${rankColors[node.rank] || "bg-slate-100 text-slate-600 ring-slate-300"}`}>
             {node.rank}
           </span>
         </div>
 
+        {/* Expand/Collapse button */}
         {hasChildren && (
           <button
             onClick={(e) => { e.stopPropagation(); toggleCollapse(node.id); }}
-            className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 z-10 flex h-5 w-5 items-center justify-center rounded-full border border-gold/30 bg-card text-[10px] font-bold text-emerald shadow-sm transition-colors hover:bg-emerald/5 hover:border-emerald/40"
+            className={`absolute -bottom-3 left-1/2 -translate-x-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-bold shadow-md transition-all ${
+              isCollapsed
+                ? "border-emerald/40 bg-emerald text-cream hover:bg-emerald/80"
+                : "border-gold/40 bg-gold text-cream hover:bg-gold/80"
+            }`}
           >
             {isCollapsed ? "+" : "−"}
           </button>
@@ -277,48 +296,48 @@ function TreeNode({
 
       {/* Children with binary tree lines */}
       {hasChildren && !isCollapsed && (
-        <div className="relative mt-5">
+        <div className="relative mt-6">
           {/* Vertical line down from parent */}
-          <div className="absolute left-1/2 top-0 h-2.5 w-px bg-gold/25 -translate-x-px" />
+          <div className="absolute left-1/2 top-0 h-3 w-px bg-gold/30 -translate-x-px" />
 
           {/* Horizontal line connecting left and right */}
           {hasLeft && hasRight && (
-            <div className="absolute left-[25%] right-[25%] top-2.5 h-px bg-gold/25" />
+            <div className="absolute left-[25%] right-[25%] top-3 h-px bg-gold/30" />
           )}
           {!hasLeft && hasRight && (
-            <div className="absolute left-1/2 right-[25%] top-2.5 h-px bg-gold/25" />
+            <div className="absolute left-1/2 right-[25%] top-3 h-px bg-gold/30" />
           )}
           {hasLeft && !hasRight && (
-            <div className="absolute left-[25%] right-1/2 top-2.5 h-px bg-gold/25" />
+            <div className="absolute left-[25%] right-1/2 top-3 h-px bg-gold/30" />
           )}
 
-          <div className="flex pt-2.5">
+          <div className="flex pt-3 gap-8 sm:gap-12 md:gap-16">
             {/* Left child */}
             <div className="flex flex-1 flex-col items-center relative">
-              <div className="absolute h-2.5 w-px bg-gold/25" style={{ left: "50%" }} />
-              <span className="mb-1.5 rounded-full px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider ring-1 ring-inset bg-emerald/8 text-emerald/70 ring-emerald/10">
+              <div className="absolute h-3 w-px bg-gold/30" style={{ left: "50%" }} />
+              <span className="mb-2 rounded-full px-2.5 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset bg-emerald/10 text-emerald-700 ring-emerald/20">
                 L
               </span>
               {node.left ? (
                 <TreeNode node={node.left} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
               ) : (
-                <div className="rounded border border-dashed border-slate-200 bg-slate-50/50 px-4 py-3 text-center">
-                  <p className="text-[9px] text-slate-400">Empty</p>
+                <div className="rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 px-6 py-4 text-center min-w-[120px]">
+                  <p className="text-xs text-slate-400 font-medium">Empty</p>
                 </div>
               )}
             </div>
 
             {/* Right child */}
             <div className="flex flex-1 flex-col items-center relative">
-              <div className="absolute h-2.5 w-px bg-gold/25" style={{ left: "50%" }} />
-              <span className="mb-1.5 rounded-full px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider ring-1 ring-inset bg-gold/8 text-gold/70 ring-gold/10">
+              <div className="absolute h-3 w-px bg-gold/30" style={{ left: "50%" }} />
+              <span className="mb-2 rounded-full px-2.5 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset bg-gold/10 text-gold-700 ring-gold/20">
                 R
               </span>
               {node.right ? (
                 <TreeNode node={node.right} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
               ) : (
-                <div className="rounded border border-dashed border-slate-200 bg-slate-50/50 px-4 py-3 text-center">
-                  <p className="text-[9px] text-slate-400">Empty</p>
+                <div className="rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 px-6 py-4 text-center min-w-[120px]">
+                  <p className="text-xs text-slate-400 font-medium">Empty</p>
                 </div>
               )}
             </div>
@@ -327,8 +346,8 @@ function TreeNode({
       )}
 
       {hasChildren && isCollapsed && (
-        <div className="mt-3 rounded-full border border-dashed border-gold/30 bg-gold/5 px-3 py-1 text-[9px] text-gold/70">
-          +{(hasLeft ? 1 : 0) + (hasRight ? 1 : 0)} hidden
+        <div className="mt-4 rounded-full border-2 border-dashed border-emerald/30 bg-emerald/5 px-4 py-1.5 text-[10px] sm:text-xs font-semibold text-emerald/70 cursor-pointer hover:bg-emerald/10 transition-colors" onClick={() => toggleCollapse(node.id)}>
+          + Click to expand
         </div>
       )}
     </div>
