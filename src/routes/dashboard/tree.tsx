@@ -18,13 +18,9 @@ function TreePage() {
   const [dragging, setDragging] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  // Start with root expanded (level 0) — rest collapsed
-  const [collapsed, setCollapsed] = useState<Set<number>>(() => {
-    const all = new Set<number>();
-    // We'll populate with all IDs once tree loads; for now start with root NOT collapsed
-    return all;
-  });
-  const [treeInitialized, setTreeInitialized] = useState(false);
+  // Start with all nodes expanded
+  const [collapsed, setCollapsed] = useState<Set<number>>(new Set());
+  const [treeInitialized, setTreeInitialized] = useState(true);
 
   useEffect(() => {
     Promise.all([getTreeVisualization(), getLevelTree(), getTeamStats()])
@@ -37,23 +33,8 @@ function TreePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Once tree loads, collapse all nodes except root
   useEffect(() => {
-    if (tree && !treeInitialized) {
-      const allIds = new Set<number>();
-      const collect = (n: any) => {
-        if (n?.id) {
-          allIds.add(n.id);
-          if (n.left) collect(n.left);
-          if (n.right) collect(n.right);
-        }
-      };
-      collect(tree);
-      // Remove root so it starts expanded
-      allIds.delete(tree.id);
-      setCollapsed(allIds);
-      setTreeInitialized(true);
-    }
+    // All nodes start expanded — no initialization needed
   }, [tree, treeInitialized]);
 
   const toggleCollapse = (id: number) => {
