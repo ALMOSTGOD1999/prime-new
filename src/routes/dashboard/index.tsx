@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getDashboard } from "../../functions/user/dashboard";
-import { activate } from "../../functions/user/activate";
 import { requestWithdrawal, getWithdrawals, getWithdrawalInfo } from "../../functions/user/withdraw";
 import { getLegBalance } from "../../functions/user/legbalance";
 import { getRankInfo } from "../../functions/user/rank";
@@ -14,7 +13,6 @@ export const Route = createFileRoute("/dashboard/")({
 function DashboardIndex() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activating, setActivating] = useState(false);
   const [copied, setCopied] = useState<"" | "left" | "right">("");
   // Withdrawal state
   const [withdrawAmount, setWithdrawAmount] = useState("");
@@ -46,19 +44,6 @@ function DashboardIndex() {
       .then(setTeamStats)
       .catch(() => {});
   }, []);
-
-  const handleActivate = async () => {
-    setActivating(true);
-    try {
-      const result = await activate();
-      alert(`Activated! Direct: ₹${result.directAmount}, Matching pairs: ${result.matchingEvents?.length || 0}`);
-      window.location.reload();
-    } catch (err: any) {
-      alert(err.message || "Activation failed");
-    } finally {
-      setActivating(false);
-    }
-  };
 
   const copyReferral = (leg: "left" | "right") => {
     const url = `${window.location.origin}/auth?ref=${data?.user?.referralCode}${leg === "left" ? "L" : "R"}`;
@@ -183,18 +168,11 @@ function DashboardIndex() {
         <div className="rounded border-2 border-gold/40 bg-gold/5 p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="font-display text-xl text-gold">Activate Your Account</h3>
+              <h3 className="font-display text-xl text-gold">Account Inactive</h3>
               <p className="mt-1 text-xs text-emerald/60">
-                Joining package: ₹2,999 — unlocks binary matching income and all benefits.
+                Contact admin to activate your account and unlock binary matching income.
               </p>
             </div>
-            <button
-              onClick={handleActivate}
-              disabled={activating}
-              className="whitespace-nowrap bg-gold px-8 py-3 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-50"
-            >
-              {activating ? "Activating..." : "Activate — ₹2,999"}
-            </button>
           </div>
         </div>
       )}

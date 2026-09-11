@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getAdminUsers } from "../../functions/admin/users";
 import { impersonateUser } from "../../functions/admin/impersonate";
 import { deleteUser } from "../../functions/admin/deleteuser";
+import { toggleUserActivation } from "../../functions/admin/activate";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsers,
@@ -17,6 +18,7 @@ function AdminUsers() {
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null);
   const [deleteKey, setDeleteKey] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [activatingId, setActivatingId] = useState<number | null>(null);
   const navigate = useNavigate();
 
   const fetchUsers = (s: string, p: number) => {
@@ -63,6 +65,21 @@ function AdminUsers() {
       alert(err.message || "Delete failed");
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleToggleActivation = async (userId: number, userName: string, currentActive: boolean) => {
+    const action = currentActive ? "deactivate" : "activate";
+    if (!confirm(`${action === "activate" ? "Activate" : "Deactivate"} ${userName}?`)) return;
+    setActivatingId(userId);
+    try {
+      const result = await toggleUserActivation({ data: { userId } });
+      alert(`${userName} has been ${result.isActive ? "activated" : "deactivated"}`);
+      fetchUsers(search, page);
+    } catch (err: any) {
+      alert(err.message || "Failed to update user");
+    } finally {
+      setActivatingId(null);
     }
   };
 
@@ -184,6 +201,28 @@ function AdminUsers() {
                       <td className="px-6 py-3.5 text-right">
                         {!user.isAdmin && (
                           <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleToggleActivation(user.id, user.name, user.isActive)}
+                              disabled={activatingId === user.id}
+                              className={`inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] transition-all duration-200 hover:shadow-sm disabled:opacity-40 ${
+                                user.isActive
+                                  ? "border-destructive/30 bg-destructive/10 text-red-600 hover:bg-destructive/20"
+                                  : "border-emerald/30 bg-emerald/10 text-emerald hover:bg-emerald/20"
+                              }`}
+                            >
+                              {activatingId === user.id ? (
+                                <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                              ) : (
+                                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  {user.isActive ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  ) : (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                  )}
+                                </svg>
+                              )}
+                              {activatingId === user.id ? "..." : user.isActive ? "Deactivate" : "Activate"}
+                            </button>
                             <button
                               onClick={() => handleImpersonate(user.id, user.name)}
                               disabled={impersonating === user.id}
