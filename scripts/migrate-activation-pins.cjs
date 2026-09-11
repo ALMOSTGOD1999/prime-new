@@ -5,9 +5,9 @@ const fs = require("fs");
 const path = require("path");
 
 async function migrateActivationPins() {
-  const databaseUrl = process.env.VITE_DATABASE_URL;
+  const databaseUrl = process.env.DATABASE_URL || process.env.VITE_DATABASE_URL;
   if (!databaseUrl) {
-    console.error("❌ VITE_DATABASE_URL not set in environment");
+    console.error("❌ DATABASE_URL not set in environment");
     process.exit(1);
   }
 
