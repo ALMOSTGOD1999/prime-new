@@ -194,17 +194,58 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
 
     const children = childrenByParent.get(id) || [];
     
-    // Find left and right positioned children
-    const leftChild = children.find((c) => c.position === "left");
-    const rightChild = children.find((c) => c.position === "right");
+    // Separate by position
+    const leftChildren = children.filter((c) => c.position === "left").sort((a, b) => a.id - b.id);
+    const rightChildren = children.filter((c) => c.position === "right").sort((a, b) => a.id - b.id);
+    const unpositioned = children
+      .filter((c) => c.position !== "left" && c.position !== "right")
+      .sort((a, b) => a.id - b.id);
 
-    // If no positioned children, use first two unpositioned as left/right
-    let finalLeft = leftChild;
-    let finalRight = rightChild;
-    if (!leftChild && !rightChild) {
-      const unpositioned = children.filter((c) => c.position !== "left" && c.position !== "right").sort((a, b) => a.id - b.id);
-      finalLeft = unpositioned[0];
-      finalRight = unpositioned[1];
+    let finalLeft: FlatUser[];
+    let finalRight: FlatUser[];
+
+    if (leftChildren.length > 0 || rightChildren.length > 0) {
+      // Has positioned children — use them, distribute unpositioned evenly
+      finalLeft = [...leftChildren];
+      finalRight = [...rightChildren];
+      for (const u of unpositioned) {
+        if (finalLeft.length <= finalRight.length) finalLeft.push(u);
+        else finalRight.push(u);
+      }
+    } else {
+      // No positioned children — split unpositioned evenly
+      finalLeft = unpositioned.filter((_, i) => i % 2 === 0);
+      finalRight = unpositioned.filter((_, i) => i % 2 === 1);
+    }
+
+    // Build left subtree: first child in left slot, extras chain under it
+    let leftNode: TreeNode | null = null;
+    if (finalLeft.length > 0) {
+      leftNode = buildNode(finalLeft[0]!.id);
+      let current = leftNode;
+      for (let i = 1; i < finalLeft.length; i++) {
+        const childNode = buildNode(finalLeft[i]!.id);
+        if (childNode && current) {
+          if (!current.left) current.left = childNode;
+          else if (!current.right) current.right = childNode;
+          current = childNode;
+        }
+      }
+    }
+
+    // Build right subtree: first child in right slot, extras chain under it
+    let rightNode: TreeNode | null = null;
+    if (finalRight.length > 0) {
+      rightNode = buildNode(finalRight[0]!.id);
+      let current = rightNode;
+      for (let i = 1; i < finalRight.length; i++) {
+        const childNode = buildNode(finalRight[i]!.id);
+        if (childNode && current) {
+          if (!current.right) current.right = childNode;
+          else if (!current.left) current.left = childNode;
+          current = childNode;
+        }
+      }
     }
 
     return {
@@ -214,8 +255,8 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       isActive: user.isActive,
       rank: user.rank || "bronze",
       position: user.position,
-      left: finalLeft ? buildNode(finalLeft.id) : null,
-      right: finalRight ? buildNode(finalRight.id) : null,
+      left: leftNode,
+      right: rightNode,
     };
   }
 
