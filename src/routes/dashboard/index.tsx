@@ -5,6 +5,7 @@ import { activate } from "../../functions/user/activate";
 import { requestWithdrawal, getWithdrawals, getWithdrawalInfo } from "../../functions/user/withdraw";
 import { getLegBalance } from "../../functions/user/legbalance";
 import { getRankInfo } from "../../functions/user/rank";
+import { getTeamStats } from "../../functions/user/tree";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardIndex,
@@ -22,6 +23,7 @@ function DashboardIndex() {
   const [withdrawInfo, setWithdrawInfo] = useState<any>(null);
   const [legBalance, setLegBalance] = useState<any>(null);
   const [rankInfo, setRankInfo] = useState<any>(null);
+  const [teamStats, setTeamStats] = useState<any>(null);
 
   useEffect(() => {
     getDashboard()
@@ -39,6 +41,9 @@ function DashboardIndex() {
       .catch(() => {});
     getRankInfo()
       .then(setRankInfo)
+      .catch(() => {});
+    getTeamStats()
+      .then(setTeamStats)
       .catch(() => {});
   }, []);
 
@@ -135,6 +140,44 @@ function DashboardIndex() {
           )}
         </div>
       </div>
+
+      {/* Team Overview — 60:40 layout */}
+      {teamStats && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
+          {/* Left: 60% — Team Stats */}
+          <div className="rounded border border-gold/20 bg-background p-6 sm:col-span-3">
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">My Team</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-lg border border-emerald/20 bg-emerald/5 p-4 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-emerald/70">Direct Team</p>
+                <p className="mt-1 font-display text-3xl text-emerald">{teamStats.directTeam}</p>
+                <p className="text-[10px] text-emerald/60">L: {teamStats.leftCount} · R: {teamStats.rightCount}</p>
+              </div>
+              <div className="rounded-lg border border-gold/20 bg-gold/5 p-4 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-gold">Total Team</p>
+                <p className="mt-1 font-display text-3xl text-gold">{teamStats.totalTeam}</p>
+                <p className="text-[10px] text-emerald/60">{teamStats.activeTeam} active members</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: 40% — Total Business */}
+          <div className="rounded border border-gold/20 bg-background p-6 sm:col-span-2">
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Total Business</h3>
+            <div className="rounded-lg border border-emerald/20 bg-emerald/5 p-4 text-center">
+              <p className="text-[10px] uppercase tracking-widest text-emerald/70">Business Volume</p>
+              <p className="mt-2 font-display text-3xl text-emerald">₹{teamStats.totalBusiness.toLocaleString("en-IN")}</p>
+              <p className="mt-1 text-[10px] text-emerald/60">Package value of your team</p>
+            </div>
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <span className="text-[10px] text-emerald/60">Active rate:</span>
+              <span className="font-display text-sm text-emerald">
+                {teamStats.totalTeam > 0 ? Math.round((teamStats.activeTeam / teamStats.totalTeam) * 100) : 0}%
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {!user.isActive && (
         <div className="rounded border-2 border-gold/40 bg-gold/5 p-6">

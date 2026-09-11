@@ -152,7 +152,7 @@ function DashboardLayout() {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-gold/20 bg-emerald text-cream transition-transform lg:translate-x-0 lg:static lg:z-auto ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-gold/20 bg-[oklch(0.22_0.06_165)] text-cream transition-transform lg:translate-x-0 lg:static lg:z-auto ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
