@@ -34,7 +34,7 @@ export const pairs = pgTable("pairs", {
 export const income = pgTable("income", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  type: text("type", { enum: ["direct", "matching", "award", "cashback"] }).notNull(),
+  type: text("type", { enum: ["direct", "matching", "award", "cashback", "daily_activation"] }).notNull(),
   amount: integer("amount").notNull(),
   pairId: integer("pair_id").references(() => pairs.id),
   description: text("description").notNull(),
@@ -160,3 +160,14 @@ export const goldRates = pgTable("gold_rates", {
   setBy: integer("set_by").references(() => users.id).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// ── Daily activation tracking ──────────────────────────
+export const dailyActivations = pgTable("daily_activations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  activationDate: text("activation_date").notNull(),
+  rewardAmount: integer("reward_amount").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  userDateUnique: uniqueIndex("daily_activation_user_date_unique").on(table.userId, table.activationDate),
+}));

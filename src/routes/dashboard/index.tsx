@@ -5,6 +5,7 @@ import { requestWithdrawal, getWithdrawals, getWithdrawalInfo } from "../../func
 import { getLegBalance } from "../../functions/user/legbalance";
 import { getRankInfo } from "../../functions/user/rank";
 import { getTeamStats } from "../../functions/user/tree";
+import { activateDailyReward, getDailyActivationStatus } from "../../functions/user/daily-activation";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardIndex,
@@ -22,6 +23,8 @@ function DashboardIndex() {
   const [legBalance, setLegBalance] = useState<any>(null);
   const [rankInfo, setRankInfo] = useState<any>(null);
   const [teamStats, setTeamStats] = useState<any>(null);
+  const [dailyActivation, setDailyActivation] = useState<any>(null);
+  const [dailyActivationLoading, setDailyActivationLoading] = useState(false);
 
   useEffect(() => {
     getDashboard()
@@ -43,6 +46,9 @@ function DashboardIndex() {
     getTeamStats()
       .then(setTeamStats)
       .catch(() => {});
+    getDailyActivationStatus()
+      .then(setDailyActivation)
+      .catch(() => {});
   }, []);
 
   const copyReferral = (leg: "left" | "right") => {
@@ -50,6 +56,24 @@ function DashboardIndex() {
     navigator.clipboard.writeText(url);
     setCopied(leg);
     setTimeout(() => setCopied(""), 2000);
+  };
+
+  const handleDailyActivation = async () => {
+    setDailyActivationLoading(true);
+    try {
+      const result = await activateDailyReward();
+      alert(`Daily activation successful! ₹${result.rewardAmount} credited to your income wallet.`);
+      // Refresh daily activation status
+      const status = await getDailyActivationStatus();
+      setDailyActivation(status);
+      // Refresh dashboard data
+      const dashData = await getDashboard();
+      setData(dashData);
+    } catch (err: any) {
+      alert(err.message || "Daily activation failed");
+    } finally {
+      setDailyActivationLoading(false);
+    }
   };
 
   const handleWithdraw = async () => {
@@ -161,6 +185,50 @@ function DashboardIndex() {
               </span>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Daily ID Activation Reward */}
+      {user.isActive && dailyActivation && (
+        <div className="rounded border border-gold/20 bg-background p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Daily ID Activation</h3>
+              <p className="mt-1 text-[10px] text-emerald/70">
+                Activate your ID daily between 12:00 PM — 12:00 AM IST to earn ₹100 reward.
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-[10px] text-emerald/60">Today's Reward</p>
+                <p className="font-display text-lg text-gold">₹{dailyActivation.rewardAmount}</p>
+              </div>
+              <button
+                onClick={handleDailyActivation}
+                disabled={dailyActivationLoading || dailyActivation.activatedToday || !dailyActivation.isWithdrawalTime}
+                className={`whitespace-nowrap px-6 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+                  dailyActivation.activatedToday
+                    ? "bg-emerald/20 text-emerald cursor-not-allowed"
+                    : dailyActivation.isWithdrawalTime
+                      ? "bg-gold text-cream hover:bg-emerald"
+                      : "bg-emerald/20 text-emerald cursor-not-allowed"
+                }`}
+              >
+                {dailyActivationLoading
+                  ? "Processing..."
+                  : dailyActivation.activatedToday
+                    ? "✓ Activated Today"
+                    : dailyActivation.isWithdrawalTime
+                      ? "Activate Now"
+                      : `Opens at ${dailyActivation.nextActivationTime}`}
+              </button>
+            </div>
+          </div>
+          {!dailyActivation.isWithdrawalTime && !dailyActivation.activatedToday && (
+            <p className="mt-3 text-[10px] text-gold">
+              ⏰ Withdrawal window: 12:00 PM — 12:00 AM IST daily
+            </p>
+          )}
         </div>
       )}
 

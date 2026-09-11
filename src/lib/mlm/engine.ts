@@ -1,6 +1,6 @@
 import { eq, and, sql, gte } from "drizzle-orm";
 import { db } from "../db";
-import { users, pairs, income, wallet, matchingAwards, dailyPairs } from "../db/schema";
+import { users, pairs, income, wallet, matchingAwards, dailyPairs, dailyActivations } from "../db/schema";
 
 // ── Constants ──────────────────────────────────────────
 const JOINING_AMOUNT = 2999;
@@ -423,4 +423,71 @@ export async function creditMonthlyCashback() {
   }
 
   return { totalUsers: credited.length, credited };
+}
+
+// ── Daily ID activation reward ────────────────────────
+// Users can activate their ID once daily between 12PM-12AM
+// Reward: ₹100 credited to income wallet (withdrawable)
+const DAILY_ACTIVATION_REWARD = 100;
+
+export async function dailyActivationReward(userId: number) {
+  const today = new Date().toISOString().slice(0, 10);
+  
+  // Check if user already activated today
+  const existing = await db
+    .select()
+    .from(dailyActivations)
+    .where(and(eq(dailyActivations.userId, userId), eq(dailyActivations.activationDate, today)));
+  
+  if (existing.length > 0) {
+    throw new Error("Already activated today. Try again tomorrow!");
+  }
+  
+  // Check if user is active
+  const user = await db.select().from(users).where(eq(users.id, userId));
+  if (user.length === 0) throw new Error("User not found");
+  if (!user[0].isActive) throw new Error("Account not activated yet");
+  
+  // Record the activation
+  await db.insert(dailyActivations).values({
+    userId,
+    activationDate: today,
+    rewardAmount: DAILY_ACTIVATION_REWARD,
+  });
+  
+  // Credit reward to income wallet (withdrawable)
+  await db.insert(income).values({
+    userId,
+    type: "daily_activation",
+    amount: DAILY_ACTIVATION_REWARD,
+    description: `Daily ID activation reward — ${today}`,
+  });
+  
+  // Distribute to wallets
+  await distributeIncome(userId, DAILY_ACTIVATION_REWARD);
+  
+  return { rewardAmount: DAILY_ACTIVATION_REWARD, date: today };
+}
+
+// ── Get daily activation status ───────────────────────
+export async function getDailyActivationStatus(userId: number) {
+  const today = new Date().toISOString().slice(0, 10);
+  
+  const existing = await db
+    .select()
+    .from(dailyActivations)
+    .where(and(eq(dailyActivations.userId, userId), eq(dailyActivations.activationDate, today)));
+  
+  // Check if within withdrawal hours (12PM-12AM)
+  const now = new Date();
+  const hours = now.getHours();
+  const isWithdrawalTime = hours >= 12; // 12PM to 12AM
+  
+  return {
+    activatedToday: existing.length > 0,
+    lastActivation: existing[0]?.createdAt ?? null,
+    rewardAmount: existing[0]?.rewardAmount ?? DAILY_ACTIVATION_REWARD,
+    isWithdrawalTime,
+    nextActivationTime: "12:00 PM",
+  };
 }
