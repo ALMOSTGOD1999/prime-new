@@ -74,6 +74,9 @@ function AuthPage() {
         console.log('[Auth] Calling login with:', { userId: email, password: '***' });
         const result = await login({ data: { userId: email, password } });
         console.log('[Auth] Login result:', result);
+        if (!result || !result.token) {
+          throw new Error("Login failed — no token received. Please try again.");
+        }
         document.cookie = `auth_token=${result.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
         if (result.user?.isAdmin) {
           console.log('[Auth] Navigating to /admin');

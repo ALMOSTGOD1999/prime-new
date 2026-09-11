@@ -18,6 +18,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as GoldRouteImport } from './routes/gold'
 import { Route as SilverRouteImport } from './routes/silver'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminActivationPinsRouteImport } from './routes/admin/activation-pins'
 import { Route as AdminAddUserRouteImport } from './routes/admin/add-user'
 import { Route as AdminAnnouncementsRouteImport } from './routes/admin/announcements'
 import { Route as AdminBulkRouteImport } from './routes/admin/bulk'
@@ -32,6 +33,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminTreeRouteImport } from './routes/admin/tree'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardActivateAccountRouteImport } from './routes/dashboard/activate-account'
 import { Route as DashboardAddUserRouteImport } from './routes/dashboard/add-user'
 import { Route as DashboardBadgesRouteImport } from './routes/dashboard/badges'
 import { Route as DashboardCalculatorRouteImport } from './routes/dashboard/calculator'
@@ -42,6 +44,7 @@ import { Route as DashboardLeaderboardRouteImport } from './routes/dashboard/lea
 import { Route as DashboardNotificationsRouteImport } from './routes/dashboard/notifications'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
 import { Route as DashboardReportsRouteImport } from './routes/dashboard/reports'
+import { Route as DashboardRewardsRouteImport } from './routes/dashboard/rewards'
 import { Route as DashboardTeamRouteImport } from './routes/dashboard/team'
 import { Route as DashboardTreeRouteImport } from './routes/dashboard/tree'
 
@@ -88,6 +91,11 @@ const SilverRoute = SilverRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminActivationPinsRoute = AdminActivationPinsRouteImport.update({
+  id: '/activation-pins',
+  path: '/activation-pins',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAddUserRoute = AdminAddUserRouteImport.update({
@@ -160,6 +168,12 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardActivateAccountRoute =
+  DashboardActivateAccountRouteImport.update({
+    id: '/activate-account',
+    path: '/activate-account',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardAddUserRoute = DashboardAddUserRouteImport.update({
   id: '/add-user',
   path: '/add-user',
@@ -210,6 +224,11 @@ const DashboardReportsRoute = DashboardReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardRewardsRoute = DashboardRewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardTeamRoute = DashboardTeamRouteImport.update({
   id: '/team',
   path: '/team',
@@ -230,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/gold': typeof GoldRoute
   '/silver': typeof SilverRoute
+  '/admin/activation-pins': typeof AdminActivationPinsRoute
   '/admin/add-user': typeof AdminAddUserRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/bulk': typeof AdminBulkRoute
@@ -243,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tree': typeof AdminTreeRoute
   '/admin/users': typeof AdminUsersRoute
+  '/dashboard/activate-account': typeof DashboardActivateAccountRoute
   '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
@@ -253,6 +274,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/reports': typeof DashboardReportsRoute
+  '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/dashboard/tree': typeof DashboardTreeRoute
   '/admin/': typeof AdminIndexRoute
@@ -265,6 +287,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/gold': typeof GoldRoute
   '/silver': typeof SilverRoute
+  '/admin/activation-pins': typeof AdminActivationPinsRoute
   '/admin/add-user': typeof AdminAddUserRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/bulk': typeof AdminBulkRoute
@@ -278,6 +301,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tree': typeof AdminTreeRoute
   '/admin/users': typeof AdminUsersRoute
+  '/dashboard/activate-account': typeof DashboardActivateAccountRoute
   '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
@@ -288,6 +312,7 @@ export interface FileRoutesByTo {
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/reports': typeof DashboardReportsRoute
+  '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/dashboard/tree': typeof DashboardTreeRoute
   '/admin': typeof AdminIndexRoute
@@ -303,6 +328,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/gold': typeof GoldRoute
   '/silver': typeof SilverRoute
+  '/admin/activation-pins': typeof AdminActivationPinsRoute
   '/admin/add-user': typeof AdminAddUserRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/bulk': typeof AdminBulkRoute
@@ -316,6 +342,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tree': typeof AdminTreeRoute
   '/admin/users': typeof AdminUsersRoute
+  '/dashboard/activate-account': typeof DashboardActivateAccountRoute
   '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
@@ -326,6 +353,7 @@ export interface FileRoutesById {
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/reports': typeof DashboardReportsRoute
+  '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/dashboard/tree': typeof DashboardTreeRoute
   '/admin/': typeof AdminIndexRoute
@@ -342,6 +370,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/gold'
     | '/silver'
+    | '/admin/activation-pins'
     | '/admin/add-user'
     | '/admin/announcements'
     | '/admin/bulk'
@@ -355,6 +384,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tree'
     | '/admin/users'
+    | '/dashboard/activate-account'
     | '/dashboard/add-user'
     | '/dashboard/badges'
     | '/dashboard/calculator'
@@ -365,6 +395,7 @@ export interface FileRouteTypes {
     | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/reports'
+    | '/dashboard/rewards'
     | '/dashboard/team'
     | '/dashboard/tree'
     | '/admin/'
@@ -377,6 +408,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/gold'
     | '/silver'
+    | '/admin/activation-pins'
     | '/admin/add-user'
     | '/admin/announcements'
     | '/admin/bulk'
@@ -390,6 +422,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tree'
     | '/admin/users'
+    | '/dashboard/activate-account'
     | '/dashboard/add-user'
     | '/dashboard/badges'
     | '/dashboard/calculator'
@@ -400,6 +433,7 @@ export interface FileRouteTypes {
     | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/reports'
+    | '/dashboard/rewards'
     | '/dashboard/team'
     | '/dashboard/tree'
     | '/admin'
@@ -414,6 +448,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/gold'
     | '/silver'
+    | '/admin/activation-pins'
     | '/admin/add-user'
     | '/admin/announcements'
     | '/admin/bulk'
@@ -427,6 +462,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tree'
     | '/admin/users'
+    | '/dashboard/activate-account'
     | '/dashboard/add-user'
     | '/dashboard/badges'
     | '/dashboard/calculator'
@@ -437,6 +473,7 @@ export interface FileRouteTypes {
     | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/reports'
+    | '/dashboard/rewards'
     | '/dashboard/team'
     | '/dashboard/tree'
     | '/admin/'
@@ -517,6 +554,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/activation-pins': {
+      id: '/admin/activation-pins'
+      path: '/activation-pins'
+      fullPath: '/admin/activation-pins'
+      preLoaderRoute: typeof AdminActivationPinsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/add-user': {
@@ -617,6 +661,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/activate-account': {
+      id: '/dashboard/activate-account'
+      path: '/activate-account'
+      fullPath: '/dashboard/activate-account'
+      preLoaderRoute: typeof DashboardActivateAccountRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/add-user': {
       id: '/dashboard/add-user'
       path: '/add-user'
@@ -687,6 +738,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardReportsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/rewards': {
+      id: '/dashboard/rewards'
+      path: '/rewards'
+      fullPath: '/dashboard/rewards'
+      preLoaderRoute: typeof DashboardRewardsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/team': {
       id: '/dashboard/team'
       path: '/team'
@@ -705,6 +763,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminActivationPinsRoute: typeof AdminActivationPinsRoute
   AdminAddUserRoute: typeof AdminAddUserRoute
   AdminAnnouncementsRoute: typeof AdminAnnouncementsRoute
   AdminBulkRoute: typeof AdminBulkRoute
@@ -722,6 +781,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminActivationPinsRoute: AdminActivationPinsRoute,
   AdminAddUserRoute: AdminAddUserRoute,
   AdminAnnouncementsRoute: AdminAnnouncementsRoute,
   AdminBulkRoute: AdminBulkRoute,
@@ -741,6 +801,7 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface DashboardRouteChildren {
+  DashboardActivateAccountRoute: typeof DashboardActivateAccountRoute
   DashboardAddUserRoute: typeof DashboardAddUserRoute
   DashboardBadgesRoute: typeof DashboardBadgesRoute
   DashboardCalculatorRoute: typeof DashboardCalculatorRoute
@@ -751,12 +812,14 @@ interface DashboardRouteChildren {
   DashboardNotificationsRoute: typeof DashboardNotificationsRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardReportsRoute: typeof DashboardReportsRoute
+  DashboardRewardsRoute: typeof DashboardRewardsRoute
   DashboardTeamRoute: typeof DashboardTeamRoute
   DashboardTreeRoute: typeof DashboardTreeRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardActivateAccountRoute: DashboardActivateAccountRoute,
   DashboardAddUserRoute: DashboardAddUserRoute,
   DashboardBadgesRoute: DashboardBadgesRoute,
   DashboardCalculatorRoute: DashboardCalculatorRoute,
@@ -767,6 +830,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardNotificationsRoute: DashboardNotificationsRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardReportsRoute: DashboardReportsRoute,
+  DashboardRewardsRoute: DashboardRewardsRoute,
   DashboardTeamRoute: DashboardTeamRoute,
   DashboardTreeRoute: DashboardTreeRoute,
   DashboardIndexRoute: DashboardIndexRoute,

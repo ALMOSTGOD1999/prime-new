@@ -134,6 +134,7 @@ function DashboardLayout() {
     { to: "/dashboard/add-user", label: "Add User", icon: "➕" },
     { to: "/dashboard/tree", label: "Tree View", icon: "🌳" },
     { to: "/dashboard/income", label: "Income", icon: "◆" },
+    { to: "/dashboard/activate-account", label: "Activate Account", icon: "🔑" },
     { to: "/dashboard/gold", label: "Gold Price", icon: "📈" },
     { to: "/dashboard/calculator", label: "Calculator", icon: "🧮" },
     { to: "/dashboard/reports", label: "Reports", icon: "📊" },

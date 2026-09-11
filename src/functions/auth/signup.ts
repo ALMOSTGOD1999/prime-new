@@ -68,7 +68,7 @@ export const signup = createServerFn({ method: "POST" })
     await db.update(users).set({ referralCode: code }).where(eq(users.id, newUser.id));
 
     // Create wallet
-    await db.insert(wallet).values({ userId: newUser.id, balance: 0, totalEarned: 0 });
+    await db.insert(wallet).values({ userId: newUser.id, workingBalance: 0, incomeBalance: 0, repurchaseBalance: 0, cashbackBalance: 0, totalEarned: 0 });
 
     // Place in binary tree if referrer exists
     if (referredBy) {

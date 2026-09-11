@@ -131,6 +131,6 @@ export async function seedAdmin() {
     })
     .returning();
 
-  await db.insert(wallet).values({ userId: admin.id, balance: 0, totalEarned: 0 });
+  await db.insert(wallet).values({ userId: admin.id, workingBalance: 0, incomeBalance: 0, repurchaseBalance: 0, cashbackBalance: 0, totalEarned: 0 });
   console.log(`[seed] Admin user created (id=${admin.id})`);
 }

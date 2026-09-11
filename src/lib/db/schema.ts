@@ -171,3 +171,14 @@ export const dailyActivations = pgTable("daily_activations", {
 }, (table) => ({
   userDateUnique: uniqueIndex("daily_activation_user_date_unique").on(table.userId, table.activationDate),
 }));
+
+// ── Activation Pins (admin-generated, user-activated) ──
+export const activationPins = pgTable("activation_pins", {
+  id: serial("id").primaryKey(),
+  pin: text("pin").notNull().unique(),
+  isUsed: boolean("is_used").default(false).notNull(),
+  generatedBy: integer("generated_by").references(() => users.id).notNull(),
+  usedBy: integer("used_by").references(() => users.id),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
