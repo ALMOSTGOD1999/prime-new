@@ -178,7 +178,7 @@ export const activationPins = pgTable("activation_pins", {
   pin: text("pin").notNull().unique(),
   isUsed: boolean("is_used").default(false).notNull(),
   generatedBy: integer("generated_by").references(() => users.id).notNull(),
-  usedBy: integer("used_by").references(() => users.id),
+  usedBy: integer("used_by").references(() => users.id, { onDelete: "set null" }),
   usedAt: timestamp("used_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

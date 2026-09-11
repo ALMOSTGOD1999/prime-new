@@ -21,7 +21,7 @@ async function migrateActivationPins() {
       "pin" text NOT NULL,
       "is_used" boolean DEFAULT false NOT NULL,
       "generated_by" integer REFERENCES "users"("id") NOT NULL,
-      "used_by" integer REFERENCES "users"("id"),
+      "used_by" integer REFERENCES "users"("id") ON DELETE SET NULL,
       "used_at" timestamp,
       "created_at" timestamp DEFAULT now() NOT NULL,
       CONSTRAINT "activation_pins_pin_unique" UNIQUE ("pin")
