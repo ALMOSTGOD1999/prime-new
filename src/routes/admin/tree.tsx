@@ -276,8 +276,9 @@ function TreeNode({
         <div className="relative mt-5">
           <div className="absolute left-1/2 top-0 h-2.5 w-px bg-gold/25 -translate-x-px" />
           
+          {/* First 2 children: horizontal row (left/right) */}
           <div className="flex gap-3 sm:gap-4 md:gap-6 pt-2.5">
-            {node.children.map((child: any, index: number) => (
+            {node.children.slice(0, 2).map((child: any, index: number) => (
               <div key={child.id} className="flex flex-col items-center relative">
                 <div className="absolute h-2.5 w-px bg-gold/25" style={{ left: "50%" }} />
                 <span className={`mb-1.5 rounded-full px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider ring-1 ring-inset ${
@@ -293,6 +294,24 @@ function TreeNode({
               </div>
             ))}
           </div>
+
+          {/* Additional children (3+): vertical chain below parent, still direct children */}
+          {node.children.length > 2 && (
+            <div className="flex flex-col items-center mt-3">
+              {node.children.slice(2).map((child: any, index: number) => (
+                <div key={child.id} className="flex flex-col items-center relative">
+                  <div className="absolute -top-3 h-3 w-px bg-gold/25" style={{ left: "50%" }} />
+                  <span className="mb-1.5 rounded-full px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider ring-1 ring-inset bg-slate-50 text-slate-500 ring-slate-100">
+                    {index + 3}
+                  </span>
+                  <TreeNode node={child} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
+                  {index < node.children.length - 3 && (
+                    <div className="absolute -bottom-3 h-3 w-px bg-gold/25" style={{ left: "50%" }} />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
