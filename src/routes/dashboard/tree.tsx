@@ -93,7 +93,7 @@ function TreePage() {
   const expandAll = () => setCollapsed(new Set());
   const collapseAll = () => {
     const ids = new Set<number>();
-    const collect = (n: any) => { if (n?.id) { ids.add(n.id); if (n.left) collect(n.left); if (n.right) collect(n.right); } };
+    const collect = (n: any) => { if (n?.id) { ids.add(n.id); if (n.children) n.children.forEach(collect); } };
     if (tree) collect(tree);
     ids.delete(tree?.id); // Keep root expanded
     setCollapsed(ids);
@@ -256,7 +256,7 @@ function TreeNode({
     );
   }
 
-  const hasChildren = node.left || node.right;
+  const hasChildren = node.children && node.children.length > 0;
   const isCollapsed = collapsed.has(node.id);
 
   const rankColors: Record<string, string> = {
@@ -313,33 +313,30 @@ function TreeNode({
       {hasChildren && !isCollapsed && (
         <div className="relative mt-5">
           <div className="absolute left-1/2 top-0 h-2.5 w-px bg-gold/25 -translate-x-px" />
-          {(node.left && node.right) && (
-            <div className="absolute left-[25%] right-[25%] top-2.5 h-px bg-gold/25" />
-          )}
-
-          <div className="flex gap-4 sm:gap-8 md:gap-12 pt-2.5">
-            <div className="flex flex-col items-center">
-              {node.left && <div className="absolute h-2.5 w-px bg-gold/25" style={{ left: "25%" }} />}
-              <span className="mb-1.5 rounded-full bg-emerald/8 px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider text-emerald/70 ring-1 ring-emerald/10">
-                L
-              </span>
-              <TreeNode node={node.left} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
-            </div>
-
-            <div className="flex flex-col items-center">
-              {node.right && <div className="absolute h-2.5 w-px bg-gold/25" style={{ left: "75%" }} />}
-              <span className="mb-1.5 rounded-full bg-gold/8 px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider text-gold/70 ring-1 ring-gold/10">
-                R
-              </span>
-              <TreeNode node={node.right} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
-            </div>
+          
+          <div className="flex gap-3 sm:gap-4 md:gap-6 pt-2.5">
+            {node.children.map((child: any, index: number) => (
+              <div key={child.id} className="flex flex-col items-center relative">
+                <div className="absolute h-2.5 w-px bg-gold/25" style={{ left: "50%" }} />
+                <span className={`mb-1.5 rounded-full px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider ring-1 ring-inset ${
+                  child.position === "left" 
+                    ? "bg-emerald/8 text-emerald/70 ring-emerald/10" 
+                    : child.position === "right"
+                      ? "bg-gold/8 text-gold/70 ring-gold/10"
+                      : "bg-slate-50 text-slate-500 ring-slate-100"
+                }`}>
+                  {child.position === "left" ? "L" : child.position === "right" ? "R" : index + 1}
+                </span>
+                <TreeNode node={child} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
+              </div>
+            ))}
           </div>
         </div>
       )}
 
       {hasChildren && isCollapsed && (
         <div className="mt-3 rounded-full border border-dashed border-gold/30 bg-gold/5 px-3 py-1 text-[9px] text-gold/70">
-          +{(node.left ? 1 : 0) + (node.right ? 1 : 0)} hidden
+          +{node.children.length} hidden
         </div>
       )}
     </div>

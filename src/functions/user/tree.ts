@@ -37,8 +37,7 @@ type TreeNode = {
   isActive: boolean;
   rank: string;
   position: string | null;
-  left: TreeNode | null;
-  right: TreeNode | null;
+  children: TreeNode[];
 };
 
 type LevelUser = {
@@ -173,7 +172,7 @@ async function fetchAllUsersInTree(rootId: number): Promise<FlatUser[]> {
   return result;
 }
 
-// ── Build binary tree from flat user list (zero DB queries) ──
+// ── Build tree from flat user list (zero DB queries) ──
 function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | null {
   const userMap = new Map<number, FlatUser>();
   for (const u of descendants) userMap.set(u.id, u);
@@ -188,62 +187,37 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
     }
   }
 
-  function makeNode(u: FlatUser): TreeNode {
-    return {
-      id: u.id, name: u.name, referralCode: u.referralCode,
-      isActive: u.isActive, rank: u.rank || "bronze",
-      position: u.position, left: null, right: null,
-    };
-  }
-
-  // BFS: insert node into first available null slot
-  function insertBFS(root: TreeNode, node: TreeNode): void {
-    const queue: TreeNode[] = [root];
-    while (queue.length > 0) {
-      const current = queue.shift()!;
-      if (!current.left) { current.left = node; return; }
-      if (!current.right) { current.right = node; return; }
-      queue.push(current.left, current.right);
-    }
-  }
-
   function buildNode(id: number): TreeNode | null {
     const user = userMap.get(id);
     if (!user) return null;
 
     const children = childrenByParent.get(id) || [];
-    if (children.length === 0) {
-      return makeNode(user);
-    }
-
+    
     // Sort: positioned left first, positioned right second, then unpositioned by id
-    const leftP = children.find((c) => c.position === "left");
-    const rightP = children.find((c) => c.position === "right");
-    const unpositioned = children
-      .filter((c) => c.position !== "left" && c.position !== "right")
-      .sort((a, b) => a.id - b.id);
+    const sortedChildren = [
+      ...children.filter((c) => c.position === "left"),
+      ...children.filter((c) => c.position === "right"),
+      ...children
+        .filter((c) => c.position !== "left" && c.position !== "right")
+        .sort((a, b) => a.id - b.id),
+    ];
 
-    // First two slots: positioned children or first unpositioned
-    const slot1 = leftP || unpositioned.shift() || null;
-    const slot2 = rightP || unpositioned.shift() || null;
-
-    // Build subtrees for the 2 direct children (handles THEIR children recursively)
-    const leftNode = slot1 ? buildNode(slot1.id) : null;
-    const rightNode = slot2 ? buildNode(slot2.id) : null;
-
-    const root: TreeNode = {
-      id: user.id, name: user.name, referralCode: user.referralCode,
-      isActive: user.isActive, rank: user.rank || "bronze",
-      position: user.position, left: leftNode, right: rightNode,
-    };
-
-    // Place remaining unpositioned children into first empty slots via BFS
-    for (const child of unpositioned) {
+    // Build child nodes recursively
+    const childNodes: TreeNode[] = [];
+    for (const child of sortedChildren) {
       const childNode = buildNode(child.id);
-      if (childNode) insertBFS(root, childNode);
+      if (childNode) childNodes.push(childNode);
     }
 
-    return root;
+    return {
+      id: user.id,
+      name: user.name,
+      referralCode: user.referralCode,
+      isActive: user.isActive,
+      rank: user.rank || "bronze",
+      position: user.position,
+      children: childNodes,
+    };
   }
 
   return buildNode(rootId);
