@@ -37,7 +37,8 @@ type TreeNode = {
   isActive: boolean;
   rank: string;
   position: string | null;
-  children: TreeNode[];
+  left: TreeNode | null;
+  right: TreeNode | null;
 };
 
 type LevelUser = {
@@ -193,20 +194,17 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
 
     const children = childrenByParent.get(id) || [];
     
-    // Sort: positioned left first, positioned right second, then unpositioned by id
-    const sortedChildren = [
-      ...children.filter((c) => c.position === "left"),
-      ...children.filter((c) => c.position === "right"),
-      ...children
-        .filter((c) => c.position !== "left" && c.position !== "right")
-        .sort((a, b) => a.id - b.id),
-    ];
+    // Find left and right positioned children
+    const leftChild = children.find((c) => c.position === "left");
+    const rightChild = children.find((c) => c.position === "right");
 
-    // Build child nodes recursively
-    const childNodes: TreeNode[] = [];
-    for (const child of sortedChildren) {
-      const childNode = buildNode(child.id);
-      if (childNode) childNodes.push(childNode);
+    // If no positioned children, use first two unpositioned as left/right
+    let finalLeft = leftChild;
+    let finalRight = rightChild;
+    if (!leftChild && !rightChild) {
+      const unpositioned = children.filter((c) => c.position !== "left" && c.position !== "right").sort((a, b) => a.id - b.id);
+      finalLeft = unpositioned[0];
+      finalRight = unpositioned[1];
     }
 
     return {
@@ -216,7 +214,8 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       isActive: user.isActive,
       rank: user.rank || "bronze",
       position: user.position,
-      children: childNodes,
+      left: finalLeft ? buildNode(finalLeft.id) : null,
+      right: finalRight ? buildNode(finalRight.id) : null,
     };
   }
 

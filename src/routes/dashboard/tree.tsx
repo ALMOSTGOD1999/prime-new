@@ -93,7 +93,7 @@ function TreePage() {
   const expandAll = () => setCollapsed(new Set());
   const collapseAll = () => {
     const ids = new Set<number>();
-    const collect = (n: any) => { if (n?.id) { ids.add(n.id); if (n.children) n.children.forEach(collect); } };
+    const collect = (n: any) => { if (n?.id) { ids.add(n.id); if (n.left) collect(n.left); if (n.right) collect(n.right); } };
     if (tree) collect(tree);
     ids.delete(tree?.id); // Keep root expanded
     setCollapsed(ids);
@@ -256,8 +256,18 @@ function TreeNode({
     );
   }
 
-  const hasChildren = node.children && node.children.length > 0;
+  const hasLeft = node.left != null;
+  const hasRight = node.right != null;
+  const hasChildren = hasLeft || hasRight;
   const isCollapsed = collapsed.has(node.id);
+
+  // Count team sizes for L/R
+  const countTeam = (n: any): number => {
+    if (!n) return 0;
+    return 1 + countTeam(n.left) + countTeam(n.right);
+  };
+  const leftCount = hasLeft ? countTeam(node.left) - 1 : 0;
+  const rightCount = hasRight ? countTeam(node.right) - 1 : 0;
 
   const rankColors: Record<string, string> = {
     bronze: "bg-amber-50 text-amber-700 ring-amber-200",
@@ -268,6 +278,7 @@ function TreeNode({
 
   return (
     <div className="flex flex-col items-center">
+      {/* Node card */}
       <div
         className={`group relative flex flex-col items-center rounded-lg border px-3 py-2 sm:px-4 sm:py-2.5 text-center transition-all ${
           isRoot
@@ -310,52 +321,60 @@ function TreeNode({
         )}
       </div>
 
+      {/* Children with binary tree lines */}
       {hasChildren && !isCollapsed && (
         <div className="relative mt-5">
+          {/* Vertical line down from parent */}
           <div className="absolute left-1/2 top-0 h-2.5 w-px bg-gold/25 -translate-x-px" />
-          
-          {/* First 2 children: horizontal row (left/right) */}
-          <div className="flex gap-3 sm:gap-4 md:gap-6 pt-2.5">
-            {node.children.slice(0, 2).map((child: any, index: number) => (
-              <div key={child.id} className="flex flex-col items-center relative">
-                <div className="absolute h-2.5 w-px bg-gold/25" style={{ left: "50%" }} />
-                <span className={`mb-1.5 rounded-full px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider ring-1 ring-inset ${
-                  child.position === "left" 
-                    ? "bg-emerald/8 text-emerald/70 ring-emerald/10" 
-                    : child.position === "right"
-                      ? "bg-gold/8 text-gold/70 ring-gold/10"
-                      : "bg-slate-50 text-slate-500 ring-slate-100"
-                }`}>
-                  {child.position === "left" ? "L" : child.position === "right" ? "R" : index + 1}
-                </span>
-                <TreeNode node={child} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
-              </div>
-            ))}
-          </div>
 
-          {/* Additional children (3+): vertical chain below parent, still direct children */}
-          {node.children.length > 2 && (
-            <div className="flex flex-col items-center mt-3">
-              {node.children.slice(2).map((child: any, index: number) => (
-                <div key={child.id} className="flex flex-col items-center relative">
-                  <div className="absolute -top-3 h-3 w-px bg-gold/25" style={{ left: "50%" }} />
-                  <span className="mb-1.5 rounded-full px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider ring-1 ring-inset bg-slate-50 text-slate-500 ring-slate-100">
-                    {index + 3}
-                  </span>
-                  <TreeNode node={child} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
-                  {index < node.children.length - 3 && (
-                    <div className="absolute -bottom-3 h-3 w-px bg-gold/25" style={{ left: "50%" }} />
-                  )}
-                </div>
-              ))}
-            </div>
+          {/* Horizontal line connecting left and right */}
+          {hasLeft && hasRight && (
+            <div className="absolute left-[25%] right-[25%] top-2.5 h-px bg-gold/25" />
           )}
+          {!hasLeft && hasRight && (
+            <div className="absolute left-1/2 right-[25%] top-2.5 h-px bg-gold/25" />
+          )}
+          {hasLeft && !hasRight && (
+            <div className="absolute left-[25%] right-1/2 top-2.5 h-px bg-gold/25" />
+          )}
+
+          <div className="flex pt-2.5">
+            {/* Left child */}
+            <div className="flex flex-1 flex-col items-center relative">
+              <div className="absolute h-2.5 w-px bg-gold/25" style={{ left: "50%" }} />
+              <span className="mb-1.5 rounded-full px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider ring-1 ring-inset bg-emerald/8 text-emerald/70 ring-emerald/10">
+                L
+              </span>
+              {node.left ? (
+                <TreeNode node={node.left} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
+              ) : (
+                <div className="rounded border border-dashed border-slate-200 bg-slate-50/50 px-4 py-3 text-center">
+                  <p className="text-[9px] text-slate-400">Empty</p>
+                </div>
+              )}
+            </div>
+
+            {/* Right child */}
+            <div className="flex flex-1 flex-col items-center relative">
+              <div className="absolute h-2.5 w-px bg-gold/25" style={{ left: "50%" }} />
+              <span className="mb-1.5 rounded-full px-2 py-0.5 text-[7px] sm:text-[8px] font-semibold uppercase tracking-wider ring-1 ring-inset bg-gold/8 text-gold/70 ring-gold/10">
+                R
+              </span>
+              {node.right ? (
+                <TreeNode node={node.right} collapsed={collapsed} toggleCollapse={toggleCollapse} depth={depth + 1} />
+              ) : (
+                <div className="rounded border border-dashed border-slate-200 bg-slate-50/50 px-4 py-3 text-center">
+                  <p className="text-[9px] text-slate-400">Empty</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
       {hasChildren && isCollapsed && (
         <div className="mt-3 rounded-full border border-dashed border-gold/30 bg-gold/5 px-3 py-1 text-[9px] text-gold/70">
-          +{node.children.length} hidden
+          +{(hasLeft ? 1 : 0) + (hasRight ? 1 : 0)} hidden
         </div>
       )}
     </div>
