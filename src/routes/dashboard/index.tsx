@@ -180,7 +180,7 @@ function DashboardIndex() {
       {/* 4 Wallet Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Working Wallet" value={`₹${income.workingBalance.toLocaleString("en-IN")}`} icon="◆" subtitle="All gross income (no deductions)" />
-        <StatCard title="Income Wallet" value={`₹${income.incomeBalance.toLocaleString("en-IN")}`} icon="◇" subtitle="Net income · Withdrawable 12AM–12PM" />
+        <StatCard title="Income Wallet" value={`₹${income.incomeBalance.toLocaleString("en-IN")}`} icon="◇" subtitle="Net income after 20% + 10% deductions" />
         <StatCard title="Re-Purchase Wallet" value={`₹${income.repurchaseBalance.toLocaleString("en-IN")}`} icon="◈" subtitle="20% reserved · Spend on products" />
         <StatCard title="Cashback Wallet" value={`₹${income.cashbackBalance.toLocaleString("en-IN")}`} icon="○" subtitle="Monthly cashback · Spend on products" />
       </div>
