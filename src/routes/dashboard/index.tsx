@@ -177,11 +177,19 @@ function DashboardIndex() {
         </div>
       )}
 
+      {/* 4 Wallet Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Income" value={`₹${income.totalIncome.toLocaleString("en-IN")}`} icon="◈" />
-        <StatCard title="Income Wallet" value={`₹${income.incomeBalance.toLocaleString("en-IN")}`} icon="◇" subtitle="Withdrawable 12AM–12PM" />
-        <StatCard title="Working Wallet" value={`₹${income.workingBalance.toLocaleString("en-IN")}`} icon="◆" subtitle="Commissions & awards" />
-        <StatCard title="Today's Pairs" value={`${income.todayPairs} / 3`} icon="○" />
+        <StatCard title="Working Wallet" value={`₹${income.workingBalance.toLocaleString("en-IN")}`} icon="◆" subtitle="All gross income (no deductions)" />
+        <StatCard title="Income Wallet" value={`₹${income.incomeBalance.toLocaleString("en-IN")}`} icon="◇" subtitle="Net income · Withdrawable 12AM–12PM" />
+        <StatCard title="Re-Purchase Wallet" value={`₹${income.repurchaseBalance.toLocaleString("en-IN")}`} icon="◈" subtitle="20% reserved · Spend on products" />
+        <StatCard title="Cashback Wallet" value={`₹${income.cashbackBalance.toLocaleString("en-IN")}`} icon="○" subtitle="Monthly cashback · Spend on products" />
+      </div>
+
+      {/* Secondary stats row */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <StatCard title="Total Earned" value={`₹${income.totalEarned.toLocaleString("en-IN")}`} icon="▣" subtitle="Lifetime earnings" />
+        <StatCard title="Today's Pairs" value={`${income.todayPairs} / 3`} icon="◎" subtitle="Daily pair cap" />
+        <StatCard title="Total Income" value={`₹${income.totalIncome.toLocaleString("en-IN")}`} icon="▤" subtitle="Direct + Matching" />
       </div>
 
       {/* Leg Balance + Rank */}
@@ -386,17 +394,20 @@ function DashboardIndex() {
         <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Direct Commission</p>
           <p className="mt-1 font-display text-2xl text-emerald">₹{income.direct.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-[10px] text-emerald/60">5% one-time → Working Wallet</p>
+          <p className="mt-1 text-[10px] text-emerald/60">5% one-time per referral</p>
         </div>
         <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-[10px] uppercase tracking-widest text-emerald/70">Matching Income</p>
           <p className="mt-1 font-display text-2xl text-gold">₹{income.matching.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-[10px] text-emerald/60">20% per pair → Income Wallet</p>
+          <p className="mt-1 text-[10px] text-emerald/60">20% per pair match</p>
         </div>
         <div className="rounded border border-gold/20 bg-background p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Earned</p>
-          <p className="mt-1 font-display text-2xl text-emerald">₹{income.totalEarned.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-[10px] text-emerald/60">Lifetime earnings</p>
+          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Income Split</p>
+          <div className="mt-2 space-y-1">
+            <div className="flex justify-between text-[10px]"><span className="text-emerald/60">→ Re-purchase (20%)</span><span className="text-gold">₹{Math.round(income.totalIncome * 0.2).toLocaleString("en-IN")}</span></div>
+            <div className="flex justify-between text-[10px]"><span className="text-emerald/60">→ Admin charge (10%)</span><span className="text-red-400">₹{Math.round(income.totalIncome * 0.1).toLocaleString("en-IN")}</span></div>
+            <div className="flex justify-between text-[10px]"><span className="text-emerald/60">→ Income wallet (70%)</span><span className="text-emerald">₹{Math.round(income.totalIncome * 0.7).toLocaleString("en-IN")}</span></div>
+          </div>
         </div>
       </div>
     </div>

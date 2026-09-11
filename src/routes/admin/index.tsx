@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getAdminUsers } from "../../functions/admin/users";
 import { getAdminIncome } from "../../functions/admin/income";
+import { monthlyCashbackPayout } from "../../functions/admin/cashback";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
@@ -11,6 +12,22 @@ function AdminDashboard() {
   const [usersData, setUsersData] = useState<any>(null);
   const [incomeData, setIncomeData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [cashbackLoading, setCashbackLoading] = useState(false);
+  const [cashbackResult, setCashbackResult] = useState<any>(null);
+
+  const handleCashbackPayout = async () => {
+    if (!confirm("Credit monthly cashback (30% of self business) to all eligible users?")) return;
+    setCashbackLoading(true);
+    try {
+      const result = await monthlyCashbackPayout();
+      setCashbackResult(result);
+      alert(`Credited cashback to ${result.totalUsers} users!`);
+    } catch (err: any) {
+      alert(err.message || "Cashback payout failed");
+    } finally {
+      setCashbackLoading(false);
+    }
+  };
 
   useEffect(() => {
     Promise.all([
@@ -88,6 +105,45 @@ function AdminDashboard() {
             <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
           </div>
         ))}
+      </div>
+
+      {/* Monthly Cashback Payout */}
+      <div className="overflow-hidden rounded-xl border border-gold/10 bg-background shadow-sm">
+        <div className="flex items-center justify-between border-b border-gold/10 px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-gold/10 p-2">
+              <svg className="h-4 w-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" /></svg>
+            </div>
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Monthly Cashback Payout</h3>
+              <p className="mt-0.5 text-[10px] text-emerald/60">Credits 30% of each active user's self business to their cashback wallet</p>
+            </div>
+          </div>
+          <button
+            onClick={handleCashbackPayout}
+            disabled={cashbackLoading}
+            className="inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-gold/20 transition-all duration-200 hover:bg-gold/90 hover:shadow-md hover:shadow-gold/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {cashbackLoading ? (
+              <>
+                <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                Processing...
+              </>
+            ) : (
+              <>
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v12m-3-2.818.879.659 1.171-1.671.48-.642A3 3 0 0 1 15.96 12H18a3 3 0 0 1 3 3v.342M3 9.342A3 3 0 0 1 5.96 6H8.04c.734 0 1.413.468 1.658 1.165l.637 1.787M3 9.342V15a3 3 0 0 0 3 3h.64M12 6V3" /></svg>
+                Credit Cashback
+              </>
+            )}
+          </button>
+        </div>
+        {cashbackResult && (
+          <div className="px-6 py-3 bg-emerald/5 border-b border-emerald/10">
+            <p className="text-xs text-emerald">
+              Credited <span className="font-semibold">₹{cashbackResult.credited?.reduce((s: number, c: any) => s + c.cashback, 0).toLocaleString("en-IN")}</span> total cashback to <span className="font-semibold">{cashbackResult.totalUsers}</span> users.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Recent Users Table */}

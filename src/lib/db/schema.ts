@@ -34,7 +34,7 @@ export const pairs = pgTable("pairs", {
 export const income = pgTable("income", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  type: text("type", { enum: ["direct", "matching", "award"] }).notNull(),
+  type: text("type", { enum: ["direct", "matching", "award", "cashback"] }).notNull(),
   amount: integer("amount").notNull(),
   pairId: integer("pair_id").references(() => pairs.id),
   description: text("description").notNull(),
@@ -42,11 +42,17 @@ export const income = pgTable("income", {
 });
 
 // ── Wallet ─────────────────────────────────────────────
+// workingBalance  = gross income (user sees ALL income, no deductions)
+// incomeBalance   = net income after 20% repurchase + 10% admin = 70% (withdrawable)
+// repurchaseBalance = 20% of every income (spendable on products)
+// cashbackBalance = monthly cashback = 30% of self business (spendable on products)
 export const wallet = pgTable("wallet", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull().unique(),
-  incomeBalance: integer("income_balance").default(0).notNull(),
   workingBalance: integer("working_balance").default(0).notNull(),
+  incomeBalance: integer("income_balance").default(0).notNull(),
+  repurchaseBalance: integer("repurchase_balance").default(0).notNull(),
+  cashbackBalance: integer("cashback_balance").default(0).notNull(),
   totalEarned: integer("total_earned").default(0).notNull(),
 });
 

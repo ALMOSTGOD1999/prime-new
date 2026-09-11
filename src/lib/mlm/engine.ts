@@ -66,6 +66,42 @@ export async function autoPlace(
   return position;
 }
 
+// ── Distribute income across 4 wallets ──────────────────
+// Every income event:
+//   workingBalance  += grossAmount (shows ALL income, no deductions)
+//   repurchaseBalance += 20% (spendable on products)
+//   incomeBalance   += 70% (withdrawable)
+//   10% admin charge → wiped from system (not stored)
+export async function distributeIncome(userId: number, grossAmount: number) {
+  const repurchaseAmount = Math.round(grossAmount * 20 / 100); // 20%
+  const incomeAmount = Math.round(grossAmount * 70 / 100);     // 70%
+  // 10% admin charge = grossAmount - repurchaseAmount - incomeAmount (wiped)
+
+  const existing = await db.select().from(wallet).where(eq(wallet.userId, userId));
+  if (existing.length > 0) {
+    await db
+      .update(wallet)
+      .set({
+        workingBalance: existing[0].workingBalance + grossAmount,
+        repurchaseBalance: existing[0].repurchaseBalance + repurchaseAmount,
+        incomeBalance: existing[0].incomeBalance + incomeAmount,
+        totalEarned: existing[0].totalEarned + grossAmount,
+      })
+      .where(eq(wallet.userId, userId));
+  } else {
+    await db.insert(wallet).values({
+      userId,
+      workingBalance: grossAmount,
+      repurchaseBalance: repurchaseAmount,
+      incomeBalance: incomeAmount,
+      cashbackBalance: 0,
+      totalEarned: grossAmount,
+    });
+  }
+
+  return { grossAmount, repurchaseAmount, incomeAmount };
+}
+
 // ── Pay direct commission (5% one-time) ────────────────
 export async function payDirectCommission(newUserId: number, referrerId: number) {
   const amount = Math.round(JOINING_AMOUNT * DIRECT_COMMISSION_PCT / 100);
@@ -77,19 +113,8 @@ export async function payDirectCommission(newUserId: number, referrerId: number)
     description: `Direct commission for referring user #${newUserId}`,
   });
 
-  // Credit working wallet (direct commission → working wallet)
-  const existing = await db.select().from(wallet).where(eq(wallet.userId, referrerId));
-  if (existing.length > 0) {
-    await db
-      .update(wallet)
-      .set({
-        workingBalance: existing[0].workingBalance + amount,
-        totalEarned: existing[0].totalEarned + amount,
-      })
-      .where(eq(wallet.userId, referrerId));
-  } else {
-    await db.insert(wallet).values({ userId: referrerId, workingBalance: amount, totalEarned: amount });
-  }
+  // Distribute across wallets (20% repurchase, 10% admin wipe, 70% income)
+  await distributeIncome(referrerId, amount);
 
   return amount;
 }
@@ -208,19 +233,8 @@ export async function calculateMatchingIncome(newUserId: number) {
           description: `Matching income pair #${totalPairs + 1}`,
         });
 
-        // Credit income wallet (matching income → income wallet)
-        const walletRow = await db.select().from(wallet).where(eq(wallet.userId, currentUserId));
-        if (walletRow.length > 0) {
-          await db
-            .update(wallet)
-            .set({
-              incomeBalance: walletRow[0].incomeBalance + amount,
-              totalEarned: walletRow[0].totalEarned + amount,
-            })
-            .where(eq(wallet.userId, currentUserId));
-        } else {
-          await db.insert(wallet).values({ userId: currentUserId, incomeBalance: amount, totalEarned: amount });
-        }
+        // Distribute matching income across wallets (20% repurchase, 10% admin wipe, 70% income)
+        await distributeIncome(currentUserId, amount);
 
         // Increment daily pairs
         await incrementTodayPairs(currentUserId);
@@ -277,10 +291,17 @@ export async function activateUser(userId: number) {
     .set({ isActive: true, packageAmount: JOINING_AMOUNT })
     .where(eq(users.id, userId));
 
-  // Create wallet
+  // Create wallet with all 4 wallet fields
   const existingWallet = await db.select().from(wallet).where(eq(wallet.userId, userId));
   if (existingWallet.length === 0) {
-    await db.insert(wallet).values({ userId, incomeBalance: 0, workingBalance: 0, totalEarned: 0 });
+    await db.insert(wallet).values({
+      userId,
+      workingBalance: 0,
+      incomeBalance: 0,
+      repurchaseBalance: 0,
+      cashbackBalance: 0,
+      totalEarned: 0,
+    });
   }
 
   // Pay direct commission to referrer
@@ -334,12 +355,72 @@ export async function getIncomeSummary(userId: number) {
     direct,
     matching,
     totalIncome: direct + matching,
-    incomeBalance: walletRow[0]?.incomeBalance ?? 0,
-    workingBalance: walletRow[0]?.workingBalance ?? 0,
+    workingBalance: walletRow[0]?.workingBalance ?? 0,   // Gross income (no deductions)
+    incomeBalance: walletRow[0]?.incomeBalance ?? 0,      // Net income (after 20%+10% deductions)
+    repurchaseBalance: walletRow[0]?.repurchaseBalance ?? 0, // 20% (spendable on products)
+    cashbackBalance: walletRow[0]?.cashbackBalance ?? 0,     // Monthly cashback (spendable on products)
     totalEarned: walletRow[0]?.totalEarned ?? 0,
     totalPairs: (await getTotalPairs(userId)),
     todayPairs: (await getTodayPairs(userId)),
     awards,
     recentIncome: allIncome.slice(-20).reverse(),
   };
+}
+
+// ── Monthly cashback: credit 30% of self business ──────
+// Called by admin button. Credits cashbackBalance for all active users.
+const CASHBACK_PCT = 30;
+
+export async function creditMonthlyCashback() {
+  // Get all active users with a package (self business = packageAmount)
+  const activeUsers = await db
+    .select()
+    .from(users)
+    .where(and(eq(users.isActive, true), gte(users.packageAmount, 1)));
+
+  const credited: { userId: number; name: string; selfBusiness: number; cashback: number }[] = [];
+
+  for (const user of activeUsers) {
+    const selfBusiness = user.packageAmount;
+    const cashback = Math.round((selfBusiness * CASHBACK_PCT) / 100);
+
+    if (cashback <= 0) continue;
+
+    // Credit cashback wallet
+    const existing = await db.select().from(wallet).where(eq(wallet.userId, user.id));
+    if (existing.length > 0) {
+      await db
+        .update(wallet)
+        .set({
+          cashbackBalance: existing[0].cashbackBalance + cashback,
+        })
+        .where(eq(wallet.userId, user.id));
+    } else {
+      await db.insert(wallet).values({
+        userId: user.id,
+        workingBalance: 0,
+        incomeBalance: 0,
+        repurchaseBalance: 0,
+        cashbackBalance: cashback,
+        totalEarned: 0,
+      });
+    }
+
+    // Record as income (type: "cashback")
+    await db.insert(income).values({
+      userId: user.id,
+      type: "cashback",
+      amount: cashback,
+      description: `Monthly cashback — 30% of self business ₹${selfBusiness.toLocaleString("en-IN")}`,
+    });
+
+    credited.push({
+      userId: user.id,
+      name: user.name,
+      selfBusiness,
+      cashback,
+    });
+  }
+
+  return { totalUsers: credited.length, credited };
 }
