@@ -179,21 +179,91 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
   for (const u of descendants) {
     userMap.set(u.id, u);
   }
-  // Also add root if not in descendants (shouldn't happen, but safety)
-  // Build children position map
-  const leftChild = new Map<number, number>();
-  const rightChild = new Map<number, number>();
 
+  // Group ALL children by parentId (not just positioned ones)
+  const childrenByParent = new Map<number, FlatUser[]>();
   for (const u of descendants) {
     if (u.parentId) {
-      if (u.position === "left") leftChild.set(u.parentId, u.id);
-      else if (u.position === "right") rightChild.set(u.parentId, u.id);
+      const list = childrenByParent.get(u.parentId) || [];
+      list.push(u);
+      childrenByParent.set(u.parentId, list);
     }
+  }
+
+  // Sort children: positioned first (left then right), then unpositioned by id
+  function sortChildren(children: FlatUser[]): FlatUser[] {
+    const left = children.filter((c) => c.position === "left");
+    const right = children.filter((c) => c.position === "right");
+    const unpositioned = children.filter((c) => !c.position);
+    return [...left, ...right, ...unpositioned];
+  }
+
+  // Recursively build a binary subtree from a list of overflow children
+  function buildSubtree(parentId: number, overflow: FlatUser[]): TreeNode | null {
+    if (overflow.length === 0) return null;
+    const first = overflow[0]!;
+    const rest = overflow.slice(1);
+    const kids = childrenByParent.get(first.id) || [];
+    const sortedKids = sortChildren(kids);
+    // Split overflow kids between left and right
+    const mid = Math.ceil(sortedKids.length / 2);
+    return {
+      id: first.id,
+      name: first.name,
+      referralCode: first.referralCode,
+      isActive: first.isActive,
+      rank: first.rank || "bronze",
+      position: first.position,
+      left: buildSubtree(first.id, sortedKids.slice(0, mid)),
+      right: buildSubtree(first.id, sortedKids.slice(mid)),
+    };
   }
 
   function buildNode(id: number): TreeNode | null {
     const user = userMap.get(id);
     if (!user) return null;
+
+    const allChildren = childrenByParent.get(id) || [];
+    const sorted = sortChildren(allChildren);
+
+    // First two become direct left/right
+    const leftChild = sorted[0] || null;
+    const rightChild = sorted[1] || null;
+    // Remaining cascade under the left or right subtree
+    const overflow = sorted.slice(2);
+
+    let left: TreeNode | null = null;
+    let right: TreeNode | null = null;
+
+    if (leftChild) {
+      left = buildNode(leftChild.id);
+      // Attach first half of overflow under left subtree
+      if (overflow.length > 0 && left) {
+        const mid = Math.ceil(overflow.length / 2);
+        const leftOverflow = overflow.slice(0, mid);
+        if (leftOverflow.length > 0) {
+          left = { ...left, right: buildSubtree(left.id, leftOverflow) };
+        }
+      }
+    }
+
+    if (rightChild) {
+      right = buildNode(rightChild.id);
+      // Attach second half of overflow under right subtree
+      if (overflow.length > 0 && right) {
+        const mid = Math.ceil(overflow.length / 2);
+        const rightOverflow = overflow.slice(mid);
+        if (rightOverflow.length > 0) {
+          right = { ...right, left: buildSubtree(right.id, rightOverflow) };
+        }
+      }
+    }
+
+    // If no positioned children but overflow exists, build from overflow directly
+    if (!left && !right && overflow.length > 0) {
+      left = buildSubtree(id, overflow);
+    }
+
     return {
       id: user.id,
       name: user.name,
@@ -201,8 +271,8 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       isActive: user.isActive,
       rank: user.rank || "bronze",
       position: user.position,
-      left: leftChild.has(id) ? buildNode(leftChild.get(id)!) : null,
-      right: rightChild.has(id) ? buildNode(rightChild.get(id)!) : null,
+      left,
+      right,
     };
   }
 
