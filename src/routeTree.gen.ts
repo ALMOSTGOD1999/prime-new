@@ -26,7 +26,9 @@ import { Route as AdminGoldrateRouteImport } from './routes/admin/goldrate'
 import { Route as AdminHistoryRouteImport } from './routes/admin/history'
 import { Route as AdminIncomeRouteImport } from './routes/admin/income'
 import { Route as AdminKycRouteImport } from './routes/admin/kyc'
+import { Route as AdminMakePurchaseRouteImport } from './routes/admin/make-purchase'
 import { Route as AdminPayoutRouteImport } from './routes/admin/payout'
+import { Route as AdminPurchasesRouteImport } from './routes/admin/purchases'
 import { Route as AdminReportsRouteImport } from './routes/admin/reports'
 import { Route as AdminRevenueRouteImport } from './routes/admin/revenue'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
@@ -43,6 +45,7 @@ import { Route as DashboardKycRouteImport } from './routes/dashboard/kyc'
 import { Route as DashboardLeaderboardRouteImport } from './routes/dashboard/leaderboard'
 import { Route as DashboardNotificationsRouteImport } from './routes/dashboard/notifications'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
+import { Route as DashboardPurchaseRouteImport } from './routes/dashboard/purchase'
 import { Route as DashboardReportsRouteImport } from './routes/dashboard/reports'
 import { Route as DashboardRewardsRouteImport } from './routes/dashboard/rewards'
 import { Route as DashboardTeamRouteImport } from './routes/dashboard/team'
@@ -133,9 +136,19 @@ const AdminKycRoute = AdminKycRouteImport.update({
   path: '/kyc',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMakePurchaseRoute = AdminMakePurchaseRouteImport.update({
+  id: '/make-purchase',
+  path: '/make-purchase',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPayoutRoute = AdminPayoutRouteImport.update({
   id: '/payout',
   path: '/payout',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPurchasesRoute = AdminPurchasesRouteImport.update({
+  id: '/purchases',
+  path: '/purchases',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
@@ -219,6 +232,11 @@ const DashboardProfileRoute = DashboardProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPurchaseRoute = DashboardPurchaseRouteImport.update({
+  id: '/purchase',
+  path: '/purchase',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardReportsRoute = DashboardReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -257,7 +275,9 @@ export interface FileRoutesByFullPath {
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
   '/admin/kyc': typeof AdminKycRoute
+  '/admin/make-purchase': typeof AdminMakePurchaseRoute
   '/admin/payout': typeof AdminPayoutRoute
+  '/admin/purchases': typeof AdminPurchasesRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -273,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/purchase': typeof DashboardPurchaseRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/team': typeof DashboardTeamRoute
@@ -295,7 +316,9 @@ export interface FileRoutesByTo {
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
   '/admin/kyc': typeof AdminKycRoute
+  '/admin/make-purchase': typeof AdminMakePurchaseRoute
   '/admin/payout': typeof AdminPayoutRoute
+  '/admin/purchases': typeof AdminPurchasesRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -311,6 +334,7 @@ export interface FileRoutesByTo {
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/purchase': typeof DashboardPurchaseRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/team': typeof DashboardTeamRoute
@@ -336,7 +360,9 @@ export interface FileRoutesById {
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
   '/admin/kyc': typeof AdminKycRoute
+  '/admin/make-purchase': typeof AdminMakePurchaseRoute
   '/admin/payout': typeof AdminPayoutRoute
+  '/admin/purchases': typeof AdminPurchasesRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -352,6 +378,7 @@ export interface FileRoutesById {
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/purchase': typeof DashboardPurchaseRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/team': typeof DashboardTeamRoute
@@ -378,7 +405,9 @@ export interface FileRouteTypes {
     | '/admin/history'
     | '/admin/income'
     | '/admin/kyc'
+    | '/admin/make-purchase'
     | '/admin/payout'
+    | '/admin/purchases'
     | '/admin/reports'
     | '/admin/revenue'
     | '/admin/settings'
@@ -394,6 +423,7 @@ export interface FileRouteTypes {
     | '/dashboard/leaderboard'
     | '/dashboard/notifications'
     | '/dashboard/profile'
+    | '/dashboard/purchase'
     | '/dashboard/reports'
     | '/dashboard/rewards'
     | '/dashboard/team'
@@ -416,7 +446,9 @@ export interface FileRouteTypes {
     | '/admin/history'
     | '/admin/income'
     | '/admin/kyc'
+    | '/admin/make-purchase'
     | '/admin/payout'
+    | '/admin/purchases'
     | '/admin/reports'
     | '/admin/revenue'
     | '/admin/settings'
@@ -432,6 +464,7 @@ export interface FileRouteTypes {
     | '/dashboard/leaderboard'
     | '/dashboard/notifications'
     | '/dashboard/profile'
+    | '/dashboard/purchase'
     | '/dashboard/reports'
     | '/dashboard/rewards'
     | '/dashboard/team'
@@ -456,7 +489,9 @@ export interface FileRouteTypes {
     | '/admin/history'
     | '/admin/income'
     | '/admin/kyc'
+    | '/admin/make-purchase'
     | '/admin/payout'
+    | '/admin/purchases'
     | '/admin/reports'
     | '/admin/revenue'
     | '/admin/settings'
@@ -472,6 +507,7 @@ export interface FileRouteTypes {
     | '/dashboard/leaderboard'
     | '/dashboard/notifications'
     | '/dashboard/profile'
+    | '/dashboard/purchase'
     | '/dashboard/reports'
     | '/dashboard/rewards'
     | '/dashboard/team'
@@ -612,11 +648,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminKycRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/make-purchase': {
+      id: '/admin/make-purchase'
+      path: '/make-purchase'
+      fullPath: '/admin/make-purchase'
+      preLoaderRoute: typeof AdminMakePurchaseRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/payout': {
       id: '/admin/payout'
       path: '/payout'
       fullPath: '/admin/payout'
       preLoaderRoute: typeof AdminPayoutRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/purchases': {
+      id: '/admin/purchases'
+      path: '/purchases'
+      fullPath: '/admin/purchases'
+      preLoaderRoute: typeof AdminPurchasesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/reports': {
@@ -731,6 +781,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProfileRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/purchase': {
+      id: '/dashboard/purchase'
+      path: '/purchase'
+      fullPath: '/dashboard/purchase'
+      preLoaderRoute: typeof DashboardPurchaseRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/reports': {
       id: '/dashboard/reports'
       path: '/reports'
@@ -771,7 +828,9 @@ interface AdminRouteChildren {
   AdminHistoryRoute: typeof AdminHistoryRoute
   AdminIncomeRoute: typeof AdminIncomeRoute
   AdminKycRoute: typeof AdminKycRoute
+  AdminMakePurchaseRoute: typeof AdminMakePurchaseRoute
   AdminPayoutRoute: typeof AdminPayoutRoute
+  AdminPurchasesRoute: typeof AdminPurchasesRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRevenueRoute: typeof AdminRevenueRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -789,7 +848,9 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHistoryRoute: AdminHistoryRoute,
   AdminIncomeRoute: AdminIncomeRoute,
   AdminKycRoute: AdminKycRoute,
+  AdminMakePurchaseRoute: AdminMakePurchaseRoute,
   AdminPayoutRoute: AdminPayoutRoute,
+  AdminPurchasesRoute: AdminPurchasesRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminRevenueRoute: AdminRevenueRoute,
   AdminSettingsRoute: AdminSettingsRoute,
@@ -811,6 +872,7 @@ interface DashboardRouteChildren {
   DashboardLeaderboardRoute: typeof DashboardLeaderboardRoute
   DashboardNotificationsRoute: typeof DashboardNotificationsRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
+  DashboardPurchaseRoute: typeof DashboardPurchaseRoute
   DashboardReportsRoute: typeof DashboardReportsRoute
   DashboardRewardsRoute: typeof DashboardRewardsRoute
   DashboardTeamRoute: typeof DashboardTeamRoute
@@ -829,6 +891,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLeaderboardRoute: DashboardLeaderboardRoute,
   DashboardNotificationsRoute: DashboardNotificationsRoute,
   DashboardProfileRoute: DashboardProfileRoute,
+  DashboardPurchaseRoute: DashboardPurchaseRoute,
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardRewardsRoute: DashboardRewardsRoute,
   DashboardTeamRoute: DashboardTeamRoute,

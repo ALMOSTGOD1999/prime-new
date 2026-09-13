@@ -18,6 +18,7 @@ export const users = pgTable("users", {
   profileImage: text("profile_image"),
   onboardingDone: boolean("onboarding_done").default(false).notNull(),
   darkMode: boolean("dark_mode").default(false).notNull(),
+  totalInvested: real("total_invested").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -180,5 +181,55 @@ export const activationPins = pgTable("activation_pins", {
   generatedBy: integer("generated_by").references(() => users.id).notNull(),
   usedBy: integer("used_by").references(() => users.id, { onDelete: "set null" }),
   usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ── Investment Packages (tier-based monthly return rates) ──
+export const investmentPackages = pgTable("investment_packages", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  minAmount: real("min_amount").notNull(),
+  maxAmount: real("max_amount").notNull(),
+  monthlyReturnPct: real("monthly_return_pct").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ── Purchases (gold jewellery purchases) ──────────────
+export const purchases = pgTable("purchases", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  carat: integer("carat").notNull(),
+  weight: real("weight").notNull(),
+  goldRatePerGram: real("gold_rate_per_gram").notNull(),
+  goldValue: real("gold_value").notNull(),
+  makingCharges: real("making_charges").default(0).notNull(),
+  gst: real("gst").notNull(),
+  hallmarkCharges: real("hallmark_charges").default(0).notNull(),
+  totalAmount: real("total_amount").notNull(),
+  status: text("status", { enum: ["pending", "approved", "rejected", "stopped", "cancelled"] }).default("pending").notNull(),
+  approvedAt: timestamp("approved_at"),
+  rejectedAt: timestamp("rejected_at"),
+  stoppedAt: timestamp("stopped_at"),
+  cancelledAt: timestamp("cancelled_at"),
+  createdByAdmin: boolean("created_by_admin").default(false).notNull(),
+  adminNote: text("admin_note"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ── Investments (linked to purchases, monthly returns) ──
+export const investments = pgTable("investments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  purchaseId: integer("purchase_id").references(() => purchases.id).notNull(),
+  packageId: integer("package_id").references(() => investmentPackages.id).notNull(),
+  amount: real("amount").notNull(),
+  monthlyReturnPct: real("monthly_return_pct").notNull(),
+  monthlyReturnAmount: real("monthly_return_amount").notNull(),
+  status: text("status", { enum: ["active", "completed", "stopped", "cancelled"] }).default("active").notNull(),
+  totalReturnsPaid: real("total_returns_paid").default(0).notNull(),
+  startDate: timestamp("start_date").defaultNow().notNull(),
+  endDate: timestamp("end_date"),
+  stoppedAt: timestamp("stopped_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

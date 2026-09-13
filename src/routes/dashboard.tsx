@@ -136,6 +136,7 @@ function DashboardLayout() {
     { to: "/dashboard/income", label: "Income", icon: "◆" },
     { to: "/dashboard/activate-account", label: "Activate Account", icon: "🔑" },
     { to: "/dashboard/gold", label: "Gold Price", icon: "📈" },
+    { to: "/dashboard/purchase", label: "Purchase", icon: "🛒" },
     { to: "/dashboard/calculator", label: "Calculator", icon: "🧮" },
     { to: "/dashboard/reports", label: "Reports", icon: "📊" },
     { to: "/dashboard/rewards", label: "Rewards", icon: "🏆" },
