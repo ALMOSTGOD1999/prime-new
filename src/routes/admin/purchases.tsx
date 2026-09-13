@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { adminGetPurchases, adminUpdatePurchase, adminGetPurchaseDetail } from "../../functions/admin/purchases";
+import { generatePurchaseBill, type PurchaseBillData } from "../../lib/pdf-bill";
 
 export const Route = createFileRoute("/admin/purchases")({
   component: PurchasesPage,
@@ -12,6 +13,7 @@ function PurchasesPage() {
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected" | "stopped" | "cancelled">("all");
   const [detail, setDetail] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [generatingPdfId, setGeneratingPdfId] = useState<number | null>(null);
 
   useEffect(() => {
     loadPurchases();
@@ -63,6 +65,65 @@ function PurchasesPage() {
     if (p.stoppedAt) return "stopped";
     if (p.rejectedAt) return "rejected";
     return p.status;
+  };
+
+  const handleDownloadPdf = (p: any, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setGeneratingPdfId(p.id);
+    try {
+      generatePurchaseBill({
+        purchaseId: p.id,
+        carat: p.carat,
+        weight: p.weight,
+        goldRatePerGram: p.goldRatePerGram,
+        goldValue: p.goldValue,
+        makingCharges: p.makingCharges,
+        gst: p.gst,
+        hallmarkCharges: p.hallmarkCharges,
+        totalAmount: p.totalAmount,
+        status: p.status,
+        createdAt: p.createdAt,
+        userName: p.userName,
+        userEmail: p.userEmail,
+        userId: p.userId,
+      });
+    } catch {
+      alert("Failed to generate PDF");
+    } finally {
+      setGeneratingPdfId(null);
+    }
+  };
+
+  const handleDownloadPdfFromDetail = () => {
+    if (!detail) return;
+    const p = detail.purchase;
+    const u = detail.user;
+    setGeneratingPdfId(p.id);
+    try {
+      generatePurchaseBill({
+        purchaseId: p.id,
+        carat: p.carat,
+        weight: p.weight,
+        goldRatePerGram: p.goldRatePerGram,
+        goldValue: p.goldValue,
+        makingCharges: p.makingCharges,
+        gst: p.gst,
+        hallmarkCharges: p.hallmarkCharges,
+        totalAmount: p.totalAmount,
+        status: p.status,
+        createdAt: p.createdAt,
+        userName: u?.name,
+        userEmail: u?.email,
+        userId: u?.id,
+        monthlyReturnAmount: detail.investment?.monthlyReturnAmount,
+        monthlyReturnPct: detail.investment?.monthlyReturnPct,
+        packageName: detail.investment?.packageName,
+      });
+    } catch {
+      alert("Failed to generate PDF");
+    } finally {
+      setGeneratingPdfId(null);
+    }
   };
 
   const filtered = filter === "all" ? purchases : purchases.filter((p) => {
@@ -197,6 +258,13 @@ function PurchasesPage() {
               >
                 Close
               </button>
+              <button
+                onClick={handleDownloadPdfFromDetail}
+                disabled={generatingPdfId === detail.purchase.id}
+                className="rounded-lg border border-gold/30 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gold transition-all hover:bg-gold/10 disabled:opacity-50"
+              >
+                {generatingPdfId === detail.purchase.id ? "Generating..." : "Download PDF"}
+              </button>
             </div>
           </div>
         </div>
@@ -261,24 +329,34 @@ function PurchasesPage() {
                       {new Date(p.createdAt).toLocaleDateString("en-IN")}
                     </td>
                     <td className="px-6 py-3.5 text-center" onClick={(e) => e.stopPropagation()}>
-                      {p.status === "pending" && (
-                        <div className="flex gap-1 justify-center">
-                          <button
-                            onClick={() => handleAction(p.id, "approve")}
-                            disabled={actionLoading === p.id}
-                            className="rounded px-2 py-1 text-[10px] font-semibold text-emerald hover:bg-emerald/10 disabled:opacity-50"
-                          >
-                            ✓
-                          </button>
-                          <button
-                            onClick={() => handleAction(p.id, "reject")}
-                            disabled={actionLoading === p.id}
-                            className="rounded px-2 py-1 text-[10px] font-semibold text-red-500 hover:bg-red-50 disabled:opacity-50"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex gap-1 justify-center">
+                        <button
+                          onClick={(e) => handleDownloadPdf(p, e)}
+                          disabled={generatingPdfId === p.id}
+                          className="rounded px-2 py-1 text-[10px] font-semibold text-gold hover:bg-gold/10 disabled:opacity-50"
+                          title="Download PDF"
+                        >
+                          {generatingPdfId === p.id ? "..." : "PDF"}
+                        </button>
+                        {p.status === "pending" && (
+                          <>
+                            <button
+                              onClick={() => handleAction(p.id, "approve")}
+                              disabled={actionLoading === p.id}
+                              className="rounded px-2 py-1 text-[10px] font-semibold text-emerald hover:bg-emerald/10 disabled:opacity-50"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              onClick={() => handleAction(p.id, "reject")}
+                              disabled={actionLoading === p.id}
+                              className="rounded px-2 py-1 text-[10px] font-semibold text-red-500 hover:bg-red-50 disabled:opacity-50"
+                            >
+                              ✕
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

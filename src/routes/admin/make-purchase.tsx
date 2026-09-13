@@ -6,6 +6,7 @@ import {
   adminCreatePurchaseWeight,
   adminCreatePurchaseAmount,
 } from "../../functions/admin/purchases";
+import { generatePurchaseBill } from "../../lib/pdf-bill";
 
 export const Route = createFileRoute("/admin/make-purchase")({
   component: MakePurchasePage,
@@ -82,6 +83,29 @@ function MakePurchasePage() {
       }
 
       alert(`Purchase created!\nID: #${result.purchaseId}\nTotal: ₹${result.totalAmount.toLocaleString("en-IN")}\nMonthly Return: ₹${result.monthlyReturnAmount.toLocaleString("en-IN")}`);
+
+      // Auto-generate PDF bill
+      try {
+        generatePurchaseBill({
+          purchaseId: result.purchaseId,
+          carat: method === "weight" ? carat : 0,
+          weight: method === "weight" ? parseFloat(weight) : undefined,
+          goldRatePerGram: preview?.effectiveRate,
+          goldValue: preview?.goldValue,
+          makingCharges: preview?.makingCharges,
+          gst: preview?.gst,
+          hallmarkCharges: preview?.hallmarkCharges,
+          totalAmount: result.totalAmount,
+          status: "approved",
+          createdAt: new Date().toISOString(),
+          userName: selectedUser.name,
+          userEmail: selectedUser.email,
+          userId: selectedUser.id,
+          monthlyReturnAmount: result.monthlyReturnAmount,
+          monthlyReturnPct: preview?.monthlyReturnPct,
+          packageName: preview?.packageName,
+        });
+      } catch { /* PDF generation is best-effort */ }
 
       // Reset
       setSelectedUser(null);

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { previewPurchase, confirmPurchase, getMyPurchases } from "../../functions/user/purchase";
+import { generatePurchaseBill, type PurchaseBillData } from "../../lib/pdf-bill";
 
 export const Route = createFileRoute("/dashboard/purchase")({
   component: PurchasePage,
@@ -15,6 +16,7 @@ function PurchasePage() {
   const [purchases, setPurchases] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [activeTab, setActiveTab] = useState<"purchase" | "history">("purchase");
+  const [generatingPdfId, setGeneratingPdfId] = useState<number | null>(null);
 
   useEffect(() => {
     loadHistory();
@@ -54,6 +56,25 @@ function PurchasePage() {
     try {
       const result = await confirmPurchase({ data: { carat, weight: w } });
       alert(`Purchase successful! ID: #${result.purchaseId}\nTotal: ₹${result.totalAmount.toLocaleString("en-IN")}\nMonthly Return: ₹${result.monthlyReturnAmount.toLocaleString("en-IN")}`);
+      // Auto-generate PDF bill
+      try {
+        generatePurchaseBill({
+          purchaseId: result.purchaseId,
+          carat,
+          weight: w,
+          goldRatePerGram: preview?.effectiveRate,
+          goldValue: preview?.goldValue,
+          makingCharges: preview?.makingCharges,
+          gst: preview?.gst,
+          hallmarkCharges: preview?.hallmarkCharges,
+          totalAmount: result.totalAmount,
+          status: "approved",
+          createdAt: new Date().toISOString(),
+          monthlyReturnAmount: result.monthlyReturnAmount,
+          monthlyReturnPct: preview?.monthlyReturnPct,
+          packageName: preview?.packageName,
+        });
+      } catch { /* PDF generation is best-effort */ }
       setWeight("");
       setPreview(null);
       setActiveTab("history");
@@ -78,6 +99,32 @@ function PurchasePage() {
     if (p.stoppedAt) return "stopped";
     if (p.rejectedAt) return "rejected";
     return p.status;
+  };
+
+  const handleDownloadPdf = (p: any) => {
+    setGeneratingPdfId(p.id);
+    try {
+      generatePurchaseBill({
+        purchaseId: p.id,
+        carat: p.carat,
+        weight: p.weight,
+        goldRatePerGram: p.goldRatePerGram,
+        goldValue: p.goldValue,
+        makingCharges: p.makingCharges,
+        gst: p.gst,
+        hallmarkCharges: p.hallmarkCharges,
+        totalAmount: p.totalAmount,
+        status: p.status,
+        createdAt: p.createdAt,
+        monthlyReturnAmount: p.investment?.monthlyReturnAmount,
+        monthlyReturnPct: p.investment?.monthlyReturnPct,
+        packageName: p.investment?.packageName,
+      });
+    } catch {
+      alert("Failed to generate PDF");
+    } finally {
+      setGeneratingPdfId(null);
+    }
   };
 
   return (
@@ -251,7 +298,17 @@ function PurchasePage() {
                         {p.carat}K • {p.weight}g • {new Date(p.createdAt).toLocaleDateString("en-IN")}
                       </p>
                     </div>
-                    <p className="font-display text-lg text-gold">₹{p.totalAmount.toLocaleString("en-IN")}</p>
+                    <div className="flex items-center gap-3">
+                      <p className="font-display text-lg text-gold">₹{p.totalAmount.toLocaleString("en-IN")}</p>
+                      <button
+                        onClick={() => handleDownloadPdf(p)}
+                        disabled={generatingPdfId === p.id}
+                        className="rounded border border-gold/30 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-gold transition-all hover:bg-gold/10 disabled:opacity-50"
+                        title="Download PDF Invoice"
+                      >
+                        {generatingPdfId === p.id ? "..." : "PDF"}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
