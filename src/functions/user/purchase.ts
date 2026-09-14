@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "../../lib/db";
-import { purchases, investments, investmentPackages, wallet, users, goldRates } from "../../lib/db/schema";
+import { purchases, investments, investmentPackages, wallet, users, goldRates, income } from "../../lib/db/schema";
 import { eq, and, sql, desc } from "drizzle-orm";
 import { getCookie } from "@tanstack/react-start/server";
 
@@ -169,6 +169,20 @@ export const confirmPurchase = createServerFn({ method: "POST" })
       .update(users)
       .set({ totalInvested: sql`${users.totalInvested} + ${billing.total}` })
       .where(eq(users.id, userId));
+
+    // Update user's packageAmount (business) so uplines see it and cashback applies
+    await db
+      .update(users)
+      .set({ packageAmount: sql`${users.packageAmount} + ${Math.round(billing.total)}` })
+      .where(eq(users.id, userId));
+
+    // Record as business income
+    await db.insert(income).values({
+      userId,
+      type: "direct" as const,
+      amount: Math.round(billing.total),
+      description: `Gold purchase — ${carat}K ${weight}g · Invoice #${purchase.id}`,
+    });
 
     return {
       success: true,

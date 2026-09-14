@@ -197,6 +197,20 @@ export const adminCreatePurchaseWeight = createServerFn({ method: "POST" })
       .set({ totalInvested: sql`${users.totalInvested} + ${billing.total}` })
       .where(eq(users.id, targetUserId));
 
+    // Update user's packageAmount (business) so uplines see it and cashback applies
+    await db
+      .update(users)
+      .set({ packageAmount: sql`${users.packageAmount} + ${Math.round(billing.total)}` })
+      .where(eq(users.id, targetUserId));
+
+    // Record as business income
+    await db.insert(income).values({
+      userId: targetUserId,
+      type: "direct",
+      amount: Math.round(billing.total),
+      description: `Gold purchase (admin) — ${carat}K ${weight}g · Invoice #${purchase.id}`,
+    });
+
     return {
       success: true,
       purchaseId: purchase.id,
@@ -258,6 +272,20 @@ export const adminCreatePurchaseAmount = createServerFn({ method: "POST" })
       .update(users)
       .set({ totalInvested: sql`${users.totalInvested} + ${amount}` })
       .where(eq(users.id, targetUserId));
+
+    // Update user's packageAmount (business) so uplines see it and cashback applies
+    await db
+      .update(users)
+      .set({ packageAmount: sql`${users.packageAmount} + ${amount}` })
+      .where(eq(users.id, targetUserId));
+
+    // Record as business income
+    await db.insert(income).values({
+      userId: targetUserId,
+      type: "direct",
+      amount,
+      description: `Amount-based purchase (admin) · Invoice #${purchase.id}`,
+    });
 
     return {
       success: true,
