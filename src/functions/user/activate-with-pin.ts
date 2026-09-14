@@ -53,7 +53,7 @@ export const activateWithPin = createServerFn({ method: "POST" })
     // Activate the user
     await db
       .update(users)
-      .set({ isActive: true, packageAmount: 2999 })
+      .set({ isActive: true })
       .where(eq(users.id, userId));
 
     // Create wallet if not exists

@@ -28,21 +28,16 @@ async function main() {
     const userId = row.user_id;
     const totalPurchase = row.total_purchase_amount;
 
+    // Business = only purchase amounts (no activation fee)
+    const newPackageAmount = totalPurchase;
+
     // Get current packageAmount
     const userResult = await sql`SELECT package_amount FROM users WHERE id = ${userId}`;
     const current = userResult[0]?.package_amount ?? 0;
 
-    // Activation sets 2999, purchases add on top
-    // If packageAmount is still 0 and user is active, they were activated but packageAmount wasn't set
-    const userActive = await sql`SELECT is_active FROM users WHERE id = ${userId}`;
-    const activationAmount = userActive[0]?.is_active ? 2999 : 0;
-
-    // New packageAmount = activation + all purchases
-    const newPackageAmount = activationAmount + totalPurchase;
-
     if (newPackageAmount !== current) {
       await sql`UPDATE users SET package_amount = ${newPackageAmount} WHERE id = ${userId}`;
-      console.log(`  User #${userId}: ₹${current.toLocaleString("en-IN")} → ₹${newPackageAmount.toLocaleString("en-IN")} (activation: ₹${activationAmount.toLocaleString("en-IN")} + purchases: ₹${totalPurchase.toLocaleString("en-IN")})`);
+      console.log(`  User #${userId}: ₹${current.toLocaleString("en-IN")} → ₹${newPackageAmount.toLocaleString("en-IN")} (purchases only)`);
       updated++;
     }
   }

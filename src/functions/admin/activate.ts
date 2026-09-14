@@ -30,7 +30,6 @@ export const toggleUserActivation = createServerFn({ method: "POST" })
       .update(users)
       .set({
         isActive: newActive,
-        packageAmount: newActive ? 2999 : 0,
       })
       .where(eq(users.id, data.userId));
 

@@ -24,7 +24,7 @@ export const bulkActivate = createServerFn({ method: "POST" })
     let count = 0;
     for (const uid of data.userIds) {
       try {
-        await db.update(users).set({ isActive: true, packageAmount: 2999 }).where(eq(users.id, uid));
+        await db.update(users).set({ isActive: true }).where(eq(users.id, uid));
         count++;
       } catch {}
     }

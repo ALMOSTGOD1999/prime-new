@@ -127,7 +127,7 @@ export async function seedAdmin() {
       referralCode: "PR0000",
       isActive: true,
       isAdmin: true,
-      packageAmount: 2999,
+      packageAmount: 0,
     })
     .returning();
 
