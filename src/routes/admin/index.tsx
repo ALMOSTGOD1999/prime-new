@@ -4,6 +4,7 @@ import { getAdminUsers } from "../../functions/admin/users";
 import { getAdminIncome } from "../../functions/admin/income";
 import { monthlyCashbackPayout } from "../../functions/admin/cashback";
 import { processMonthlyReturns } from "../../functions/admin/investment";
+import { getTotalBusiness } from "../../functions/admin/business";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
@@ -17,6 +18,7 @@ function AdminDashboard() {
   const [cashbackResult, setCashbackResult] = useState<any>(null);
   const [returnsLoading, setReturnsLoading] = useState(false);
   const [returnsResult, setReturnsResult] = useState<any>(null);
+  const [businessData, setBusinessData] = useState<any>(null);
 
   const handleCashbackPayout = async () => {
     if (!confirm("Credit monthly cashback (30% of self business) to all eligible users?")) return;
@@ -50,8 +52,9 @@ function AdminDashboard() {
     Promise.all([
       getAdminUsers({ data: {} }),
       getAdminIncome({ data: {} }),
+      getTotalBusiness(),
     ])
-      .then(([u, i]) => { setUsersData(u); setIncomeData(i); })
+      .then(([u, i, b]) => { setUsersData(u); setIncomeData(i); setBusinessData(b); })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -81,6 +84,8 @@ function AdminDashboard() {
   const stats = [
     { title: "Total Users", value: String(totalUsers), gradient: "from-emerald/10 to-emerald/5", border: "border-emerald/15", iconBg: "bg-emerald/10 text-emerald", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg> },
     { title: "Active Users", value: String(activeUsers), gradient: "from-gold/10 to-gold/5", border: "border-gold/15", iconBg: "bg-gold/10 text-gold", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg> },
+    { title: "Total Business", value: `₹${(businessData?.totalBusiness || 0).toLocaleString("en-IN")}`, gradient: "from-gold/15 to-gold/5", border: "border-gold/20", iconBg: "bg-gold/15 text-gold", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v12m-3-2.818.879.659 1.171-1.671.48-.642A3 3 0 0 1 15.96 12H18a3 3 0 0 1 3 3v.342M3 9.342A3 3 0 0 1 5.96 6H8.04c.734 0 1.413.468 1.658 1.165l.637 1.787M3 9.342V15a3 3 0 0 0 3 3h.64M12 6V3" /></svg> },
+    { title: "Purchase Business", value: `₹${(businessData?.totalPurchaseBusiness || 0).toLocaleString("en-IN")}`, gradient: "from-emerald/10 to-emerald/5", border: "border-emerald/15", iconBg: "bg-emerald/10 text-emerald", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121 0 2.09-.773 2.34-1.872l1.836-8.073a1.125 1.125 0 0 0-1.1-1.372H6.518M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75-3a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg> },
     { title: "Direct Paid", value: `₹${totalDirect.toLocaleString("en-IN")}`, gradient: "from-emerald/10 to-emerald/5", border: "border-emerald/15", iconBg: "bg-emerald/10 text-emerald", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v12m-3-2.818.879.659 1.171-1.671.48-.642A3 3 0 0 1 15.96 12H18a3 3 0 0 1 3 3v.342M3 9.342A3 3 0 0 1 5.96 6H8.04c.734 0 1.413.468 1.658 1.165l.637 1.787M3 9.342V15a3 3 0 0 0 3 3h.64M12 6V3" /></svg> },
     { title: "Matching Paid", value: `₹${totalMatching.toLocaleString("en-IN")}`, gradient: "from-gold/10 to-gold/5", border: "border-gold/15", iconBg: "bg-gold/10 text-gold", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg> },
   ];
@@ -105,7 +110,7 @@ function AdminDashboard() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map((stat, i) => (
           <div
             key={stat.title}
