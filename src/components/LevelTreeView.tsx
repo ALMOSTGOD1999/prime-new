@@ -71,11 +71,11 @@ export function LevelTreeView({ levels, rootId, startExpanded = false }: { level
                 <span className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold ${
                   levelIdx === 0 ? "bg-gold text-cream" : "bg-emerald/10 text-emerald"
                 }`}>
-                  L{levelIdx}
+                  L{levelIdx + 1}
                 </span>
                 <div className="text-left">
                   <p className="text-xs font-semibold">
-                    Level {levelIdx === 0 ? "0 (You)" : levelIdx}
+                    Level {levelIdx + 1}
                   </p>
                   <p className="text-[10px] text-emerald/60">
                     {levelUsers.length} member{levelUsers.length !== 1 ? "s" : ""}
