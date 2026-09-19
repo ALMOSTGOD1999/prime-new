@@ -365,21 +365,41 @@ export const getTeamStats = createServerFn({ method: "GET" })
     const userId = await getAuthUserId();
     const descendants = await fetchAllUsersInTree(userId);
 
+    // Split descendants into left and right legs
+    // Walk the tree from root to classify each user's leg
+    const leftLeg: typeof descendants = [];
+    const rightLeg: typeof descendants = [];
+
+    function classify(currentId: number, leg: "left" | "right") {
+      for (const u of descendants) {
+        if (u.parentId === currentId && u.position === leg) {
+          if (leg === "left") leftLeg.push(u);
+          else rightLeg.push(u);
+          classify(u.id, "left");
+          classify(u.id, "right");
+        }
+      }
+    }
+    classify(userId, "left");
+    classify(userId, "right");
+
     // Direct team = immediate children
     const directTeam = descendants.filter((u) => u.parentId === userId);
-
-    // Total team = all descendants
     const totalTeam = descendants.length;
-
-    // Active team
     const activeTeam = descendants.filter((u) => u.isActive).length;
-
-    // Total business = sum of packageAmount of all descendants
-    const totalBusiness = descendants.reduce((sum, u) => sum + (u.packageAmount || 0), 0);
-
-    // Direct team left/right counts
     const leftCount = directTeam.filter((u) => u.position === "left").length;
     const rightCount = directTeam.filter((u) => u.position === "right").length;
+
+    // Left leg stats
+    const teamLeftActive = leftLeg.filter((u) => u.isActive).length;
+    const totalBusinessLeft = leftLeg.reduce((s, u) => s + (u.packageAmount || 0), 0);
+    const teamBusinessLeftActive = leftLeg.filter((u) => u.isActive).reduce((s, u) => s + (u.packageAmount || 0), 0);
+    const teamBusinessLeftGold = leftLeg.filter((u) => u.rank === "gold" || u.rank === "platinum").reduce((s, u) => s + (u.packageAmount || 0), 0);
+
+    // Right leg stats
+    const teamRightActive = rightLeg.filter((u) => u.isActive).length;
+    const totalBusinessRight = rightLeg.reduce((s, u) => s + (u.packageAmount || 0), 0);
+    const teamBusinessRightGold = rightLeg.filter((u) => u.rank === "gold" || u.rank === "platinum").reduce((s, u) => s + (u.packageAmount || 0), 0);
 
     return {
       directTeam: directTeam.length,
@@ -387,7 +407,20 @@ export const getTeamStats = createServerFn({ method: "GET" })
       rightCount,
       totalTeam,
       activeTeam,
-      totalBusiness,
+      totalBusiness: totalBusinessLeft + totalBusinessRight,
+
+      // Left leg
+      teamLeft: leftLeg.length,
+      teamLeftActive,
+      totalBusinessLeft,
+      teamBusinessLeftActive,
+      teamBusinessLeftGold,
+
+      // Right leg
+      teamRight: rightLeg.length,
+      teamRightActive,
+      totalBusinessRight,
+      teamBusinessRightGold,
     };
   });
 

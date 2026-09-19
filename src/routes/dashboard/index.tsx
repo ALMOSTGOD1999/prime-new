@@ -115,6 +115,14 @@ function DashboardIndex() {
 
   const { user, income } = data;
 
+  const gradients = {
+    pink: "from-rose-400 to-pink-500",
+    green: "from-emerald-400 to-green-500",
+    blue: "from-sky-400 to-blue-500",
+    orange: "from-amber-400 to-orange-500",
+    red: "from-red-400 to-rose-500",
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -150,42 +158,40 @@ function DashboardIndex() {
         </div>
       </div>
 
-      {/* Team Overview — 60:40 layout */}
+      {/* Gradient stat cards — 4 rows matching reference */}
       {teamStats && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
-          {/* Left: 60% — Team Stats */}
-          <div className="rounded border border-gold/20 bg-background p-6 sm:col-span-3">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gold">My Team</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-lg border border-emerald/20 bg-emerald/5 p-4 text-center">
-                <p className="text-xs uppercase tracking-widest text-emerald/70">Direct Team</p>
-                <p className="mt-1 font-display text-3xl text-emerald">{teamStats.directTeam}</p>
-                <p className="text-xs text-emerald/60">L: {teamStats.leftCount} · R: {teamStats.rightCount}</p>
-              </div>
-              <div className="rounded-lg border border-gold/20 bg-gold/5 p-4 text-center">
-                <p className="text-xs uppercase tracking-widest text-gold">Total Team</p>
-                <p className="mt-1 font-display text-3xl text-gold">{teamStats.totalTeam}</p>
-                <p className="text-xs text-emerald/60">{teamStats.activeTeam} active members</p>
-              </div>
-            </div>
+        <>
+          {/* Row 1: Team counts */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <DashCard title="Total Downline" value={teamStats.totalTeam ?? 0} gradient={gradients.pink} icon="🛍" />
+            <DashCard title="Total Direct" value={teamStats.directTeam ?? 0} gradient={gradients.green} icon="📊" />
+            <DashCard title={`Team Left: ${teamStats.teamLeft ?? 0}`} value={`Team Left Active: ${teamStats.teamLeftActive ?? 0}`} gradient={gradients.blue} icon="👤" />
+            <DashCard title={`Team Right : ${teamStats.teamRight ?? 0}`} value={`Team Right Active : ${teamStats.teamRightActive ?? 0}`} gradient={gradients.orange} icon="📊" />
           </div>
 
-          {/* Right: 40% — Total Business */}
-          <div className="rounded border border-gold/20 bg-background p-6 sm:col-span-2">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gold">Total Business</h3>
-            <div className="rounded-lg border border-emerald/20 bg-emerald/5 p-4 text-center">
-              <p className="text-xs uppercase tracking-widest text-emerald/70">Business Volume</p>
-              <p className="mt-2 font-display text-3xl text-emerald">₹{teamStats.totalBusiness.toLocaleString("en-IN")}</p>
-              <p className="mt-1 text-xs text-emerald/60">Package value of your team</p>
-            </div>
-            <div className="mt-3 flex items-center justify-center gap-2">
-              <span className="text-xs text-emerald/60">Active rate:</span>
-              <span className="font-display text-sm text-emerald">
-                {teamStats.totalTeam > 0 ? Math.round((teamStats.activeTeam / teamStats.totalTeam) * 100) : 0}%
-              </span>
-            </div>
+          {/* Row 2: Left business */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <DashCard title="Total Business Team Left" value={`₹${(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="📊" />
+            <DashCard title="Team Business left Active" value={`₹${(teamStats.teamBusinessLeftActive ?? 0).toLocaleString("en-IN")}`} gradient={gradients.blue} icon="📊" />
+            <DashCard title="Team Business left Gold" value={`₹${(teamStats.teamBusinessLeftGold ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" />
+            <DashCard title="Total Business Team Right" value={`₹${(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="📊" />
           </div>
-        </div>
+
+          {/* Row 3: Right business + cashback + awards */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <DashCard title="Total Right Business joining" value={`₹${(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" />
+            <DashCard title="Team Business Right Gold" value={`₹${(teamStats.teamBusinessRightGold ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="📊" />
+            <DashCard title="Cash Back Income" value={`₹${(income.cashbackBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="📊" />
+            <DashCard title="Joining Awards" value={income.awards?.length ?? 0} gradient={gradients.blue} icon="📊" />
+          </div>
+
+          {/* Row 4: Ratio, Rank, Matching */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+            <DashCard title="60 : 40 Ratio" value={`${(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")} : ${(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="📊" />
+            <DashCard title="60:40 Ratio Rank and Reward" value={`${rankInfo?.currentRankLabel ?? "Bronze"} : ${rankInfo?.teamSize ?? 0}`} gradient={gradients.blue} icon="📊" />
+            <DashCard title="Matching Income" value={`₹${(income.matching ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" />
+          </div>
+        </>
       )}
 
       {/* Daily ID Activation Reward */}
@@ -245,67 +251,19 @@ function DashboardIndex() {
         </div>
       )}
 
-      {/* 4 Wallet Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Working Wallet" value={`₹${income.workingBalance.toLocaleString("en-IN")}`} icon="◆" subtitle="All gross income (no deductions)" />
-        <StatCard title="Income Wallet" value={`₹${income.incomeBalance.toLocaleString("en-IN")}`} icon="◇" subtitle="Net income after 20% + 10% deductions" />
-        <StatCard title="Re-Purchase Wallet" value={`₹${income.repurchaseBalance.toLocaleString("en-IN")}`} icon="◈" subtitle="20% reserved · Spend on products" />
-        <StatCard title="Cashback Wallet" value={`₹${income.cashbackBalance.toLocaleString("en-IN")}`} icon="○" subtitle="Monthly cashback · Spend on products" />
-      </div>
-
-      {/* Secondary stats row */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard title="Total Earned" value={`₹${income.totalEarned.toLocaleString("en-IN")}`} icon="▣" subtitle="Lifetime earnings" />
-        <StatCard title="Today's Pairs" value={`${income.todayPairs} / 3`} icon="◎" subtitle="Daily pair cap" />
-        <StatCard title="Total Income" value={`₹${income.totalIncome.toLocaleString("en-IN")}`} icon="▤" subtitle="Direct + Matching" />
-      </div>
-
-      {/* Leg Balance + Rank */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {legBalance && (
-          <div className="rounded border border-gold/20 bg-background p-6">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">Leg Balance</h3>
-            <div className="flex items-center gap-6">
-              <div className="flex-1 rounded-lg border border-emerald/20 bg-emerald/5 p-4 text-center">
-                <p className="text-xs uppercase tracking-widest text-emerald/70">Left Leg</p>
-                <p className="mt-1 font-display text-2xl text-emerald">{legBalance.leftTotal}</p>
-                <p className="text-xs text-emerald/60">active members</p>
-              </div>
-              <div className="text-xl text-gold/40">vs</div>
-              <div className="flex-1 rounded-lg border border-gold/20 bg-gold/5 p-4 text-center">
-                <p className="text-xs uppercase tracking-widest text-gold">Right Leg</p>
-                <p className="mt-1 font-display text-2xl text-gold">{legBalance.rightTotal}</p>
-                <p className="text-xs text-emerald/60">active members</p>
-              </div>
-            </div>
-          </div>
-        )}
-        {rankInfo && (
-          <div className="rounded border border-gold/20 bg-background p-6">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">Your Rank</h3>
-            <div className="flex items-center gap-4">
-              <div className={`rounded-lg border px-4 py-2 text-sm font-bold uppercase ${
-                rankInfo.currentRank === "platinum" ? "border-purple-300 bg-purple-100 text-purple-700" :
-                rankInfo.currentRank === "gold" ? "border-yellow-300 bg-yellow-100 text-yellow-700" :
-                rankInfo.currentRank === "silver" ? "border-gray-300 bg-gray-100 text-gray-700" :
-                "border-orange-300 bg-orange-100 text-orange-700"
-              }`}>
-                {rankInfo.currentRankLabel}
-              </div>
-              <div className="flex-1">
-                <p className="text-xs text-emerald/70">Team: {rankInfo.teamSize} members</p>
-                {rankInfo.nextRank && (
-                  <>
-                    <div className="mt-1 h-2 rounded-full bg-emerald/10">
-                      <div className="h-2 rounded-full bg-gold transition-all" style={{ width: `${rankInfo.progress}%` }} />
-                    </div>
-                    <p className="mt-1 text-xs text-emerald/60">Next: {rankInfo.nextRankLabel}</p>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+      {/* Referral Links */}
+      <div className="rounded-2xl border border-gold/20 bg-background p-6">
+        <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">Your Referral Links</h3>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <button onClick={() => copyReferral("left")} className="rounded-lg border border-emerald/30 bg-emerald/5 p-3 text-left transition-colors hover:bg-emerald/10">
+            <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-emerald">{copied === "left" ? "Copied!" : "Left Leg Link"}</p>
+            <code className="block break-all text-xs text-emerald/70">{window.location.origin}/auth?ref={user.referralCode}L</code>
+          </button>
+          <button onClick={() => copyReferral("right")} className="rounded-lg border border-gold/30 bg-gold/5 p-3 text-left transition-colors hover:bg-gold/10">
+            <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-gold">{copied === "right" ? "Copied!" : "Right Leg Link"}</p>
+            <code className="block break-all text-xs text-emerald/70">{window.location.origin}/auth?ref={user.referralCode}R</code>
+          </button>
+        </div>
       </div>
 
       {/* Withdrawal Section — from Income Wallet only */}
@@ -389,25 +347,7 @@ function DashboardIndex() {
         )}
       </div>
 
-      <div className="rounded border border-gold/20 bg-background p-6">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-gold">Your Referral Code</h3>
-        <p className="font-display text-2xl">{user.referralCode}</p>
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border border-emerald/20 bg-emerald/5 p-3">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-emerald">Left Leg Link</p>
-            <code className="block break-all text-xs text-emerald/70">
-              {window.location.origin}/auth?ref={user.referralCode}L
-            </code>
-          </div>
-          <div className="rounded-lg border border-gold/20 bg-gold/5 p-3">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gold">Right Leg Link</p>
-            <code className="block break-all text-xs text-emerald/70">
-              {window.location.origin}/auth?ref={user.referralCode}R
-            </code>
-          </div>
-        </div>
-      </div>
-
+      {/* Recent Income */}
       <div className="rounded border border-gold/20 bg-background">
         <div className="border-b border-gold/10 px-6 py-4">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Recent Income</h3>
@@ -458,39 +398,42 @@ function DashboardIndex() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded border border-gold/20 bg-background p-6">
-          <p className="text-xs uppercase tracking-widest text-emerald/70">Direct Commission</p>
-          <p className="mt-1 font-display text-2xl text-emerald">₹{income.direct.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-xs text-emerald/60">5% one-time per referral</p>
-        </div>
-        <div className="rounded border border-gold/20 bg-background p-6">
-          <p className="text-xs uppercase tracking-widest text-emerald/70">Matching Income</p>
-          <p className="mt-1 font-display text-2xl text-gold">₹{income.matching.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-xs text-emerald/60">20% per pair match</p>
-        </div>
-        <div className="rounded border border-gold/20 bg-background p-6">
-          <p className="text-xs uppercase tracking-widest text-emerald/70">Income Split</p>
-          <div className="mt-2 space-y-1">
-            <div className="flex justify-between text-xs"><span className="text-emerald/60">→ Re-purchase (20%)</span><span className="text-gold">₹{Math.round(income.totalIncome * 0.2).toLocaleString("en-IN")}</span></div>
-            <div className="flex justify-between text-xs"><span className="text-emerald/60">→ Admin charge (10%)</span><span className="text-red-400">₹{Math.round(income.totalIncome * 0.1).toLocaleString("en-IN")}</span></div>
-            <div className="flex justify-between text-xs"><span className="text-emerald/60">→ Income wallet (70%)</span><span className="text-emerald">₹{Math.round(income.totalIncome * 0.7).toLocaleString("en-IN")}</span></div>
-          </div>
-        </div>
-      </div>
+      {user.isAdmin && (
+        <Link
+          to="/admin"
+          className="block rounded border border-gold/20 bg-background p-6 text-center transition-colors hover:border-gold/40"
+        >
+          <p className="text-xs font-semibold uppercase tracking-widest text-gold">Admin Panel</p>
+          <p className="mt-1 text-xs text-emerald/60">Manage users, purchases & more</p>
+        </Link>
+      )}
     </div>
   );
 }
 
-function StatCard({ title, value, icon, subtitle }: { title: string; value: string; icon: string; subtitle?: string }) {
+function DashCard({
+  title,
+  value,
+  gradient,
+  icon,
+}: {
+  title: string;
+  value: string | number;
+  gradient: string;
+  icon?: string;
+}) {
   return (
-    <div className="rounded border border-gold/20 bg-background p-6 transition-colors hover:border-gold/40">
-      <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-widest text-emerald/70">{title}</p>
-        <span className="text-gold/40">{icon}</span>
+    <div
+      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} p-5 text-white shadow-lg transition-transform hover:scale-[1.02]`}
+    >
+      {icon && (
+        <span className="absolute right-4 top-4 text-4xl opacity-30">{icon}</span>
+      )}
+      <p className="text-sm font-bold">{value}</p>
+      <p className="mt-1 text-xs font-semibold opacity-90">{title}</p>
+      <div className="mt-3 border-t border-white/20 pt-2">
+        <p className="text-[10px] font-semibold uppercase tracking-wider opacity-80">More info →</p>
       </div>
-      <p className="mt-2 font-display text-2xl">{value}</p>
-      {subtitle && <p className="mt-1 text-xs text-emerald/50">{subtitle}</p>}
     </div>
   );
 }
