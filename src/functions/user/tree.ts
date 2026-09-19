@@ -60,6 +60,7 @@ type FlatUser = {
   rank: string | null;
   position: string | null;
   parentId: number | null;
+  referredBy: number | null;
   packageAmount: number | null;
   createdAt: Date | null;
 };
@@ -76,6 +77,7 @@ async function fetchAllDescendants(rootId: number): Promise<FlatUser[]> {
       rank: users.rank,
       position: users.position,
       parentId: users.parentId,
+      referredBy: users.referredBy,
       packageAmount: users.packageAmount,
       createdAt: users.createdAt,
     })
@@ -100,6 +102,7 @@ async function fetchAllDescendants(rootId: number): Promise<FlatUser[]> {
         rank: users.rank,
         position: users.position,
         parentId: users.parentId,
+        referredBy: users.referredBy,
         packageAmount: users.packageAmount,
         createdAt: users.createdAt,
       })
@@ -135,6 +138,7 @@ async function fetchAllUsersInTree(rootId: number): Promise<FlatUser[]> {
       rank: users.rank,
       position: users.position,
       parentId: users.parentId,
+      referredBy: users.referredBy,
       packageAmount: users.packageAmount,
       createdAt: users.createdAt,
     })
@@ -406,13 +410,13 @@ export const getDownlineUsers = createServerFn({ method: "GET" })
       }));
   });
 
-// ── Get direct referral users (immediate children only) ──
+// ── Get direct referral users (people YOU referred, not tree children) ──
 export const getDirectUsers = createServerFn({ method: "GET" })
   .handler(async () => {
     const userId = await getAuthUserId();
     const descendants = await fetchAllUsersInTree(userId);
     return descendants
-      .filter((u) => u.parentId === userId)
+      .filter((u) => u.referredBy === userId)
       .map((u) => ({
         id: u.id,
         name: u.name,

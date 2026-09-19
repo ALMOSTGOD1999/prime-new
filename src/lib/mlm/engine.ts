@@ -23,47 +23,72 @@ const MATCHING_AWARDS: { threshold: number; name: string }[] = [
 // ── Place a new user in the binary tree ────────────────
 export async function placeInTree(
   newUserId: number,
-  referrerId: number,
+  parentId: number,
   position: "left" | "right",
 ) {
-  const referrer = await db.select().from(users).where(eq(users.id, referrerId));
-  if (referrer.length === 0) throw new Error("Referrer not found");
-
   await db
     .update(users)
-    .set({ parentId: referrerId, position })
+    .set({ parentId, position })
     .where(eq(users.id, newUserId));
 }
 
-// ── Auto-place in binary tree (fill left first, or use preferred leg) ──
+// ── Find first empty slot in a subtree (BFS, left-first) ──
+async function findEmptySlot(
+  rootId: number,
+): Promise<{ parentId: number; position: "left" | "right" }> {
+  const queue = [rootId];
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+
+    // Fetch all children of this node in one query
+    const children = await db
+      .select({ id: users.id, position: users.position })
+      .from(users)
+      .where(eq(users.parentId, currentId));
+
+    const hasLeft = children.some((c) => c.position === "left");
+    const hasRight = children.some((c) => c.position === "right");
+
+    if (!hasLeft) return { parentId: currentId, position: "left" };
+    if (!hasRight) return { parentId: currentId, position: "right" };
+
+    // Both slots taken — enqueue children for next level
+    for (const child of children) {
+      queue.push(child.id);
+    }
+  }
+
+  throw new Error("No empty slot found in tree");
+}
+
+// ── Auto-place in binary tree with spillover ──────────
+// The user picks a leg (left/right). If that leg slot on the
+// referrer is empty, place directly. If taken, spill to the
+// first empty slot in that leg's subtree (BFS left-first).
 export async function autoPlace(
   newUserId: number,
   referrerId: number,
   preferredLeg?: "left" | "right",
 ): Promise<"left" | "right"> {
-  // If a preferred leg is specified, use it
-  if (preferredLeg) {
-    await placeInTree(newUserId, referrerId, preferredLeg);
-    return preferredLeg;
+  const leg = preferredLeg ?? "left";
+
+  // Check if the preferred leg slot on referrer is empty
+  const legChild = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(and(eq(users.parentId, referrerId), eq(users.position, leg)));
+
+  if (legChild.length === 0) {
+    // Slot is empty — place directly
+    await placeInTree(newUserId, referrerId, leg);
+    return leg;
   }
 
-  // Otherwise auto-fill: smaller leg first; if equal, fill left first
-  const leftCount = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(users)
-    .where(and(eq(users.parentId, referrerId), eq(users.position, "left")));
-
-  const rightCount = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(users)
-    .where(and(eq(users.parentId, referrerId), eq(users.position, "right")));
-
-  const left = leftCount[0]?.count ?? 0;
-  const right = rightCount[0]?.count ?? 0;
-
-  const position = left <= right ? "left" : "right";
-  await placeInTree(newUserId, referrerId, position);
-  return position;
+  // Slot is taken — find first empty slot in that leg's subtree
+  const slot = await findEmptySlot(legChild[0].id);
+  await placeInTree(newUserId, slot.parentId, slot.position);
+  return slot.position;
 }
 
 // ── Distribute income across 4 wallets ──────────────────
