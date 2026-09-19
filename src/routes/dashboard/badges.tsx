@@ -38,7 +38,7 @@ function BadgesPage() {
         </h1>
         <div className="text-right">
           <p className="font-display text-2xl text-gold">{data?.totalEarned || 0} / {data?.totalPossible || 0}</p>
-          <p className="text-[10px] text-emerald/60">badges earned</p>
+          <p className="text-xs text-emerald/60">badges earned</p>
         </div>
       </div>
 
@@ -69,15 +69,15 @@ function BadgesPage() {
                 <h3 className={`text-sm font-bold ${badge.earned ? "text-emerald" : "text-emerald/50"}`}>
                   {badge.title}
                 </h3>
-                <p className="mt-1 text-[10px] text-emerald/60">{badge.description}</p>
+                <p className="mt-1 text-xs text-emerald/60">{badge.description}</p>
                 {badge.earned && badge.earnedAt && (
-                  <p className="mt-2 text-[10px] text-gold">
+                  <p className="mt-2 text-xs text-gold">
                     Earned {new Date(badge.earnedAt).toLocaleDateString("en-IN")}
                   </p>
                 )}
               </div>
               {badge.earned && (
-                <span className="rounded bg-emerald/10 px-2 py-0.5 text-[10px] font-bold text-emerald">✓</span>
+                <span className="rounded bg-emerald/10 px-2 py-0.5 text-xs font-bold text-emerald">✓</span>
               )}
             </div>
           </div>

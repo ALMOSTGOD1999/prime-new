@@ -106,13 +106,13 @@ function ProfilePage() {
               <div>
                 <h2 className="font-display text-2xl">{user?.name}</h2>
                 <p className="text-xs text-emerald/70">{user?.email}</p>
-                <p className="text-[10px] uppercase tracking-widest text-emerald/60">{user?.referralCode}</p>
+                <p className="text-xs uppercase tracking-widest text-emerald/60">{user?.referralCode}</p>
               </div>
             </div>
           </div>
           <button
             onClick={() => setEditing(!editing)}
-            className="border border-emerald/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10"
+            className="border border-emerald/40 px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10"
           >
             {editing ? "Cancel" : "Edit Profile"}
           </button>
@@ -121,7 +121,7 @@ function ProfilePage() {
         {editing ? (
           <div className="mt-6 space-y-4 border-t border-gold/10 pt-6">
             <div>
-              <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">Name</label>
+              <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Name</label>
               <input
                 type="text"
                 value={name}
@@ -130,7 +130,7 @@ function ProfilePage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">Phone</label>
+              <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Phone</label>
               <input
                 type="tel"
                 value={phone}
@@ -142,7 +142,7 @@ function ProfilePage() {
             <button
               onClick={handleSaveProfile}
               disabled={saving}
-              className="bg-emerald px-6 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
+              className="bg-emerald px-6 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>
@@ -150,19 +150,19 @@ function ProfilePage() {
         ) : (
           <div className="mt-6 grid grid-cols-1 gap-4 border-t border-gold/10 pt-6 sm:grid-cols-2">
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-emerald/70">Phone</p>
+              <p className="text-xs uppercase tracking-widest text-emerald/70">Phone</p>
               <p className="mt-1 text-sm">{user?.phone || "Not set"}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-emerald/70">Position</p>
+              <p className="text-xs uppercase tracking-widest text-emerald/70">Position</p>
               <p className="mt-1 text-sm capitalize">{user?.position || "Root"}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-emerald/70">Parent</p>
+              <p className="text-xs uppercase tracking-widest text-emerald/70">Parent</p>
               <p className="mt-1 text-sm">{parent ? `${parent.name} (${parent.referralCode})` : "Root user"}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-emerald/70">Member Since</p>
+              <p className="text-xs uppercase tracking-widest text-emerald/70">Member Since</p>
               <p className="mt-1 text-sm">{new Date(user?.createdAt).toLocaleDateString("en-IN")}</p>
             </div>
           </div>
@@ -177,7 +177,7 @@ function ProfilePage() {
             {rankInfo?.currentRankLabel}
           </div>
           <div className="flex-1">
-            <div className="flex items-center justify-between text-[10px] text-emerald/70">
+            <div className="flex items-center justify-between text-xs text-emerald/70">
               <span>Team: {rankInfo?.teamSize} members</span>
               {rankInfo?.nextRank && <span>Next: {rankInfo?.nextRankLabel} ({rankInfo?.nextThreshold})</span>}
             </div>
@@ -196,7 +196,7 @@ function ProfilePage() {
         <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Change Password</h3>
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">Current Password</label>
+            <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Current Password</label>
             <input
               type="password"
               value={currentPassword}
@@ -205,7 +205,7 @@ function ProfilePage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">New Password</label>
+            <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">New Password</label>
             <input
               type="password"
               value={newPassword}
@@ -217,7 +217,7 @@ function ProfilePage() {
           <button
             onClick={handleChangePassword}
             disabled={changingPassword || !currentPassword || !newPassword}
-            className="bg-emerald px-6 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
+            className="bg-emerald px-6 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
           >
             {changingPassword ? "Changing..." : "Change Password"}
           </button>

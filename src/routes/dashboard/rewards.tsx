@@ -65,7 +65,7 @@ function RewardsPage() {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between border-t border-gold/10 pt-6 text-[10px] uppercase tracking-widest text-emerald/40">
+      <div className="flex items-center justify-between border-t border-gold/10 pt-6 text-xs uppercase tracking-widest text-emerald/40">
         <span>Prime Jewellery Pvt. Ltd.</span>
         <span>Crafted for a Brighter Tomorrow</span>
       </div>

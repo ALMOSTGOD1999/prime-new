@@ -140,7 +140,7 @@ function PurchasePage() {
       <div className="flex gap-2">
         <button
           onClick={() => setActiveTab("purchase")}
-          className={`px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+          className={`px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all ${
             activeTab === "purchase"
               ? "bg-gold text-cream"
               : "border border-gold/20 text-emerald/60 hover:border-gold/40"
@@ -150,7 +150,7 @@ function PurchasePage() {
         </button>
         <button
           onClick={() => setActiveTab("history")}
-          className={`px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+          className={`px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all ${
             activeTab === "history"
               ? "bg-gold text-cream"
               : "border border-gold/20 text-emerald/60 hover:border-gold/40"
@@ -177,7 +177,7 @@ function PurchasePage() {
                   }`}
                 >
                   <p className="font-display text-2xl">{c}K</p>
-                  <p className="mt-1 text-[10px] uppercase tracking-widest">
+                  <p className="mt-1 text-xs uppercase tracking-widest">
                     {c === 24 ? "Pure Gold" : c === 22 ? "Standard" : "Light"}
                   </p>
                 </button>
@@ -201,12 +201,12 @@ function PurchasePage() {
               <button
                 onClick={handlePreview}
                 disabled={previewLoading || !weight}
-                className="border border-emerald/40 px-6 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10 disabled:opacity-50"
+                className="border border-emerald/40 px-6 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10 disabled:opacity-50"
               >
                 {previewLoading ? "Computing..." : "Preview Billing"}
               </button>
             </div>
-            <p className="mt-2 text-[10px] text-emerald/50">Minimum purchase: ₹10,000</p>
+            <p className="mt-2 text-xs text-emerald/50">Minimum purchase: ₹10,000</p>
           </div>
 
           {/* Billing Preview */}
@@ -253,15 +253,15 @@ function PurchasePage() {
               </div>
 
               <div className="rounded-lg border border-emerald/20 bg-emerald/5 p-4">
-                <p className="text-[10px] uppercase tracking-widest text-emerald/70">Monthly Return</p>
+                <p className="text-xs uppercase tracking-widest text-emerald/70">Monthly Return</p>
                 <p className="mt-1 font-display text-2xl text-emerald">₹{preview.monthlyReturnAmount.toLocaleString("en-IN")}</p>
-                <p className="text-[10px] text-emerald/60">{preview.monthlyReturnPct}% per month • Package: {preview.packageName}</p>
+                <p className="text-xs text-emerald/60">{preview.monthlyReturnPct}% per month • Package: {preview.packageName}</p>
               </div>
 
               <button
                 onClick={handleConfirm}
                 disabled={confirmLoading}
-                className="w-full bg-gold py-3 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-50"
+                className="w-full bg-gold py-3 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-50"
               >
                 {confirmLoading ? "Processing..." : "Confirm Purchase"}
               </button>
@@ -290,11 +290,11 @@ function PurchasePage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-display text-sm">Purchase #{p.id}</p>
-                        <span className={`rounded px-2 py-0.5 text-[10px] font-semibold ${getStatusColor(p)}`}>
+                        <span className={`rounded px-2 py-0.5 text-xs font-semibold ${getStatusColor(p)}`}>
                           {getStatusLabel(p)}
                         </span>
                       </div>
-                      <p className="mt-1 text-[10px] text-emerald/60">
+                      <p className="mt-1 text-xs text-emerald/60">
                         {p.carat}K • {p.weight}g • {new Date(p.createdAt).toLocaleDateString("en-IN")}
                       </p>
                     </div>
@@ -303,7 +303,7 @@ function PurchasePage() {
                       <button
                         onClick={() => handleDownloadPdf(p)}
                         disabled={generatingPdfId === p.id}
-                        className="rounded border border-gold/30 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-gold transition-all hover:bg-gold/10 disabled:opacity-50"
+                        className="rounded border border-gold/30 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-gold transition-all hover:bg-gold/10 disabled:opacity-50"
                         title="Download PDF Invoice"
                       >
                         {generatingPdfId === p.id ? "..." : "PDF"}

@@ -104,7 +104,7 @@ function KycPage() {
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">PAN Number</label>
+                <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">PAN Number</label>
                 <input
                   type="text"
                   value={form.panNumber}
@@ -115,7 +115,7 @@ function KycPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">Aadhaar Number</label>
+                <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Aadhaar Number</label>
                 <input
                   type="text"
                   value={form.aadhaarNumber}
@@ -128,7 +128,7 @@ function KycPage() {
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div>
-                <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">Bank Name</label>
+                <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Bank Name</label>
                 <input
                   type="text"
                   value={form.bankName}
@@ -138,7 +138,7 @@ function KycPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">Account Number</label>
+                <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Account Number</label>
                 <input
                   type="text"
                   value={form.accountNumber}
@@ -148,7 +148,7 @@ function KycPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">IFSC Code</label>
+                <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">IFSC Code</label>
                 <input
                   type="text"
                   value={form.ifscCode}
@@ -162,7 +162,7 @@ function KycPage() {
             <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="bg-emerald px-6 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
+              className="bg-emerald px-6 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
             >
               {submitting ? "Submitting..." : status === "pending" ? "Update Submission" : "Submit KYC"}
             </button>

@@ -114,7 +114,7 @@ function AdminUsers() {
         </div>
         <button
           onClick={handleSearch}
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald px-6 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md hover:shadow-emerald/30"
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md hover:shadow-emerald/30"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
           Search
@@ -133,7 +133,7 @@ function AdminUsers() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/60">
+                  <tr className="border-b border-gold/10 text-xs uppercase tracking-[0.2em] text-emerald/60">
                     <th className="px-6 py-3 text-left font-semibold">ID</th>
                     <th className="px-6 py-3 text-left font-semibold">Name</th>
                     <th className="px-6 py-3 text-left font-semibold">Email</th>
@@ -155,7 +155,7 @@ function AdminUsers() {
                       <td className="px-6 py-3.5 font-mono text-xs text-emerald/60">#{user.id}</td>
                       <td className="px-6 py-3.5">
                         <div className="flex items-center gap-2.5">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald/10 to-emerald/5 text-[10px] font-bold text-emerald ring-1 ring-emerald/15">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald/10 to-emerald/5 text-xs font-bold text-emerald ring-1 ring-emerald/15">
                             {user.name?.charAt(0)?.toUpperCase()}
                           </div>
                           <span className="text-xs font-semibold">{user.name}</span>
@@ -163,19 +163,19 @@ function AdminUsers() {
                       </td>
                       <td className="px-6 py-3.5 text-xs text-emerald/60">{user.email}</td>
                       <td className="px-6 py-3.5">
-                        <code className="rounded-md bg-emerald/5 px-2 py-0.5 text-[10px] font-semibold text-emerald/70">{user.referralCode}</code>
+                        <code className="rounded-md bg-emerald/5 px-2 py-0.5 text-xs font-semibold text-emerald/70">{user.referralCode}</code>
                       </td>
                       <td className="px-6 py-3.5">
                         {user.position ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-gold/5 px-2 py-0.5 text-[10px] font-semibold text-gold ring-1 ring-gold/15">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gold/5 px-2 py-0.5 text-xs font-semibold text-gold ring-1 ring-gold/15">
                             {user.position === "left" ? "←" : "→"} {user.position}
                           </span>
                         ) : (
-                          <span className="text-[10px] text-emerald/25">—</span>
+                          <span className="text-xs text-emerald/25">—</span>
                         )}
                       </td>
                       <td className="px-6 py-3.5">
-                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ${
+                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${
                           user.isActive
                             ? "bg-emerald/5 text-emerald ring-emerald/20"
                             : "bg-destructive/10 text-red-600 ring-destructive/20"
@@ -186,7 +186,7 @@ function AdminUsers() {
                       </td>
                       <td className="px-6 py-3.5">
                         {user.isAdmin && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-gold/10 px-2.5 py-0.5 text-[10px] font-semibold text-gold ring-1 ring-gold/20">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gold/10 px-2.5 py-0.5 text-xs font-semibold text-gold ring-1 ring-gold/20">
                             <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
                             Admin
                           </span>
@@ -195,7 +195,7 @@ function AdminUsers() {
                       <td className="px-6 py-3.5 text-right text-xs font-semibold text-emerald/60">
                         ₹{user.packageAmount?.toLocaleString("en-IN") || "0"}
                       </td>
-                      <td className="px-6 py-3.5 text-right text-[10px] text-emerald/60">
+                      <td className="px-6 py-3.5 text-right text-xs text-emerald/60">
                         {new Date(user.createdAt).toLocaleDateString("en-IN")}
                       </td>
                       <td className="px-6 py-3.5 text-right">
@@ -204,7 +204,7 @@ function AdminUsers() {
                             <button
                               onClick={() => handleToggleActivation(user.id, user.name, user.isActive)}
                               disabled={activatingId === user.id}
-                              className={`inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] transition-all duration-200 hover:shadow-sm disabled:opacity-40 ${
+                              className={`inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] transition-all duration-200 hover:shadow-sm disabled:opacity-40 ${
                                 user.isActive
                                   ? "border-destructive/30 bg-destructive/10 text-red-600 hover:bg-destructive/20"
                                   : "border-emerald/30 bg-emerald/10 text-emerald hover:bg-emerald/20"
@@ -226,7 +226,7 @@ function AdminUsers() {
                             <button
                               onClick={() => handleImpersonate(user.id, user.name)}
                               disabled={impersonating === user.id}
-                              className="inline-flex items-center gap-1.5 rounded-lg border border-gold/25 bg-gold/5 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-gold transition-all duration-200 hover:bg-gold/10 hover:border-gold/40 hover:shadow-sm disabled:opacity-40"
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-gold/25 bg-gold/5 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-gold transition-all duration-200 hover:bg-gold/10 hover:border-gold/40 hover:shadow-sm disabled:opacity-40"
                             >
                               {impersonating === user.id ? (
                                 <div className="h-3 w-3 animate-spin rounded-full border border-gold border-t-transparent" />
@@ -237,7 +237,7 @@ function AdminUsers() {
                             </button>
                             <button
                               onClick={() => { setDeleteTarget({ id: user.id, name: user.name }); setDeleteKey(""); }}
-                              className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-600 transition-all duration-200 hover:bg-destructive/20 hover:border-red-300"
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-red-600 transition-all duration-200 hover:bg-destructive/20 hover:border-red-300"
                             >
                               <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
                               Delete
@@ -253,25 +253,25 @@ function AdminUsers() {
 
             {/* Pagination */}
             <div className="flex items-center justify-between border-t border-gold/10 px-6 py-4">
-              <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-emerald/60">
+              <p className="text-xs font-medium uppercase tracking-[0.15em] text-emerald/60">
                 Showing {(page - 1) * 20 + 1}–{Math.min(page * 20, data?.total || 0)} of {data?.total || 0}
               </p>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => { setPage(Math.max(1, page - 1)); fetchUsers(search, Math.max(1, page - 1)); }}
                   disabled={page <= 1}
-                  className="inline-flex items-center gap-1 rounded-lg border border-gold/20 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald/60 transition-all duration-200 hover:border-gold/40 hover:bg-gold/5 disabled:opacity-30 disabled:hover:bg-transparent"
+                  className="inline-flex items-center gap-1 rounded-lg border border-gold/20 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-emerald/60 transition-all duration-200 hover:border-gold/40 hover:bg-gold/5 disabled:opacity-30 disabled:hover:bg-transparent"
                 >
                   <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
                   Prev
                 </button>
-                <span className="rounded-lg bg-emerald/5 px-3 py-1.5 text-[10px] font-bold text-emerald">
+                <span className="rounded-lg bg-emerald/5 px-3 py-1.5 text-xs font-bold text-emerald">
                   {page} / {totalPages}
                 </span>
                 <button
                   onClick={() => { setPage(Math.min(totalPages, page + 1)); fetchUsers(search, Math.min(totalPages, page + 1)); }}
                   disabled={page >= totalPages}
-                  className="inline-flex items-center gap-1 rounded-lg border border-gold/20 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald/60 transition-all duration-200 hover:border-gold/40 hover:bg-gold/5 disabled:opacity-30 disabled:hover:bg-transparent"
+                  className="inline-flex items-center gap-1 rounded-lg border border-gold/20 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-emerald/60 transition-all duration-200 hover:border-gold/40 hover:bg-gold/5 disabled:opacity-30 disabled:hover:bg-transparent"
                 >
                   Next
                   <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
@@ -310,14 +310,14 @@ function AdminUsers() {
             <div className="flex items-center justify-end gap-3 border-t border-destructive/20 px-6 py-4">
               <button
                 onClick={() => { setDeleteTarget(null); setDeleteKey(""); }}
-                className="rounded-lg border border-gold/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"
+                className="rounded-lg border border-gold/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={deleteKey !== "DELETE" || deleting}
-                className="rounded-lg bg-red-600 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-white transition-all hover:bg-red-700 disabled:opacity-40 disabled:hover:bg-red-600"
+                className="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-white transition-all hover:bg-red-700 disabled:opacity-40 disabled:hover:bg-red-600"
               >
                 {deleting ? "Deleting..." : "Delete User"}
               </button>

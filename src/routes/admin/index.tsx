@@ -102,7 +102,7 @@ function AdminDashboard() {
         </div>
         <Link
           to="/admin/users"
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md hover:shadow-emerald/30 hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md hover:shadow-emerald/30 hover:-translate-y-0.5"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" /></svg>
           Manage Users
@@ -118,7 +118,7 @@ function AdminDashboard() {
             style={{ animationDelay: `${i * 80}ms` }}
           >
             <div className="flex items-start justify-between">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/70">{stat.title}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald/70">{stat.title}</p>
               <div className={`rounded-lg p-2 ${stat.iconBg} transition-transform duration-300 group-hover:scale-110`}>
                 {stat.icon}
               </div>
@@ -138,13 +138,13 @@ function AdminDashboard() {
             </div>
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Monthly Cashback Payout</h3>
-              <p className="mt-0.5 text-[10px] text-emerald/60">Credits 30% of each active user's self business to their cashback wallet</p>
+              <p className="mt-0.5 text-xs text-emerald/60">Credits 30% of each active user's self business to their cashback wallet</p>
             </div>
           </div>
           <button
             onClick={handleCashbackPayout}
             disabled={cashbackLoading}
-            className="inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-gold/20 transition-all duration-200 hover:bg-gold/90 hover:shadow-md hover:shadow-gold/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-gold/20 transition-all duration-200 hover:bg-gold/90 hover:shadow-md hover:shadow-gold/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {cashbackLoading ? (
               <>
@@ -177,13 +177,13 @@ function AdminDashboard() {
             </div>
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Monthly Investment Returns</h3>
-              <p className="mt-0.5 text-[10px] text-emerald/60">Credits monthly returns from active investments to user wallets (70/20/10 split)</p>
+              <p className="mt-0.5 text-xs text-emerald/60">Credits monthly returns from active investments to user wallets (70/20/10 split)</p>
             </div>
           </div>
           <button
             onClick={handleProcessReturns}
             disabled={returnsLoading}
-            className="inline-flex items-center gap-2 rounded-lg bg-emerald px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md hover:shadow-emerald/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md hover:shadow-emerald/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {returnsLoading ? (
               <>
@@ -216,14 +216,14 @@ function AdminDashboard() {
             </div>
             <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Recent Users</h3>
           </div>
-          <Link to="/admin/users" className="text-[10px] font-semibold uppercase tracking-[0.15em] text-emerald/70 transition-colors hover:text-emerald">
+          <Link to="/admin/users" className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald/70 transition-colors hover:text-emerald">
             View all →
           </Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/60">
+              <tr className="border-b border-gold/10 text-xs uppercase tracking-[0.2em] text-emerald/60">
                 <th className="px-6 py-3 text-left font-semibold">ID</th>
                 <th className="px-6 py-3 text-left font-semibold">Name</th>
                 <th className="px-6 py-3 text-left font-semibold">Email</th>
@@ -242,7 +242,7 @@ function AdminDashboard() {
                   <td className="px-6 py-3.5 text-xs text-emerald/60 font-mono">#{user.id}</td>
                   <td className="px-6 py-3.5">
                     <div className="flex items-center gap-2.5">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald/10 text-[10px] font-bold text-emerald">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald/10 text-xs font-bold text-emerald">
                         {user.name?.charAt(0)?.toUpperCase()}
                       </div>
                       <span className="text-xs font-semibold">{user.name}</span>
@@ -250,10 +250,10 @@ function AdminDashboard() {
                   </td>
                   <td className="px-6 py-3.5 text-xs text-emerald/60">{user.email}</td>
                   <td className="px-6 py-3.5">
-                    <code className="rounded-md bg-emerald/5 px-2 py-0.5 text-[10px] font-semibold text-emerald/70">{user.referralCode}</code>
+                    <code className="rounded-md bg-emerald/5 px-2 py-0.5 text-xs font-semibold text-emerald/70">{user.referralCode}</code>
                   </td>
                   <td className="px-6 py-3.5">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ${
+                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${
                       user.isActive
                         ? "bg-emerald/5 text-emerald ring-emerald/20"
                         : "bg-destructive/10 text-red-600 ring-destructive/20"
@@ -262,7 +262,7 @@ function AdminDashboard() {
                       {user.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-6 py-3.5 text-right text-[10px] text-emerald/60">
+                  <td className="px-6 py-3.5 text-right text-xs text-emerald/60">
                     {new Date(user.createdAt).toLocaleDateString("en-IN")}
                   </td>
                 </tr>

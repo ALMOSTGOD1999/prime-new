@@ -75,7 +75,7 @@ function AdminPayoutPage() {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+            className={`px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all ${
               filter === f ? "bg-emerald text-cream" : "border border-emerald/40 text-emerald hover:bg-emerald/10"
             }`}
           >
@@ -92,7 +92,7 @@ function AdminPayoutPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
+                <tr className="border-b border-gold/10 text-xs uppercase tracking-widest text-emerald/70">
                   <th className="px-6 py-3 text-left">User</th>
                   <th className="px-6 py-3 text-left">Code</th>
                   <th className="px-6 py-3 text-right">Amount</th>
@@ -106,13 +106,13 @@ function AdminPayoutPage() {
                 {filtered.map((p) => (
                   <tr key={p.id} className="border-b border-gold/5 transition-colors hover:bg-gold/5">
                     <td className="px-6 py-3 text-xs font-semibold">{p.userName}</td>
-                    <td className="px-6 py-3 text-[10px] text-emerald/70">{p.userReferralCode}</td>
+                    <td className="px-6 py-3 text-xs text-emerald/70">{p.userReferralCode}</td>
                     <td className="px-6 py-3 text-right text-xs font-semibold text-emerald">
                       ₹{p.amount.toLocaleString("en-IN")}
                     </td>
                     <td className="px-6 py-3">
                       <span
-                        className={`inline-block rounded px-2 py-0.5 text-[10px] font-semibold ${
+                        className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${
                           p.status === "approved"
                             ? "bg-emerald/10 text-emerald"
                             : p.status === "rejected"
@@ -123,8 +123,8 @@ function AdminPayoutPage() {
                         {p.status}
                       </span>
                     </td>
-                    <td className="px-6 py-3 text-[10px] text-emerald/60">{p.adminNote || "-"}</td>
-                    <td className="px-6 py-3 text-right text-[10px] text-emerald/70">
+                    <td className="px-6 py-3 text-xs text-emerald/60">{p.adminNote || "-"}</td>
+                    <td className="px-6 py-3 text-right text-xs text-emerald/70">
                       {new Date(p.requestedAt).toLocaleDateString("en-IN")}
                     </td>
                     <td className="px-6 py-3 text-right">
@@ -133,14 +133,14 @@ function AdminPayoutPage() {
                           <button
                             onClick={() => handleProcess(p.id, "approved")}
                             disabled={processing === p.id}
-                            className="rounded bg-emerald px-3 py-1 text-[10px] font-semibold text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
+                            className="rounded bg-emerald px-3 py-1 text-xs font-semibold text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => handleProcess(p.id, "rejected")}
                             disabled={processing === p.id}
-                            className="rounded border border-red-300 px-3 py-1 text-[10px] font-semibold text-red-600 transition-all hover:bg-destructive/10 disabled:opacity-50"
+                            className="rounded border border-red-300 px-3 py-1 text-xs font-semibold text-red-600 transition-all hover:bg-destructive/10 disabled:opacity-50"
                           >
                             Reject
                           </button>

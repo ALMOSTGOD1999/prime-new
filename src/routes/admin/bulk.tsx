@@ -135,20 +135,20 @@ function AdminBulkPage() {
         <button
           onClick={() => setAction(action === "notify" ? "none" : "notify")}
           disabled={selected.size === 0}
-          className="border border-gold/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-gold/10 disabled:opacity-40"
+          className="border border-gold/40 px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-gold/10 disabled:opacity-40"
         >
           Notify Selected
         </button>
         <button
           onClick={handleBulkActivate}
           disabled={selected.size === 0 || processing}
-          className="border border-emerald/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-emerald transition-all hover:bg-emerald/10 disabled:opacity-40"
+          className="border border-emerald/40 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-emerald transition-all hover:bg-emerald/10 disabled:opacity-40"
         >
           Activate Selected
         </button>
         <button
           onClick={handleExport}
-          className="bg-emerald px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
+          className="bg-emerald px-4 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
         >
           Export CSV
         </button>
@@ -176,7 +176,7 @@ function AdminBulkPage() {
           <button
             onClick={handleBulkNotify}
             disabled={processing || !notifyTitle || !notifyMsg}
-            className="mt-3 bg-gold px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-50"
+            className="mt-3 bg-gold px-4 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-50"
           >
             Send Notification
           </button>
@@ -188,7 +188,7 @@ function AdminBulkPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
+              <tr className="border-b border-gold/10 text-xs uppercase tracking-widest text-emerald/70">
                 <th className="px-4 py-3">
                   <input type="checkbox" onChange={toggleAll} checked={selected.size === users.length && users.length > 0} className="accent-gold" />
                 </th>
@@ -212,13 +212,13 @@ function AdminBulkPage() {
                   </td>
                   <td className="px-4 py-3 text-xs">#{u.id}</td>
                   <td className="px-4 py-3 text-xs font-semibold">{u.name}</td>
-                  <td className="px-4 py-3 text-[10px] text-emerald/70">{u.referralCode}</td>
+                  <td className="px-4 py-3 text-xs text-emerald/70">{u.referralCode}</td>
                   <td className="px-4 py-3">
-                    <span className={`rounded px-2 py-0.5 text-[10px] font-bold ${u.isActive ? "bg-emerald/10 text-emerald" : "bg-destructive/10 text-red-600"}`}>
+                    <span className={`rounded px-2 py-0.5 text-xs font-bold ${u.isActive ? "bg-emerald/10 text-emerald" : "bg-destructive/10 text-red-600"}`}>
                       {u.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-[10px] capitalize">{u.rank}</td>
+                  <td className="px-4 py-3 text-xs capitalize">{u.rank}</td>
                 </tr>
               ))}
             </tbody>
@@ -228,19 +228,19 @@ function AdminBulkPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between border-t border-gold/10 px-6 py-3">
-            <p className="text-[10px] text-emerald/60">Page {page} of {totalPages}</p>
+            <p className="text-xs text-emerald/60">Page {page} of {totalPages}</p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage(Math.max(1, page - 1))}
                 disabled={page === 1}
-                className="border border-emerald/40 px-3 py-1 text-[10px] font-semibold uppercase disabled:opacity-40"
+                className="border border-emerald/40 px-3 py-1 text-xs font-semibold uppercase disabled:opacity-40"
               >
                 Prev
               </button>
               <button
                 onClick={() => setPage(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages}
-                className="border border-emerald/40 px-3 py-1 text-[10px] font-semibold uppercase disabled:opacity-40"
+                className="border border-emerald/40 px-3 py-1 text-xs font-semibold uppercase disabled:opacity-40"
               >
                 Next
               </button>

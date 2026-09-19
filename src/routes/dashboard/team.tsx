@@ -53,7 +53,7 @@ function TreeNode({ node, depth }: { node: any; depth: number }) {
     return (
       <div className="flex flex-col items-center">
         <div className="rounded border border-dashed border-gold/20 bg-background/50 px-4 py-3 text-center">
-          <p className="text-[10px] text-emerald/70">Empty</p>
+          <p className="text-xs text-emerald/70">Empty</p>
         </div>
       </div>
     );
@@ -69,7 +69,7 @@ function TreeNode({ node, depth }: { node: any; depth: number }) {
         }`}
       >
         <p className="text-xs font-semibold">{node.name}</p>
-        <p className="text-[10px] text-emerald/70">{node.referralCode}</p>
+        <p className="text-xs text-emerald/70">{node.referralCode}</p>
         <div className="mt-1 flex items-center justify-center gap-2">
           <span
             className={`inline-block rounded px-1.5 py-0.5 text-[8px] font-semibold uppercase ${

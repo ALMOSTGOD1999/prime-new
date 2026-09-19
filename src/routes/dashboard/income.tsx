@@ -45,25 +45,25 @@ function IncomePage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded border border-emerald/20 bg-emerald/5 p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Direct Commission</p>
+          <p className="text-xs uppercase tracking-widest text-emerald/70">Direct Commission</p>
           <p className="mt-2 font-display text-2xl text-emerald">
             ₹{income.direct.toLocaleString("en-IN")}
           </p>
-          <p className="mt-1 text-[10px] text-emerald/60">5% per referral</p>
+          <p className="mt-1 text-xs text-emerald/60">5% per referral</p>
         </div>
         <div className="rounded border border-gold/20 bg-gold/5 p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Matching Income</p>
+          <p className="text-xs uppercase tracking-widest text-emerald/70">Matching Income</p>
           <p className="mt-2 font-display text-2xl text-gold">
             ₹{income.matching.toLocaleString("en-IN")}
           </p>
-          <p className="mt-1 text-[10px] text-emerald/60">20% per pair</p>
+          <p className="mt-1 text-xs text-emerald/60">20% per pair</p>
         </div>
         <div className="rounded border border-gold/20 bg-background p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Earned</p>
+          <p className="text-xs uppercase tracking-widest text-emerald/70">Total Earned</p>
           <p className="mt-2 font-display text-2xl text-emerald">
             ₹{income.totalEarned.toLocaleString("en-IN")}
           </p>
-          <p className="mt-1 text-[10px] text-emerald/60">Lifetime</p>
+          <p className="mt-1 text-xs text-emerald/60">Lifetime</p>
         </div>
       </div>
 
@@ -99,7 +99,7 @@ function IncomePage() {
                 <span className="text-lg text-gold">&#127942;</span>
                 <div>
                   <p className="text-xs font-semibold">{award.awardName}</p>
-                  <p className="text-[10px] text-emerald/60">
+                  <p className="text-xs text-emerald/60">
                     At {award.totalPairs} pairs — {new Date(award.awardedAt).toLocaleDateString("en-IN")}
                   </p>
                 </div>
@@ -114,7 +114,7 @@ function IncomePage() {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`rounded px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition-colors ${
+            className={`rounded px-3 py-1.5 text-xs font-semibold uppercase tracking-widest transition-colors ${
               filter === f
                 ? "bg-emerald text-cream"
                 : "border border-gold/20 text-emerald/70 hover:border-gold/40"
@@ -129,7 +129,7 @@ function IncomePage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
+              <tr className="border-b border-gold/10 text-xs uppercase tracking-widest text-emerald/70">
                 <th className="px-6 py-3 text-left">Type</th>
                 <th className="px-6 py-3 text-left">Description</th>
                 <th className="px-6 py-3 text-right">Amount</th>
@@ -148,7 +148,7 @@ function IncomePage() {
                   <tr key={item.id} className="border-b border-gold/5 transition-colors hover:bg-gold/5">
                     <td className="px-6 py-3">
                       <span
-                        className={`inline-block rounded px-2 py-0.5 text-[10px] font-semibold uppercase ${
+                        className={`inline-block rounded px-2 py-0.5 text-xs font-semibold uppercase ${
                           item.type === "direct"
                             ? "bg-emerald/10 text-emerald"
                             : item.type === "matching"
@@ -163,7 +163,7 @@ function IncomePage() {
                     <td className="px-6 py-3 text-right text-xs font-semibold text-emerald">
                       ₹{item.amount.toLocaleString("en-IN")}
                     </td>
-                    <td className="px-6 py-3 text-right text-[10px] text-emerald/70">
+                    <td className="px-6 py-3 text-right text-xs text-emerald/70">
                       {new Date(item.createdAt).toLocaleDateString("en-IN")}
                     </td>
                   </tr>

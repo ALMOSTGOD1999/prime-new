@@ -153,7 +153,7 @@ function PurchasesPage() {
         </div>
         <Link
           to="/admin/make-purchase"
-          className="inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream shadow-sm transition-all hover:bg-gold/90"
+          className="inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm transition-all hover:bg-gold/90"
         >
           + Make Purchase
         </Link>
@@ -165,7 +165,7 @@ function PurchasesPage() {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`rounded-full px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] transition-all ${
+            className={`rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] transition-all ${
               filter === f
                 ? "bg-gold text-cream"
                 : "border border-gold/20 text-emerald/60 hover:border-gold/40"
@@ -199,7 +199,7 @@ function PurchasesPage() {
                 <span className="font-display text-gold text-lg">₹{detail.purchase.totalAmount?.toLocaleString("en-IN")}</span>
               </div>
               <div className="flex justify-between"><span className="text-emerald/70">Status</span>
-                <span className={`rounded px-2 py-0.5 text-[10px] font-semibold ${getStatusColor(detail.purchase)}`}>
+                <span className={`rounded px-2 py-0.5 text-xs font-semibold ${getStatusColor(detail.purchase)}`}>
                   {getStatusLabel(detail.purchase)}
                 </span>
               </div>
@@ -208,7 +208,7 @@ function PurchasesPage() {
               )}
               {detail.investment && (
                 <div className="border-t border-gold/10 pt-3">
-                  <p className="text-[10px] uppercase tracking-widest text-gold mb-2">Investment</p>
+                  <p className="text-xs uppercase tracking-widest text-gold mb-2">Investment</p>
                   <div className="flex justify-between"><span className="text-emerald/70">Monthly Return</span><span className="text-emerald">₹{detail.investment.monthlyReturnAmount?.toLocaleString("en-IN")}</span></div>
                   <div className="flex justify-between"><span className="text-emerald/70">Return %</span><span>{detail.investment.monthlyReturnPct}%</span></div>
                   <div className="flex justify-between"><span className="text-emerald/70">Status</span><span>{detail.investment.status}</span></div>
@@ -221,14 +221,14 @@ function PurchasesPage() {
                   <button
                     onClick={() => handleAction(detail.purchase.id, "approve")}
                     disabled={actionLoading === detail.purchase.id}
-                    className="rounded-lg bg-emerald px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream transition-all hover:bg-emerald/90 disabled:opacity-50"
+                    className="rounded-lg bg-emerald px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-cream transition-all hover:bg-emerald/90 disabled:opacity-50"
                   >
                     Approve
                   </button>
                   <button
                     onClick={() => handleAction(detail.purchase.id, "reject")}
                     disabled={actionLoading === detail.purchase.id}
-                    className="rounded-lg bg-red-500 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream transition-all hover:bg-red-600 disabled:opacity-50"
+                    className="rounded-lg bg-red-500 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-cream transition-all hover:bg-red-600 disabled:opacity-50"
                   >
                     Reject
                   </button>
@@ -239,14 +239,14 @@ function PurchasesPage() {
                   <button
                     onClick={() => handleAction(detail.purchase.id, "stop")}
                     disabled={actionLoading === detail.purchase.id}
-                    className="rounded-lg bg-orange-500 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream transition-all hover:bg-orange-600 disabled:opacity-50"
+                    className="rounded-lg bg-orange-500 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-cream transition-all hover:bg-orange-600 disabled:opacity-50"
                   >
                     Stop
                   </button>
                   <button
                     onClick={() => handleAction(detail.purchase.id, "cancel")}
                     disabled={actionLoading === detail.purchase.id}
-                    className="rounded-lg bg-gray-500 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream transition-all hover:bg-gray-600 disabled:opacity-50"
+                    className="rounded-lg bg-gray-500 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-cream transition-all hover:bg-gray-600 disabled:opacity-50"
                   >
                     Cancel
                   </button>
@@ -254,14 +254,14 @@ function PurchasesPage() {
               )}
               <button
                 onClick={() => setDetail(null)}
-                className="rounded-lg border border-gold/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"
+                className="rounded-lg border border-gold/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"
               >
                 Close
               </button>
               <button
                 onClick={handleDownloadPdfFromDetail}
                 disabled={generatingPdfId === detail.purchase.id}
-                className="rounded-lg border border-gold/30 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gold transition-all hover:bg-gold/10 disabled:opacity-50"
+                className="rounded-lg border border-gold/30 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-gold transition-all hover:bg-gold/10 disabled:opacity-50"
               >
                 {generatingPdfId === detail.purchase.id ? "Generating..." : "Download PDF"}
               </button>
@@ -286,7 +286,7 @@ function PurchasesPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gold/10 text-[10px] uppercase tracking-[0.2em] text-emerald/60">
+                <tr className="border-b border-gold/10 text-xs uppercase tracking-[0.2em] text-emerald/60">
                   <th className="px-6 py-3 text-left font-semibold">ID</th>
                   <th className="px-6 py-3 text-left font-semibold">User</th>
                   <th className="px-6 py-3 text-left font-semibold">Details</th>
@@ -307,7 +307,7 @@ function PurchasesPage() {
                     <td className="px-6 py-3.5">
                       <div>
                         <p className="text-xs font-semibold">{p.userName}</p>
-                        <p className="text-[10px] text-emerald/60">{p.userEmail}</p>
+                        <p className="text-xs text-emerald/60">{p.userEmail}</p>
                       </div>
                     </td>
                     <td className="px-6 py-3.5 text-xs text-emerald/70">
@@ -317,7 +317,7 @@ function PurchasesPage() {
                       <span className="text-xs font-semibold text-gold">₹{p.totalAmount?.toLocaleString("en-IN")}</span>
                     </td>
                     <td className="px-6 py-3.5 text-center">
-                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ${getStatusColor(p)}`}>
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${getStatusColor(p)}`}>
                         <span className={`h-1 w-1 rounded-full ${
                           p.status === "approved" && !p.stoppedAt && !p.cancelledAt ? "bg-emerald" :
                           p.rejectedAt ? "bg-red-400" : "bg-gold"
@@ -325,7 +325,7 @@ function PurchasesPage() {
                         {getStatusLabel(p)}
                       </span>
                     </td>
-                    <td className="px-6 py-3.5 text-right text-[10px] text-emerald/60">
+                    <td className="px-6 py-3.5 text-right text-xs text-emerald/60">
                       {new Date(p.createdAt).toLocaleDateString("en-IN")}
                     </td>
                     <td className="px-6 py-3.5 text-center" onClick={(e) => e.stopPropagation()}>
@@ -333,7 +333,7 @@ function PurchasesPage() {
                         <button
                           onClick={(e) => handleDownloadPdf(p, e)}
                           disabled={generatingPdfId === p.id}
-                          className="rounded px-2 py-1 text-[10px] font-semibold text-gold hover:bg-gold/10 disabled:opacity-50"
+                          className="rounded px-2 py-1 text-xs font-semibold text-gold hover:bg-gold/10 disabled:opacity-50"
                           title="Download PDF"
                         >
                           {generatingPdfId === p.id ? "..." : "PDF"}
@@ -343,14 +343,14 @@ function PurchasesPage() {
                             <button
                               onClick={() => handleAction(p.id, "approve")}
                               disabled={actionLoading === p.id}
-                              className="rounded px-2 py-1 text-[10px] font-semibold text-emerald hover:bg-emerald/10 disabled:opacity-50"
+                              className="rounded px-2 py-1 text-xs font-semibold text-emerald hover:bg-emerald/10 disabled:opacity-50"
                             >
                               ✓
                             </button>
                             <button
                               onClick={() => handleAction(p.id, "reject")}
                               disabled={actionLoading === p.id}
-                              className="rounded px-2 py-1 text-[10px] font-semibold text-red-500 hover:bg-red-50 disabled:opacity-50"
+                              className="rounded px-2 py-1 text-xs font-semibold text-red-500 hover:bg-red-50 disabled:opacity-50"
                             >
                               ✕
                             </button>

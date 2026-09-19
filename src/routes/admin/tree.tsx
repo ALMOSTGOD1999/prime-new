@@ -122,7 +122,7 @@ function AdminTreePage() {
           <h1 className="font-display text-2xl sm:text-3xl">
             Full <span className="italic text-gold">Tree</span>
           </h1>
-          <p className="text-[10px] sm:text-xs text-emerald/70">
+          <p className="text-xs sm:text-xs text-emerald/70">
             {viewMode === "binary" ? "Complete org tree — scroll to zoom, drag to pan." : "Members organized by level."}
           </p>
         </div>
@@ -131,7 +131,7 @@ function AdminTreePage() {
           <div className="flex rounded-lg border border-gold/20 bg-background p-0.5">
             <button
               onClick={() => setViewMode("binary")}
-              className={`rounded-md px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-all ${
+              className={`rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all ${
                 viewMode === "binary"
                   ? "bg-emerald text-cream shadow-sm"
                   : "text-emerald/60 hover:text-emerald"
@@ -141,7 +141,7 @@ function AdminTreePage() {
             </button>
             <button
               onClick={() => setViewMode("level")}
-              className={`rounded-md px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-all ${
+              className={`rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all ${
                 viewMode === "level"
                   ? "bg-emerald text-cream shadow-sm"
                   : "text-emerald/60 hover:text-emerald"
@@ -154,14 +154,14 @@ function AdminTreePage() {
           {/* Expand/Collapse + Zoom (binary only) */}
           {viewMode === "binary" && (
             <>
-              <button onClick={expandAll} className="rounded border border-emerald/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Expand</button>
-              <button onClick={collapseAll} className="rounded border border-gold/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-gold hover:bg-gold/5">Collapse</button>
+              <button onClick={expandAll} className="rounded border border-emerald/30 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Expand</button>
+              <button onClick={collapseAll} className="rounded border border-gold/30 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-gold hover:bg-gold/5">Collapse</button>
               <div className="flex items-center gap-1 rounded border border-gold/30 px-1.5 py-0.5">
                 <button onClick={() => setZoom((z) => Math.min(3, z + 0.15))} className="px-1.5 py-0.5 text-xs font-bold text-emerald hover:bg-emerald/10 rounded">+</button>
-                <span className="min-w-[36px] text-center text-[10px] text-emerald/60">{Math.round(zoom * 100)}%</span>
+                <span className="min-w-[36px] text-center text-xs text-emerald/60">{Math.round(zoom * 100)}%</span>
                 <button onClick={() => setZoom((z) => Math.max(0.1, z - 0.15))} className="px-1.5 py-0.5 text-xs font-bold text-emerald hover:bg-emerald/10 rounded">−</button>
               </div>
-              <button onClick={resetView} className="rounded border border-emerald/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Reset</button>
+              <button onClick={resetView} className="rounded border border-emerald/30 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Reset</button>
             </>
           )}
         </div>
@@ -257,7 +257,7 @@ function TreeNode({
         }`}
       >
         {isRoot && (
-          <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gold px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-cream shadow-md">
+          <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gold px-3 py-1 text-xs font-bold uppercase tracking-wider text-cream shadow-md">
             Root
           </span>
         )}
@@ -268,13 +268,13 @@ function TreeNode({
         <p className="text-[11px] sm:text-xs font-mono text-emerald/50 mt-1">{node.referralCode}</p>
 
         <div className="mt-2 flex items-center justify-center gap-1.5">
-          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold ${
+          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs sm:text-xs font-semibold ${
             node.isActive ? "bg-emerald/15 text-emerald-700" : "bg-red-50 text-red-600"
           }`}>
             <span className={`mr-1 h-1.5 w-1.5 rounded-full ${node.isActive ? "bg-emerald-500" : "bg-red-400"}`} />
             {node.isActive ? "Active" : "Inactive"}
           </span>
-          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold ring-1 ring-inset ${rankColors[node.rank] || "bg-slate-100 text-slate-600 ring-slate-300"}`}>
+          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs sm:text-xs font-semibold ring-1 ring-inset ${rankColors[node.rank] || "bg-slate-100 text-slate-600 ring-slate-300"}`}>
             {node.rank}
           </span>
         </div>
@@ -315,7 +315,7 @@ function TreeNode({
             {/* Left child */}
             <div className="flex flex-1 flex-col items-center relative">
               <div className="absolute h-3 w-px bg-gold/30" style={{ left: "50%" }} />
-              <span className="mb-2 rounded-full px-2.5 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset bg-emerald/10 text-emerald-700 ring-emerald/20">
+              <span className="mb-2 rounded-full px-2.5 py-0.5 text-xs sm:text-xs font-bold uppercase tracking-wider ring-1 ring-inset bg-emerald/10 text-emerald-700 ring-emerald/20">
                 L
               </span>
               {node.left ? (
@@ -330,7 +330,7 @@ function TreeNode({
             {/* Right child */}
             <div className="flex flex-1 flex-col items-center relative">
               <div className="absolute h-3 w-px bg-gold/30" style={{ left: "50%" }} />
-              <span className="mb-2 rounded-full px-2.5 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset bg-gold/10 text-gold-700 ring-gold/20">
+              <span className="mb-2 rounded-full px-2.5 py-0.5 text-xs sm:text-xs font-bold uppercase tracking-wider ring-1 ring-inset bg-gold/10 text-gold-700 ring-gold/20">
                 R
               </span>
               {node.right ? (
@@ -346,7 +346,7 @@ function TreeNode({
       )}
 
       {hasChildren && isCollapsed && (
-        <div className="mt-4 rounded-full border-2 border-dashed border-emerald/30 bg-emerald/5 px-4 py-1.5 text-[10px] sm:text-xs font-semibold text-emerald/70 cursor-pointer hover:bg-emerald/10 transition-colors" onClick={() => toggleCollapse(node.id)}>
+        <div className="mt-4 rounded-full border-2 border-dashed border-emerald/30 bg-emerald/5 px-4 py-1.5 text-xs sm:text-xs font-semibold text-emerald/70 cursor-pointer hover:bg-emerald/10 transition-colors" onClick={() => toggleCollapse(node.id)}>
           + Click to expand
         </div>
       )}

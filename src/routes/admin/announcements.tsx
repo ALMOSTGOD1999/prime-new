@@ -80,7 +80,7 @@ function AdminAnnouncementsPage() {
         <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Send New Announcement</h3>
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">Title</label>
+            <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Title</label>
             <input
               type="text"
               value={title}
@@ -90,7 +90,7 @@ function AdminAnnouncementsPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">Message</label>
+            <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Message</label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -101,7 +101,7 @@ function AdminAnnouncementsPage() {
           </div>
           <div className="flex items-center gap-4">
             <div>
-              <label className="mb-1 block text-[10px] uppercase tracking-widest text-emerald/70">Priority</label>
+              <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Priority</label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as any)}
@@ -115,7 +115,7 @@ function AdminAnnouncementsPage() {
             <button
               onClick={handleSend}
               disabled={sending || !title || !message}
-              className="mt-4 bg-emerald px-6 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
+              className="mt-4 bg-emerald px-6 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
             >
               {sending ? "Sending..." : "Send to All Users"}
             </button>
@@ -137,14 +137,14 @@ function AdminAnnouncementsPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="text-sm font-bold">{a.title}</h4>
-                    <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${priorityColors[a.priority]}`}>
+                    <span className={`rounded px-2 py-0.5 text-xs font-bold uppercase ${priorityColors[a.priority]}`}>
                       {a.priority}
                     </span>
                   </div>
                   <p className="mt-1 text-xs text-emerald/60">{a.message}</p>
-                  <p className="mt-1 text-[10px] text-emerald/50">{new Date(a.createdAt).toLocaleString("en-IN")}</p>
+                  <p className="mt-1 text-xs text-emerald/50">{new Date(a.createdAt).toLocaleString("en-IN")}</p>
                 </div>
-                <button onClick={() => handleDelete(a.id)} className="text-[10px] text-red-500 hover:text-red-700">Delete</button>
+                <button onClick={() => handleDelete(a.id)} className="text-xs text-red-500 hover:text-red-700">Delete</button>
               </div>
             ))}
           </div>

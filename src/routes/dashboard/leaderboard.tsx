@@ -61,7 +61,7 @@ function LeaderboardPage() {
             <button
               key={p}
               onClick={() => setPeriod(p)}
-              className={`px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+              className={`px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all ${
                 period === p ? "bg-emerald text-cream" : "text-emerald/60 hover:bg-emerald/5"
               }`}
             >
@@ -87,7 +87,7 @@ function LeaderboardPage() {
                   {leaderboard[1]?.name?.charAt(0)}
                 </div>
                 <p className="mt-2 text-xs font-bold">{leaderboard[1]?.name}</p>
-                <p className="text-[10px] text-emerald/60">{leaderboard[1]?.totalPairs} pairs</p>
+                <p className="text-xs text-emerald/60">{leaderboard[1]?.totalPairs} pairs</p>
                 <div className="mt-1 h-16 w-16 rounded-t bg-gray-200" />
                 <span className="text-lg">🥈</span>
               </div>
@@ -97,7 +97,7 @@ function LeaderboardPage() {
                   {leaderboard[0]?.name?.charAt(0)}
                 </div>
                 <p className="mt-2 text-sm font-bold">{leaderboard[0]?.name}</p>
-                <p className="text-[10px] text-emerald/60">{leaderboard[0]?.totalPairs} pairs</p>
+                <p className="text-xs text-emerald/60">{leaderboard[0]?.totalPairs} pairs</p>
                 <div className="mt-1 h-20 w-20 rounded-t bg-gold/20" />
                 <span className="text-2xl">🥇</span>
               </div>
@@ -107,7 +107,7 @@ function LeaderboardPage() {
                   {leaderboard[2]?.name?.charAt(0)}
                 </div>
                 <p className="mt-2 text-xs font-bold">{leaderboard[2]?.name}</p>
-                <p className="text-[10px] text-emerald/60">{leaderboard[2]?.totalPairs} pairs</p>
+                <p className="text-xs text-emerald/60">{leaderboard[2]?.totalPairs} pairs</p>
                 <div className="mt-1 h-12 w-12 rounded-t bg-orange-100" />
                 <span className="text-lg">🥉</span>
               </div>
@@ -118,7 +118,7 @@ function LeaderboardPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
+                <tr className="border-b border-gold/10 text-xs uppercase tracking-widest text-emerald/70">
                   <th className="px-6 py-3 text-left">Rank</th>
                   <th className="px-6 py-3 text-left">Name</th>
                   <th className="px-6 py-3 text-left">Code</th>
@@ -134,9 +134,9 @@ function LeaderboardPage() {
                       <span className="text-sm">{medalIcons[i] || `#${i + 1}`}</span>
                     </td>
                     <td className="px-6 py-3 text-xs font-semibold">{entry.name}</td>
-                    <td className="px-6 py-3 text-[10px] text-emerald/70">{entry.referralCode}</td>
+                    <td className="px-6 py-3 text-xs text-emerald/70">{entry.referralCode}</td>
                     <td className="px-6 py-3">
-                      <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${rankColors[entry.rank] || "bg-gray-100 text-gray-700"}`}>
+                      <span className={`rounded px-2 py-0.5 text-xs font-bold uppercase ${rankColors[entry.rank] || "bg-gray-100 text-gray-700"}`}>
                         {entry.rank}
                       </span>
                     </td>

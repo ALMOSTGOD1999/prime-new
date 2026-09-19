@@ -75,15 +75,15 @@ function DashboardAddUser() {
               onClick={() => copyReferral("left")}
               className="rounded-lg border border-emerald/20 bg-emerald/5 p-4 text-center transition-all hover:border-emerald/40 hover:bg-emerald/10"
             >
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald">← Left Leg</p>
-              <p className="mt-1 text-[10px] text-emerald/60">{copied === "left" ? "Copied!" : "Click to copy"}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-emerald">← Left Leg</p>
+              <p className="mt-1 text-xs text-emerald/60">{copied === "left" ? "Copied!" : "Click to copy"}</p>
             </button>
             <button
               onClick={() => copyReferral("right")}
               className="rounded-lg border border-gold/20 bg-gold/5 p-4 text-center transition-all hover:border-gold/40 hover:bg-gold/10"
             >
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-gold">Right Leg →</p>
-              <p className="mt-1 text-[10px] text-emerald/60">{copied === "right" ? "Copied!" : "Click to copy"}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gold">Right Leg →</p>
+              <p className="mt-1 text-xs text-emerald/60">{copied === "right" ? "Copied!" : "Click to copy"}</p>
             </button>
           </div>
         </div>
@@ -91,13 +91,13 @@ function DashboardAddUser() {
         <div className="flex gap-3">
           <button
             onClick={() => setCreated(null)}
-            className="flex-1 rounded-lg bg-emerald px-5 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
+            className="flex-1 rounded-lg bg-emerald px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
           >
             Add Another User
           </button>
           <Link
             to="/dashboard"
-            className="rounded-lg border border-gold/20 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"
+            className="rounded-lg border border-gold/20 px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"
           >
             Back to Dashboard
           </Link>
@@ -120,7 +120,7 @@ function DashboardAddUser() {
 
       <form onSubmit={handleAdd} className="space-y-5 rounded border border-gold/20 bg-background p-6">
         <div>
-          <label className="mb-1.5 block text-[10px] uppercase tracking-widest text-emerald/70">Full Name</label>
+          <label className="mb-1.5 block text-xs uppercase tracking-widest text-emerald/70">Full Name</label>
           <input
             className={inputClass}
             placeholder="e.g. Priya Sharma"
@@ -130,7 +130,7 @@ function DashboardAddUser() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-[10px] uppercase tracking-widest text-emerald/70">Email</label>
+          <label className="mb-1.5 block text-xs uppercase tracking-widest text-emerald/70">Email</label>
           <input
             className={inputClass}
             type="email"
@@ -141,7 +141,7 @@ function DashboardAddUser() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-[10px] uppercase tracking-widest text-emerald/70">Password</label>
+          <label className="mb-1.5 block text-xs uppercase tracking-widest text-emerald/70">Password</label>
           <input
             className={inputClass}
             type="password"
@@ -153,12 +153,12 @@ function DashboardAddUser() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-[10px] uppercase tracking-widest text-emerald/70">Your Referral Code</label>
+          <label className="mb-1.5 block text-xs uppercase tracking-widest text-emerald/70">Your Referral Code</label>
           <p className="font-display text-lg text-gold">{myCode || "Loading..."}</p>
         </div>
 
         <div>
-          <label className="mb-1.5 block text-[10px] uppercase tracking-widest text-emerald/70">Placement Leg</label>
+          <label className="mb-1.5 block text-xs uppercase tracking-widest text-emerald/70">Placement Leg</label>
           <div className="flex gap-3">
             <button
               type="button"
@@ -183,7 +183,7 @@ function DashboardAddUser() {
               Right Leg →
             </button>
           </div>
-          <p className="mt-1.5 text-[10px] text-emerald/60">
+          <p className="mt-1.5 text-xs text-emerald/60">
             User will be placed on the <strong className={form.leg === "left" ? "text-emerald" : "text-gold"}>{form.leg}</strong> leg
           </p>
         </div>
@@ -192,7 +192,7 @@ function DashboardAddUser() {
           <button
             type="submit"
             disabled={loading || !myCode}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald px-5 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
           >
             {loading ? (
               <>
@@ -208,7 +208,7 @@ function DashboardAddUser() {
           </button>
           <Link
             to="/dashboard"
-            className="rounded-lg border border-gold/20 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"
+            className="rounded-lg border border-gold/20 px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"
           >
             Cancel
           </Link>

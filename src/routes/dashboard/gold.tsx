@@ -78,18 +78,18 @@ function GoldPricePage() {
       <div className="rounded border border-gold/20 bg-background p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-emerald/70">Today's Gold Rate (per gram)</p>
+            <p className="text-xs uppercase tracking-widest text-emerald/70">Today's Gold Rate (per gram)</p>
             {priceData?.price > 0 ? (
               <p className="mt-2 font-display text-4xl text-gold">₹{priceData.price.toLocaleString("en-IN")}</p>
             ) : (
               <p className="mt-2 font-display text-4xl text-emerald/40">Not set yet</p>
             )}
           </div>
-          <button onClick={loadPrice} className="border border-emerald/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10">
+          <button onClick={loadPrice} className="border border-emerald/40 px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10">
             Refresh
           </button>
         </div>
-        <p className="mt-3 text-[10px] text-emerald/50">Set by: {priceData?.source} • Updated: {priceData?.timestamp ? new Date(priceData.timestamp).toLocaleString("en-IN") : "N/A"}</p>
+        <p className="mt-3 text-xs text-emerald/50">Set by: {priceData?.source} • Updated: {priceData?.timestamp ? new Date(priceData.timestamp).toLocaleString("en-IN") : "N/A"}</p>
       </div>
 
       {/* Price Alerts */}
@@ -114,7 +114,7 @@ function GoldPricePage() {
           <button
             onClick={handleSetAlert}
             disabled={settingAlert || !alertPrice}
-            className="bg-gold px-6 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-50"
+            className="bg-gold px-6 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-50"
           >
             {settingAlert ? "Setting..." : "Set Alert"}
           </button>
@@ -129,9 +129,9 @@ function GoldPricePage() {
                     {a.direction === "below" ? "📉 Below" : "📈 Above"}
                   </span>
                   <span className="ml-2 font-display text-sm text-gold">${a.targetPrice}</span>
-                  {a.triggeredAt && <span className="ml-2 text-[10px] text-emerald/60">• Triggered</span>}
+                  {a.triggeredAt && <span className="ml-2 text-xs text-emerald/60">• Triggered</span>}
                 </div>
-                <button onClick={() => handleDeleteAlert(a.id)} className="text-[10px] text-red-500 hover:text-red-700">Remove</button>
+                <button onClick={() => handleDeleteAlert(a.id)} className="text-xs text-red-500 hover:text-red-700">Remove</button>
               </div>
             ))}
           </div>

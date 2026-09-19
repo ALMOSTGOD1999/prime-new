@@ -38,7 +38,7 @@ function ReportsPage() {
         <div className="flex gap-2">
           <button
             onClick={() => setPeriod("weekly")}
-            className={`px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+            className={`px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all ${
               period === "weekly" ? "bg-emerald text-cream" : "border border-emerald/40 text-emerald hover:bg-emerald/10"
             }`}
           >
@@ -46,7 +46,7 @@ function ReportsPage() {
           </button>
           <button
             onClick={() => setPeriod("monthly")}
-            className={`px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+            className={`px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all ${
               period === "monthly" ? "bg-emerald text-cream" : "border border-emerald/40 text-emerald hover:bg-emerald/10"
             }`}
           >
@@ -59,15 +59,15 @@ function ReportsPage() {
       {data?.totals && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="rounded border border-gold/20 bg-background p-6">
-            <p className="text-[10px] uppercase tracking-widest text-emerald/70">Direct Commission</p>
+            <p className="text-xs uppercase tracking-widest text-emerald/70">Direct Commission</p>
             <p className="mt-2 font-display text-2xl text-emerald">₹{data.totals.direct.toLocaleString("en-IN")}</p>
           </div>
           <div className="rounded border border-gold/20 bg-background p-6">
-            <p className="text-[10px] uppercase tracking-widest text-emerald/70">Matching Income</p>
+            <p className="text-xs uppercase tracking-widest text-emerald/70">Matching Income</p>
             <p className="mt-2 font-display text-2xl text-gold">₹{data.totals.matching.toLocaleString("en-IN")}</p>
           </div>
           <div className="rounded border border-gold/20 bg-background p-6">
-            <p className="text-[10px] uppercase tracking-widest text-emerald/70">Total Earned</p>
+            <p className="text-xs uppercase tracking-widest text-emerald/70">Total Earned</p>
             <p className="mt-2 font-display text-2xl text-emerald">₹{data.totals.total.toLocaleString("en-IN")}</p>
           </div>
         </div>
@@ -110,11 +110,11 @@ function ReportsPage() {
           <div className="mt-4 flex items-center justify-center gap-4">
             <div className="flex items-center gap-1">
               <div className="h-3 w-3 bg-emerald" />
-              <span className="text-[10px] text-emerald/70">Direct</span>
+              <span className="text-xs text-emerald/70">Direct</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="h-3 w-3 bg-gold" />
-              <span className="text-[10px] text-emerald/70">Matching</span>
+              <span className="text-xs text-emerald/70">Matching</span>
             </div>
           </div>
         </div>
@@ -133,7 +133,7 @@ function ReportsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
+                <tr className="border-b border-gold/10 text-xs uppercase tracking-widest text-emerald/70">
                   <th className="px-6 py-3 text-left">Date</th>
                   <th className="px-6 py-3 text-right">Direct</th>
                   <th className="px-6 py-3 text-right">Matching</th>

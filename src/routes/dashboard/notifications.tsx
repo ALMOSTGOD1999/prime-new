@@ -110,7 +110,7 @@ function NotificationsPage() {
         {unreadCount > 0 && (
           <button
             onClick={handleMarkAllRead}
-            className="border border-emerald/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10"
+            className="border border-emerald/40 px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10"
           >
             Mark All Read
           </button>
@@ -143,11 +143,11 @@ function NotificationsPage() {
                   {!n.isRead && <span className="h-2 w-2 rounded-full bg-gold" />}
                 </div>
                 <p className="mt-1 text-xs text-emerald/60">{n.message}</p>
-                <p className="mt-1 text-[10px] text-emerald/50">
+                <p className="mt-1 text-xs text-emerald/50">
                   {new Date(n.createdAt).toLocaleString("en-IN")}
                 </p>
               </div>
-              <span className={`rounded px-2 py-0.5 text-[10px] font-semibold ${typeColors[n.type] || "bg-gray-100 text-gray-700"}`}>
+              <span className={`rounded px-2 py-0.5 text-xs font-semibold ${typeColors[n.type] || "bg-gray-100 text-gray-700"}`}>
                 {n.type.replace("_", " ")}
               </span>
             </div>

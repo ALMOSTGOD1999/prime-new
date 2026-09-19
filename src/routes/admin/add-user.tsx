@@ -60,7 +60,7 @@ function AdminAddUser() {
 
       <form onSubmit={handleAdd} className="space-y-5 rounded-xl border border-gold/10 bg-background p-6 shadow-sm">
         <div>
-          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">Full Name</label>
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.2em] text-emerald/60">Full Name</label>
           <input
             className={inputClass}
             placeholder="e.g. Priya Sharma"
@@ -70,7 +70,7 @@ function AdminAddUser() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">Email</label>
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.2em] text-emerald/60">Email</label>
           <input
             className={inputClass}
             type="email"
@@ -81,7 +81,7 @@ function AdminAddUser() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">Password</label>
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.2em] text-emerald/60">Password</label>
           <input
             className={inputClass}
             type="password"
@@ -92,7 +92,7 @@ function AdminAddUser() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.2em] text-emerald/60">
             Referral Code <span className="text-emerald/60">(optional)</span>
           </label>
           <input
@@ -101,12 +101,12 @@ function AdminAddUser() {
             value={form.referralCode}
             onChange={(e) => setForm({ ...form, referralCode: e.target.value })}
           />
-          <p className="mt-1 text-[10px] text-emerald/60">Leave blank to create a root user</p>
+          <p className="mt-1 text-xs text-emerald/60">Leave blank to create a root user</p>
         </div>
 
         {form.referralCode && (
           <div>
-            <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.2em] text-emerald/60">
               Placement Leg
             </label>
             <div className="flex gap-3">
@@ -133,7 +133,7 @@ function AdminAddUser() {
                 Right Leg →
               </button>
             </div>
-            <p className="mt-1.5 text-[10px] text-emerald/60">
+            <p className="mt-1.5 text-xs text-emerald/60">
               User will be placed on the <strong className={form.leg === "left" ? "text-emerald" : "text-gold"}>{form.leg}</strong> leg of the referrer
             </p>
           </div>
@@ -143,7 +143,7 @@ function AdminAddUser() {
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md disabled:opacity-50"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md disabled:opacity-50"
           >
             {loading ? (
               <>
@@ -160,7 +160,7 @@ function AdminAddUser() {
           <button
             type="button"
             onClick={() => navigate({ to: "/admin/users" })}
-            className="rounded-lg border border-gold/20 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-emerald/60 transition-all duration-200 hover:border-gold/40 hover:bg-gold/5"
+            className="rounded-lg border border-gold/20 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-emerald/60 transition-all duration-200 hover:border-gold/40 hover:bg-gold/5"
           >
             Cancel
           </button>

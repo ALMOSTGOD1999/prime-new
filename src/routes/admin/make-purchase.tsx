@@ -150,7 +150,7 @@ function MakePurchasePage() {
           <button
             onClick={handleSearch}
             disabled={searching || searchQuery.length < 2}
-            className="rounded-lg bg-emerald px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream transition-all hover:bg-emerald/90 disabled:opacity-50"
+            className="rounded-lg bg-emerald px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-cream transition-all hover:bg-emerald/90 disabled:opacity-50"
           >
             {searching ? "Searching..." : "Search"}
           </button>
@@ -165,12 +165,12 @@ function MakePurchasePage() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold">{selectedUser.name}</p>
-                  <p className="text-[10px] text-emerald/60">
+                  <p className="text-xs text-emerald/60">
                     {selectedUser.email} • {selectedUser.referralCode} • {selectedUser.isActive ? "Active" : "Inactive"}
                   </p>
                 </div>
               </div>
-              <button onClick={() => setSelectedUser(null)} className="text-[10px] text-red-500 hover:text-red-700">
+              <button onClick={() => setSelectedUser(null)} className="text-xs text-red-500 hover:text-red-700">
                 Change
               </button>
             </div>
@@ -190,13 +190,13 @@ function MakePurchasePage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-xs font-semibold">{u.name}</p>
-                  <p className="truncate text-[10px] text-emerald/60">{u.email} • {u.referralCode}</p>
+                  <p className="truncate text-xs text-emerald/60">{u.email} • {u.referralCode}</p>
                 </div>
                 <div className="text-right">
-                  <p className={`text-[10px] font-semibold ${u.isActive ? "text-emerald" : "text-red-500"}`}>
+                  <p className={`text-xs font-semibold ${u.isActive ? "text-emerald" : "text-red-500"}`}>
                     {u.isActive ? "Active" : "Inactive"}
                   </p>
-                  <p className="text-[10px] text-emerald/60">₹{(u.totalInvested || 0).toLocaleString("en-IN")}</p>
+                  <p className="text-xs text-emerald/60">₹{(u.totalInvested || 0).toLocaleString("en-IN")}</p>
                 </div>
               </button>
             ))}
@@ -221,7 +221,7 @@ function MakePurchasePage() {
                 }`}
               >
                 <p className="font-display text-lg">Weight-based</p>
-                <p className="mt-1 text-[10px] text-emerald/60">Carat + Weight → Auto billing</p>
+                <p className="mt-1 text-xs text-emerald/60">Carat + Weight → Auto billing</p>
               </button>
               <button
                 onClick={() => { setMethod("amount"); setPreview(null); }}
@@ -232,7 +232,7 @@ function MakePurchasePage() {
                 }`}
               >
                 <p className="font-display text-lg">Amount-based</p>
-                <p className="mt-1 text-[10px] text-emerald/60">Direct amount entry</p>
+                <p className="mt-1 text-xs text-emerald/60">Direct amount entry</p>
               </button>
             </div>
           </div>
@@ -246,7 +246,7 @@ function MakePurchasePage() {
             {method === "weight" ? (
               <div className="space-y-4">
                 <div>
-                  <label className="mb-2 block text-[10px] uppercase tracking-widest text-emerald/70">Carat</label>
+                  <label className="mb-2 block text-xs uppercase tracking-widest text-emerald/70">Carat</label>
                   <div className="flex gap-2">
                     {([18, 22, 24] as const).map((c) => (
                       <button
@@ -264,7 +264,7 @@ function MakePurchasePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="mb-2 block text-[10px] uppercase tracking-widest text-emerald/70">Weight (grams)</label>
+                  <label className="mb-2 block text-xs uppercase tracking-widest text-emerald/70">Weight (grams)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -278,7 +278,7 @@ function MakePurchasePage() {
               </div>
             ) : (
               <div>
-                <label className="mb-2 block text-[10px] uppercase tracking-widest text-emerald/70">Amount (₹)</label>
+                <label className="mb-2 block text-xs uppercase tracking-widest text-emerald/70">Amount (₹)</label>
                 <input
                   type="number"
                   min="10000"
@@ -291,7 +291,7 @@ function MakePurchasePage() {
             )}
 
             <div className="mt-4">
-              <label className="mb-2 block text-[10px] uppercase tracking-widest text-emerald/70">Admin Note (optional)</label>
+              <label className="mb-2 block text-xs uppercase tracking-widest text-emerald/70">Admin Note (optional)</label>
               <input
                 type="text"
                 value={adminNote}
@@ -304,7 +304,7 @@ function MakePurchasePage() {
             <button
               onClick={handlePreview}
               disabled={previewLoading}
-              className="mt-4 w-full rounded-lg border border-emerald/40 bg-emerald/5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-emerald transition-all hover:bg-emerald/10 disabled:opacity-50"
+              className="mt-4 w-full rounded-lg border border-emerald/40 bg-emerald/5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-emerald transition-all hover:bg-emerald/10 disabled:opacity-50"
             >
               {previewLoading ? "Computing..." : "Preview Billing"}
             </button>
@@ -335,15 +335,15 @@ function MakePurchasePage() {
               </div>
 
               <div className="mt-3 rounded-lg border border-emerald/20 bg-emerald/5 p-4">
-                <p className="text-[10px] uppercase tracking-widest text-emerald/70">Monthly Return</p>
+                <p className="text-xs uppercase tracking-widest text-emerald/70">Monthly Return</p>
                 <p className="mt-1 font-display text-2xl text-emerald">₹{preview.monthlyReturnAmount.toLocaleString("en-IN")}</p>
-                <p className="text-[10px] text-emerald/60">{preview.monthlyReturnPct}% per month • {preview.packageName}</p>
+                <p className="text-xs text-emerald/60">{preview.monthlyReturnPct}% per month • {preview.packageName}</p>
               </div>
 
               <button
                 onClick={handleCreate}
                 disabled={createLoading}
-                className="mt-4 w-full rounded-lg bg-gold py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream shadow-sm transition-all hover:bg-gold/90 disabled:opacity-50"
+                className="mt-4 w-full rounded-lg bg-gold py-3 text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm transition-all hover:bg-gold/90 disabled:opacity-50"
               >
                 {createLoading ? "Creating..." : `Create Purchase for ${selectedUser.name}`}
               </button>

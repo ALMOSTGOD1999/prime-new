@@ -122,27 +122,27 @@ function DashboardIndex() {
           <h1 className="font-display text-2xl sm:text-3xl">
             Welcome, <span className="italic text-gold">{user.name}</span>
           </h1>
-          <p className="mt-1 text-[10px] sm:text-xs uppercase tracking-widest text-emerald/70">
+          <p className="mt-1 text-xs sm:text-xs uppercase tracking-widest text-emerald/70">
             Member since {new Date(user.createdAt).toLocaleDateString("en-IN")}
           </p>
         </div>
         <div className="flex flex-wrap gap-2 sm:gap-3">
           <button
             onClick={() => copyReferral("left")}
-            className="border border-emerald/40 px-3 sm:px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10"
+            className="border border-emerald/40 px-3 sm:px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10"
           >
             {copied === "left" ? "Copied!" : "Share Left Leg Link"}
           </button>
           <button
             onClick={() => copyReferral("right")}
-            className="border border-gold/40 px-3 sm:px-4 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all hover:bg-gold/10"
+            className="border border-gold/40 px-3 sm:px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-gold/10"
           >
             {copied === "right" ? "Copied!" : "Share Right Leg Link"}
           </button>
           {user.isAdmin && (
             <Link
               to="/admin"
-              className="bg-emerald px-3 sm:px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
+              className="bg-emerald px-3 sm:px-4 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
             >
               Admin Panel
             </Link>
@@ -155,31 +155,31 @@ function DashboardIndex() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
           {/* Left: 60% — Team Stats */}
           <div className="rounded border border-gold/20 bg-background p-6 sm:col-span-3">
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">My Team</h3>
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gold">My Team</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-lg border border-emerald/20 bg-emerald/5 p-4 text-center">
-                <p className="text-[10px] uppercase tracking-widest text-emerald/70">Direct Team</p>
+                <p className="text-xs uppercase tracking-widest text-emerald/70">Direct Team</p>
                 <p className="mt-1 font-display text-3xl text-emerald">{teamStats.directTeam}</p>
-                <p className="text-[10px] text-emerald/60">L: {teamStats.leftCount} · R: {teamStats.rightCount}</p>
+                <p className="text-xs text-emerald/60">L: {teamStats.leftCount} · R: {teamStats.rightCount}</p>
               </div>
               <div className="rounded-lg border border-gold/20 bg-gold/5 p-4 text-center">
-                <p className="text-[10px] uppercase tracking-widest text-gold">Total Team</p>
+                <p className="text-xs uppercase tracking-widest text-gold">Total Team</p>
                 <p className="mt-1 font-display text-3xl text-gold">{teamStats.totalTeam}</p>
-                <p className="text-[10px] text-emerald/60">{teamStats.activeTeam} active members</p>
+                <p className="text-xs text-emerald/60">{teamStats.activeTeam} active members</p>
               </div>
             </div>
           </div>
 
           {/* Right: 40% — Total Business */}
           <div className="rounded border border-gold/20 bg-background p-6 sm:col-span-2">
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Total Business</h3>
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gold">Total Business</h3>
             <div className="rounded-lg border border-emerald/20 bg-emerald/5 p-4 text-center">
-              <p className="text-[10px] uppercase tracking-widest text-emerald/70">Business Volume</p>
+              <p className="text-xs uppercase tracking-widest text-emerald/70">Business Volume</p>
               <p className="mt-2 font-display text-3xl text-emerald">₹{teamStats.totalBusiness.toLocaleString("en-IN")}</p>
-              <p className="mt-1 text-[10px] text-emerald/60">Package value of your team</p>
+              <p className="mt-1 text-xs text-emerald/60">Package value of your team</p>
             </div>
             <div className="mt-3 flex items-center justify-center gap-2">
-              <span className="text-[10px] text-emerald/60">Active rate:</span>
+              <span className="text-xs text-emerald/60">Active rate:</span>
               <span className="font-display text-sm text-emerald">
                 {teamStats.totalTeam > 0 ? Math.round((teamStats.activeTeam / teamStats.totalTeam) * 100) : 0}%
               </span>
@@ -194,19 +194,19 @@ function DashboardIndex() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Daily ID Activation</h3>
-              <p className="mt-1 text-[10px] text-emerald/70">
+              <p className="mt-1 text-xs text-emerald/70">
                 Activate your ID daily between 12:00 PM — 12:00 AM IST to earn ₹100 reward.
               </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <p className="text-[10px] text-emerald/60">Today's Reward</p>
+                <p className="text-xs text-emerald/60">Today's Reward</p>
                 <p className="font-display text-lg text-gold">₹{dailyActivation.rewardAmount}</p>
               </div>
               <button
                 onClick={handleDailyActivation}
                 disabled={dailyActivationLoading || dailyActivation.activatedToday || !dailyActivation.isWithdrawalTime}
-                className={`whitespace-nowrap px-6 py-2 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+                className={`whitespace-nowrap px-6 py-2 text-xs font-semibold uppercase tracking-widest transition-all ${
                   dailyActivation.activatedToday
                     ? "bg-emerald/20 text-emerald cursor-not-allowed"
                     : dailyActivation.isWithdrawalTime
@@ -225,7 +225,7 @@ function DashboardIndex() {
             </div>
           </div>
           {!dailyActivation.isWithdrawalTime && !dailyActivation.activatedToday && (
-            <p className="mt-3 text-[10px] text-gold">
+            <p className="mt-3 text-xs text-gold">
               ⏰ Withdrawal window: 12:00 PM — 12:00 AM IST daily
             </p>
           )}
@@ -267,15 +267,15 @@ function DashboardIndex() {
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">Leg Balance</h3>
             <div className="flex items-center gap-6">
               <div className="flex-1 rounded-lg border border-emerald/20 bg-emerald/5 p-4 text-center">
-                <p className="text-[10px] uppercase tracking-widest text-emerald/70">Left Leg</p>
+                <p className="text-xs uppercase tracking-widest text-emerald/70">Left Leg</p>
                 <p className="mt-1 font-display text-2xl text-emerald">{legBalance.leftTotal}</p>
-                <p className="text-[10px] text-emerald/60">active members</p>
+                <p className="text-xs text-emerald/60">active members</p>
               </div>
               <div className="text-xl text-gold/40">vs</div>
               <div className="flex-1 rounded-lg border border-gold/20 bg-gold/5 p-4 text-center">
-                <p className="text-[10px] uppercase tracking-widest text-gold">Right Leg</p>
+                <p className="text-xs uppercase tracking-widest text-gold">Right Leg</p>
                 <p className="mt-1 font-display text-2xl text-gold">{legBalance.rightTotal}</p>
-                <p className="text-[10px] text-emerald/60">active members</p>
+                <p className="text-xs text-emerald/60">active members</p>
               </div>
             </div>
           </div>
@@ -293,13 +293,13 @@ function DashboardIndex() {
                 {rankInfo.currentRankLabel}
               </div>
               <div className="flex-1">
-                <p className="text-[10px] text-emerald/70">Team: {rankInfo.teamSize} members</p>
+                <p className="text-xs text-emerald/70">Team: {rankInfo.teamSize} members</p>
                 {rankInfo.nextRank && (
                   <>
                     <div className="mt-1 h-2 rounded-full bg-emerald/10">
                       <div className="h-2 rounded-full bg-gold transition-all" style={{ width: `${rankInfo.progress}%` }} />
                     </div>
-                    <p className="mt-1 text-[10px] text-emerald/60">Next: {rankInfo.nextRankLabel}</p>
+                    <p className="mt-1 text-xs text-emerald/60">Next: {rankInfo.nextRankLabel}</p>
                   </>
                 )}
               </div>
@@ -313,7 +313,7 @@ function DashboardIndex() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Withdraw Funds</h3>
-            <p className="mt-1 text-[10px] text-emerald/70">
+            <p className="mt-1 text-xs text-emerald/70">
               From Income Wallet. Available 12:00 AM — 12:00 PM IST daily. Missed days carry over.
             </p>
           </div>
@@ -336,7 +336,7 @@ function DashboardIndex() {
           <button
             onClick={handleWithdraw}
             disabled={withdrawLoading || !withdrawInfo?.isOpen || income.incomeBalance <= 0}
-            className="whitespace-nowrap bg-gold px-6 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-40"
+            className="whitespace-nowrap bg-gold px-6 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-40"
           >
             {withdrawLoading
               ? "Processing..."
@@ -348,11 +348,11 @@ function DashboardIndex() {
 
         {withdrawHistory.length > 0 && (
           <div className="mt-6">
-            <h4 className="mb-2 text-[10px] uppercase tracking-widest text-emerald/70">Recent Withdrawals</h4>
+            <h4 className="mb-2 text-xs uppercase tracking-widest text-emerald/70">Recent Withdrawals</h4>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
+                  <tr className="border-b border-gold/10 text-xs uppercase tracking-widest text-emerald/70">
                     <th className="px-4 py-2 text-left">Amount</th>
                     <th className="px-4 py-2 text-left">Status</th>
                     <th className="px-4 py-2 text-right">Date</th>
@@ -366,7 +366,7 @@ function DashboardIndex() {
                       </td>
                       <td className="px-4 py-2">
                         <span
-                          className={`inline-block rounded px-2 py-0.5 text-[10px] font-semibold ${
+                          className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${
                             w.status === "approved"
                               ? "bg-emerald/10 text-emerald"
                               : w.status === "rejected"
@@ -377,7 +377,7 @@ function DashboardIndex() {
                           {w.status}
                         </span>
                       </td>
-                      <td className="px-4 py-2 text-right text-[10px] text-emerald/70">
+                      <td className="px-4 py-2 text-right text-xs text-emerald/70">
                         {new Date(w.requestedAt).toLocaleDateString("en-IN")}
                       </td>
                     </tr>
@@ -394,14 +394,14 @@ function DashboardIndex() {
         <p className="font-display text-2xl">{user.referralCode}</p>
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="rounded-lg border border-emerald/20 bg-emerald/5 p-3">
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-emerald">Left Leg Link</p>
-            <code className="block break-all text-[10px] text-emerald/70">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-emerald">Left Leg Link</p>
+            <code className="block break-all text-xs text-emerald/70">
               {window.location.origin}/auth?ref={user.referralCode}L
             </code>
           </div>
           <div className="rounded-lg border border-gold/20 bg-gold/5 p-3">
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-gold">Right Leg Link</p>
-            <code className="block break-all text-[10px] text-emerald/70">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gold">Right Leg Link</p>
+            <code className="block break-all text-xs text-emerald/70">
               {window.location.origin}/auth?ref={user.referralCode}R
             </code>
           </div>
@@ -420,7 +420,7 @@ function DashboardIndex() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gold/10 text-[10px] uppercase tracking-widest text-emerald/70">
+                <tr className="border-b border-gold/10 text-xs uppercase tracking-widest text-emerald/70">
                   <th className="px-6 py-3 text-left">Type</th>
                   <th className="px-6 py-3 text-left">Description</th>
                   <th className="px-6 py-3 text-right">Amount</th>
@@ -432,7 +432,7 @@ function DashboardIndex() {
                   <tr key={item.id} className="border-b border-gold/5 transition-colors hover:bg-gold/5">
                     <td className="px-6 py-3">
                       <span
-                        className={`inline-block rounded px-2 py-0.5 text-[10px] font-semibold uppercase ${
+                        className={`inline-block rounded px-2 py-0.5 text-xs font-semibold uppercase ${
                           item.type === "direct"
                             ? "bg-emerald/10 text-emerald"
                             : item.type === "matching"
@@ -447,7 +447,7 @@ function DashboardIndex() {
                     <td className="px-6 py-3 text-right text-xs font-semibold text-emerald">
                       ₹{item.amount.toLocaleString("en-IN")}
                     </td>
-                    <td className="px-6 py-3 text-right text-[10px] text-emerald/70">
+                    <td className="px-6 py-3 text-right text-xs text-emerald/70">
                       {new Date(item.createdAt).toLocaleDateString("en-IN")}
                     </td>
                   </tr>
@@ -460,21 +460,21 @@ function DashboardIndex() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded border border-gold/20 bg-background p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Direct Commission</p>
+          <p className="text-xs uppercase tracking-widest text-emerald/70">Direct Commission</p>
           <p className="mt-1 font-display text-2xl text-emerald">₹{income.direct.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-[10px] text-emerald/60">5% one-time per referral</p>
+          <p className="mt-1 text-xs text-emerald/60">5% one-time per referral</p>
         </div>
         <div className="rounded border border-gold/20 bg-background p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Matching Income</p>
+          <p className="text-xs uppercase tracking-widest text-emerald/70">Matching Income</p>
           <p className="mt-1 font-display text-2xl text-gold">₹{income.matching.toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-[10px] text-emerald/60">20% per pair match</p>
+          <p className="mt-1 text-xs text-emerald/60">20% per pair match</p>
         </div>
         <div className="rounded border border-gold/20 bg-background p-6">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/70">Income Split</p>
+          <p className="text-xs uppercase tracking-widest text-emerald/70">Income Split</p>
           <div className="mt-2 space-y-1">
-            <div className="flex justify-between text-[10px]"><span className="text-emerald/60">→ Re-purchase (20%)</span><span className="text-gold">₹{Math.round(income.totalIncome * 0.2).toLocaleString("en-IN")}</span></div>
-            <div className="flex justify-between text-[10px]"><span className="text-emerald/60">→ Admin charge (10%)</span><span className="text-red-400">₹{Math.round(income.totalIncome * 0.1).toLocaleString("en-IN")}</span></div>
-            <div className="flex justify-between text-[10px]"><span className="text-emerald/60">→ Income wallet (70%)</span><span className="text-emerald">₹{Math.round(income.totalIncome * 0.7).toLocaleString("en-IN")}</span></div>
+            <div className="flex justify-between text-xs"><span className="text-emerald/60">→ Re-purchase (20%)</span><span className="text-gold">₹{Math.round(income.totalIncome * 0.2).toLocaleString("en-IN")}</span></div>
+            <div className="flex justify-between text-xs"><span className="text-emerald/60">→ Admin charge (10%)</span><span className="text-red-400">₹{Math.round(income.totalIncome * 0.1).toLocaleString("en-IN")}</span></div>
+            <div className="flex justify-between text-xs"><span className="text-emerald/60">→ Income wallet (70%)</span><span className="text-emerald">₹{Math.round(income.totalIncome * 0.7).toLocaleString("en-IN")}</span></div>
           </div>
         </div>
       </div>
@@ -486,11 +486,11 @@ function StatCard({ title, value, icon, subtitle }: { title: string; value: stri
   return (
     <div className="rounded border border-gold/20 bg-background p-6 transition-colors hover:border-gold/40">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-widest text-emerald/70">{title}</p>
+        <p className="text-xs uppercase tracking-widest text-emerald/70">{title}</p>
         <span className="text-gold/40">{icon}</span>
       </div>
       <p className="mt-2 font-display text-2xl">{value}</p>
-      {subtitle && <p className="mt-1 text-[10px] text-emerald/50">{subtitle}</p>}
+      {subtitle && <p className="mt-1 text-xs text-emerald/50">{subtitle}</p>}
     </div>
   );
 }
