@@ -63,9 +63,9 @@ export function NetTreeNode({ node, isRoot, collapsed, toggleCollapse }: Props) 
         </div>
 
         {/* Info */}
-        <p className="mt-2 text-center text-[10px] font-mono text-emerald/60">{node.referralCode}</p>
+        <p className="mt-2 text-center text-[10px] font-bold font-mono text-slate-800">{node.referralCode}</p>
         <p className="mt-0.5 text-center text-xs font-bold leading-tight text-slate-800">{node.name}</p>
-        <p className="mt-1 text-[10px] text-slate-500">{regDate}</p>
+        <p className="mt-1 text-[10px] text-slate-600">{regDate}</p>
       </div>
 
       {/* Children */}
