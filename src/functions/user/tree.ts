@@ -178,7 +178,20 @@ async function fetchAllUsersInTree(rootId: number): Promise<FlatUser[]> {
   return result;
 }
 
-// ── Build tree from flat user list (zero DB queries) ──
+// ── Find the last available position in a subtree (BFS, left-first spillover) ──
+function findLastAvailableSlot(root: TreeNode): TreeNode {
+  const queue: TreeNode[] = [root];
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    if (!current.left) return current;
+    if (!current.right) return current;
+    queue.push(current.left);
+    queue.push(current.right);
+  }
+  return root;
+}
+
+// ── Build tree from flat user list (binary MLM spillover) ──
 function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | null {
   const userMap = new Map<number, FlatUser>();
   for (const u of descendants) userMap.set(u.id, u);
@@ -210,7 +223,6 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
     let finalRight: FlatUser[];
 
     if (leftChildren.length > 0 || rightChildren.length > 0) {
-      // Has positioned children — use them, distribute unpositioned evenly
       finalLeft = [...leftChildren];
       finalRight = [...rightChildren];
       for (const u of unpositioned) {
@@ -218,37 +230,38 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
         else finalRight.push(u);
       }
     } else {
-      // No positioned children — split unpositioned evenly
       finalLeft = unpositioned.filter((_, i) => i % 2 === 0);
       finalRight = unpositioned.filter((_, i) => i % 2 === 1);
     }
 
-    // Build left subtree: first child in left slot, extras chain under it
+    // Build left subtree with spillover
     let leftNode: TreeNode | null = null;
     if (finalLeft.length > 0) {
+      // First left child is the direct left child
       leftNode = buildNode(finalLeft[0]!.id);
-      let current = leftNode;
+      // Remaining left children spill to last available position on left leg
       for (let i = 1; i < finalLeft.length; i++) {
         const childNode = buildNode(finalLeft[i]!.id);
-        if (childNode && current) {
-          if (!current.left) current.left = childNode;
-          else if (!current.right) current.right = childNode;
-          current = childNode;
+        if (childNode && leftNode) {
+          const slot = findLastAvailableSlot(leftNode);
+          if (!slot.left) slot.left = childNode;
+          else slot.right = childNode;
         }
       }
     }
 
-    // Build right subtree: first child in right slot, extras chain under it
+    // Build right subtree with spillover
     let rightNode: TreeNode | null = null;
     if (finalRight.length > 0) {
+      // First right child is the direct right child
       rightNode = buildNode(finalRight[0]!.id);
-      let current = rightNode;
+      // Remaining right children spill to last available position on right leg
       for (let i = 1; i < finalRight.length; i++) {
         const childNode = buildNode(finalRight[i]!.id);
-        if (childNode && current) {
-          if (!current.right) current.right = childNode;
-          else if (!current.left) current.left = childNode;
-          current = childNode;
+        if (childNode && rightNode) {
+          const slot = findLastAvailableSlot(rightNode);
+          if (!slot.left) slot.left = childNode;
+          else slot.right = childNode;
         }
       }
     }
