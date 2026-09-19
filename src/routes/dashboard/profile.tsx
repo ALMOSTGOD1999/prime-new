@@ -7,7 +7,7 @@ export const Route = createFileRoute("/dashboard/profile")({
   component: ProfilePage,
 });
 
-type Tab = "welcome" | "view" | "edit" | "password";
+type Tab = "welcome" | "view" | "edit" | "password" | "photo";
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -33,6 +33,11 @@ function ProfilePage() {
   const [pwdMsg, setPwdMsg] = useState("");
   const [pwdError, setPwdError] = useState("");
 
+  // Photo state
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [savingPhoto, setSavingPhoto] = useState(false);
+  const [photoMsg, setPhotoMsg] = useState("");
+
   useEffect(() => {
     Promise.all([getProfile(), getRankInfo()])
       .then(([profileData, rankData]) => {
@@ -43,6 +48,7 @@ function ProfilePage() {
         setEditEmail(profileData.user.email || "");
         setEditProfileImage(profileData.user.profileImage || "");
         setEditDarkMode(profileData.user.darkMode || false);
+        setPhotoUrl(profileData.user.profileImage || "");
       })
       .catch(() => navigate({ to: "/auth" }))
       .finally(() => setLoading(false));
@@ -93,10 +99,44 @@ function ProfilePage() {
     }
   };
 
+  const handleSavePhoto = async () => {
+    setSavingPhoto(true);
+    setPhotoMsg("");
+    try {
+      await updateProfile({ data: { profileImage: photoUrl } });
+      setUser({ ...user, profileImage: photoUrl });
+      setEditProfileImage(photoUrl);
+      setPhotoMsg("Profile photo updated!");
+      setTimeout(() => setPhotoMsg(""), 3000);
+    } catch (err: any) {
+      setPhotoMsg(err.message || "Failed to update photo");
+    } finally {
+      setSavingPhoto(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    setSavingPhoto(true);
+    setPhotoMsg("");
+    try {
+      await updateProfile({ data: { profileImage: "" } });
+      setUser({ ...user, profileImage: "" });
+      setEditProfileImage("");
+      setPhotoUrl("");
+      setPhotoMsg("Photo removed!");
+      setTimeout(() => setPhotoMsg(""), 3000);
+    } catch (err: any) {
+      setPhotoMsg(err.message || "Failed to remove photo");
+    } finally {
+      setSavingPhoto(false);
+    }
+  };
+
   const tabs: { id: Tab; label: string }[] = [
     { id: "welcome", label: "Welcome" },
     { id: "view", label: "View Profile" },
     { id: "edit", label: "Update Profile" },
+    { id: "photo", label: "Profile Photo" },
     { id: "password", label: "Change Password" },
   ];
 
@@ -266,6 +306,83 @@ function ProfilePage() {
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>
+          </div>
+        )}
+
+        {/* ── Profile Photo Tab ──────────────────────── */}
+        {activeTab === "photo" && (
+          <div className="space-y-6">
+            <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+              {/* Current Photo Preview */}
+              <div className="flex flex-col items-center gap-3">
+                {user?.profileImage ? (
+                  <img
+                    src={user.profileImage}
+                    alt="Profile"
+                    className="h-32 w-32 rounded-full border-4 border-gold/30 object-cover shadow-lg"
+                  />
+                ) : (
+                  <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-gold/30 bg-emerald text-5xl font-bold text-cream shadow-lg">
+                    {user?.name?.charAt(0)}
+                  </div>
+                )}
+                <p className="text-xs text-emerald/60">Current Photo</p>
+              </div>
+
+              {/* Photo Form */}
+              <div className="flex-1 space-y-4">
+                <div>
+                  <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">New Photo URL</label>
+                  <input
+                    type="text"
+                    value={photoUrl}
+                    onChange={(e) => setPhotoUrl(e.target.value)}
+                    placeholder="https://example.com/photo.jpg"
+                    className="w-full border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/40 focus:border-gold"
+                  />
+                </div>
+
+                {/* URL Preview */}
+                {photoUrl && (
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={photoUrl}
+                      alt="Preview"
+                      className="h-16 w-16 rounded-full border-2 border-gold/20 object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                    <p className="text-xs text-emerald/50">Preview</p>
+                  </div>
+                )}
+
+                {photoMsg && (
+                  <p className={`text-xs font-semibold ${photoMsg.includes("updated") || photoMsg.includes("removed") ? "text-emerald" : "text-red-500"}`}>
+                    {photoMsg}
+                  </p>
+                )}
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleSavePhoto}
+                    disabled={savingPhoto}
+                    className="bg-emerald px-6 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
+                  >
+                    {savingPhoto ? "Saving..." : "Save Photo"}
+                  </button>
+                  {user?.profileImage && (
+                    <button
+                      onClick={handleRemovePhoto}
+                      disabled={savingPhoto}
+                      className="border border-red-400 px-6 py-2 text-xs font-semibold uppercase tracking-widest text-red-400 transition-all hover:bg-red-50 disabled:opacity-50"
+                    >
+                      Remove Photo
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

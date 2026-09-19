@@ -37,6 +37,7 @@ type TreeNode = {
   isActive: boolean;
   rank: string;
   position: string | null;
+  createdAt: Date | null;
   left: TreeNode | null;
   right: TreeNode | null;
 };
@@ -60,6 +61,7 @@ type FlatUser = {
   position: string | null;
   parentId: number | null;
   packageAmount: number | null;
+  createdAt: Date | null;
 };
 
 // ── Efficient batch fetch: get all descendants of a root user via BFS ──
@@ -75,6 +77,7 @@ async function fetchAllDescendants(rootId: number): Promise<FlatUser[]> {
       position: users.position,
       parentId: users.parentId,
       packageAmount: users.packageAmount,
+      createdAt: users.createdAt,
     })
     .from(users)
     .where(eq(users.id, rootId));
@@ -98,6 +101,7 @@ async function fetchAllDescendants(rootId: number): Promise<FlatUser[]> {
         position: users.position,
         parentId: users.parentId,
         packageAmount: users.packageAmount,
+        createdAt: users.createdAt,
       })
       .from(users);
 
@@ -132,6 +136,7 @@ async function fetchAllUsersInTree(rootId: number): Promise<FlatUser[]> {
       position: users.position,
       parentId: users.parentId,
       packageAmount: users.packageAmount,
+      createdAt: users.createdAt,
     })
     .from(users);
 
@@ -255,6 +260,7 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       isActive: user.isActive,
       rank: user.rank || "bronze",
       position: user.position,
+      createdAt: user.createdAt,
       left: leftNode,
       right: rightNode,
     };
@@ -379,4 +385,41 @@ export const getTeamStats = createServerFn({ method: "GET" })
       activeTeam,
       totalBusiness,
     };
+  });
+
+// ── Get downline users (all descendants as flat list) ──
+export const getDownlineUsers = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const userId = await getAuthUserId();
+    const descendants = await fetchAllUsersInTree(userId);
+    return descendants
+      .filter((u) => u.id !== userId)
+      .map((u) => ({
+        id: u.id,
+        name: u.name,
+        referralCode: u.referralCode,
+        isActive: u.isActive,
+        rank: u.rank,
+        position: u.position,
+        parentId: u.parentId,
+        packageAmount: u.packageAmount,
+      }));
+  });
+
+// ── Get direct referral users (immediate children only) ──
+export const getDirectUsers = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const userId = await getAuthUserId();
+    const descendants = await fetchAllUsersInTree(userId);
+    return descendants
+      .filter((u) => u.parentId === userId)
+      .map((u) => ({
+        id: u.id,
+        name: u.name,
+        referralCode: u.referralCode,
+        isActive: u.isActive,
+        rank: u.rank,
+        position: u.position,
+        packageAmount: u.packageAmount,
+      }));
   });

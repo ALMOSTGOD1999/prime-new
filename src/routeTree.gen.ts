@@ -43,6 +43,7 @@ import { Route as DashboardGoldRouteImport } from './routes/dashboard/gold'
 import { Route as DashboardIncomeRouteImport } from './routes/dashboard/income'
 import { Route as DashboardKycRouteImport } from './routes/dashboard/kyc'
 import { Route as DashboardLeaderboardRouteImport } from './routes/dashboard/leaderboard'
+import { Route as DashboardNetworkRouteImport } from './routes/dashboard/network'
 import { Route as DashboardNotificationsRouteImport } from './routes/dashboard/notifications'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
 import { Route as DashboardPurchaseRouteImport } from './routes/dashboard/purchase'
@@ -222,6 +223,11 @@ const DashboardLeaderboardRoute = DashboardLeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardNetworkRoute = DashboardNetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardNotificationsRoute = DashboardNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -291,6 +297,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
+  '/dashboard/network': typeof DashboardNetworkRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/purchase': typeof DashboardPurchaseRoute
@@ -332,6 +339,7 @@ export interface FileRoutesByTo {
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
+  '/dashboard/network': typeof DashboardNetworkRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/purchase': typeof DashboardPurchaseRoute
@@ -376,6 +384,7 @@ export interface FileRoutesById {
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
+  '/dashboard/network': typeof DashboardNetworkRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/purchase': typeof DashboardPurchaseRoute
@@ -421,6 +430,7 @@ export interface FileRouteTypes {
     | '/dashboard/income'
     | '/dashboard/kyc'
     | '/dashboard/leaderboard'
+    | '/dashboard/network'
     | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/purchase'
@@ -462,6 +472,7 @@ export interface FileRouteTypes {
     | '/dashboard/income'
     | '/dashboard/kyc'
     | '/dashboard/leaderboard'
+    | '/dashboard/network'
     | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/purchase'
@@ -505,6 +516,7 @@ export interface FileRouteTypes {
     | '/dashboard/income'
     | '/dashboard/kyc'
     | '/dashboard/leaderboard'
+    | '/dashboard/network'
     | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/purchase'
@@ -767,6 +779,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLeaderboardRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/network': {
+      id: '/dashboard/network'
+      path: '/network'
+      fullPath: '/dashboard/network'
+      preLoaderRoute: typeof DashboardNetworkRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/notifications': {
       id: '/dashboard/notifications'
       path: '/notifications'
@@ -870,6 +889,7 @@ interface DashboardRouteChildren {
   DashboardIncomeRoute: typeof DashboardIncomeRoute
   DashboardKycRoute: typeof DashboardKycRoute
   DashboardLeaderboardRoute: typeof DashboardLeaderboardRoute
+  DashboardNetworkRoute: typeof DashboardNetworkRoute
   DashboardNotificationsRoute: typeof DashboardNotificationsRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardPurchaseRoute: typeof DashboardPurchaseRoute
@@ -889,6 +909,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIncomeRoute: DashboardIncomeRoute,
   DashboardKycRoute: DashboardKycRoute,
   DashboardLeaderboardRoute: DashboardLeaderboardRoute,
+  DashboardNetworkRoute: DashboardNetworkRoute,
   DashboardNotificationsRoute: DashboardNotificationsRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardPurchaseRoute: DashboardPurchaseRoute,
