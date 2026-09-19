@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "../../lib/db";
-import { users } from "../../lib/db/schema";
+import { users, kyc } from "../../lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getCookie } from "@tanstack/react-start/server";
 
@@ -32,6 +32,9 @@ export const getProfile = createServerFn({ method: "GET" })
         packageAmount: users.packageAmount,
         rank: users.rank,
         phone: users.phone,
+        profileImage: users.profileImage,
+        darkMode: users.darkMode,
+        totalInvested: users.totalInvested,
         createdAt: users.createdAt,
       })
       .from(users)
@@ -51,18 +54,35 @@ export const getProfile = createServerFn({ method: "GET" })
       if (parentResult.length > 0) parent = parentResult[0];
     }
 
-    return { user, parent };
+    // Get KYC data
+    let kycData = null;
+    const kycResult = await db.select().from(kyc).where(eq(kyc.userId, userId));
+    if (kycResult.length > 0) {
+      const k = kycResult[0]!;
+      kycData = {
+        panNumber: k.panNumber,
+        aadhaarNumber: k.aadhaarNumber,
+        bankName: k.bankName,
+        accountNumber: k.accountNumber,
+        ifscCode: k.ifscCode,
+        status: k.status,
+      };
+    }
+
+    return { user, parent, kyc: kycData };
   });
 
 // ── Update profile ──────────────────────────────────────
 export const updateProfile = createServerFn({ method: "POST" })
-  .validator((data: { name?: string; phone?: string }) => data)
+  .validator((data: { email?: string; phone?: string; profileImage?: string; darkMode?: boolean }) => data)
   .handler(async ({ data }) => {
     const userId = await getAuthUserId();
 
-    const updates: Record<string, string> = {};
-    if (data.name) updates["name"] = data.name;
+    const updates: Record<string, any> = {};
+    if (data.email !== undefined) updates["email"] = data.email;
     if (data.phone !== undefined) updates["phone"] = data.phone;
+    if (data.profileImage !== undefined) updates["profileImage"] = data.profileImage;
+    if (data.darkMode !== undefined) updates["darkMode"] = data.darkMode;
 
     if (Object.keys(updates).length === 0) {
       throw new Error("No updates provided");
