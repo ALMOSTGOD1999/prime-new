@@ -5,6 +5,7 @@ import { getMe } from "../functions/auth/me";
 import { logout } from "../functions/auth/logout";
 import { stopImpersonation } from "../functions/admin/impersonate";
 import { getNotifications } from "../functions/user/notifications";
+import { getGoldPrice } from "../functions/user/goldprice";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { OnboardingTour } from "../components/OnboardingTour";
 import { MobileBottomNav } from "../components/MobileBottomNav";
@@ -24,6 +25,7 @@ function DashboardLayout() {
   const [newPassword, setNewPassword] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [goldPrice, setGoldPrice] = useState<any>(null);
   const prevUnreadRef = useRef(0);
   const navigate = useNavigate();
 
@@ -65,6 +67,11 @@ function DashboardLayout() {
         setUnreadCount(d.unreadCount);
         prevUnreadRef.current = d.unreadCount;
       })
+      .catch(() => {});
+
+    // Fetch gold price for ticker
+    getGoldPrice()
+      .then((d) => setGoldPrice(d))
       .catch(() => {});
 
     return () => clearInterval(interval);
@@ -135,13 +142,9 @@ function DashboardLayout() {
     { to: "/dashboard/tree", label: "Tree View", icon: "🌳" },
     { to: "/dashboard/income", label: "Income", icon: "◆" },
     { to: "/dashboard/activate-account", label: "Activate Account", icon: "🔑" },
-    { to: "/dashboard/gold", label: "Gold Price", icon: "📈" },
     { to: "/dashboard/purchase", label: "Purchase", icon: "🛒" },
-    { to: "/dashboard/calculator", label: "Calculator", icon: "🧮" },
     { to: "/dashboard/reports", label: "Reports", icon: "📊" },
     { to: "/dashboard/rewards", label: "Rewards", icon: "🏆" },
-    { to: "/dashboard/leaderboard", label: "Leaderboard", icon: "🥇" },
-    { to: "/dashboard/badges", label: "Badges", icon: "🎖️" },
     { to: "/dashboard/profile", label: "Profile", icon: "👤" },
     { to: "/dashboard/kyc", label: "KYC", icon: "📋" },
     { to: "/dashboard/notifications", label: "Notifications", icon: "🔔", badge: unreadCount },
@@ -265,6 +268,22 @@ function DashboardLayout() {
         )}
 
         <main className="flex-1 p-6 pb-20 lg:p-8 lg:pb-8">
+          {/* Gold Price Ticker */}
+          {goldPrice?.price && (
+            <div className="mb-6 overflow-hidden rounded border border-gold/20 bg-gradient-to-r from-gold/10 via-gold/5 to-gold/10">
+              <div className="flex items-center gap-4 whitespace-nowrap px-4 py-2 animate-marquee">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <span key={i} className="flex items-center gap-2 text-xs font-semibold text-gold">
+                    <span className="text-emerald/60">✦</span>
+                    Gold Rate: ₹{goldPrice.price?.toLocaleString("en-IN")}/g
+                    <span className="text-emerald/60">•</span>
+                    Updated: {goldPrice.createdAt ? new Date(goldPrice.createdAt).toLocaleDateString("en-IN") : "N/A"}
+                    <span className="text-emerald/60">✦</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
           <Outlet />
           <div className="mt-12 border-t border-gold/10 pt-6 text-center">
             <Typewriter
