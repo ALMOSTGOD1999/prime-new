@@ -6,31 +6,23 @@ import { NetTreeNode } from "../../components/network/NetTreeNode";
 
 export const Route = createFileRoute("/dashboard/network")({
   component: NetworkPage,
+  validateSearch: (search) => ({
+    tab: String(search["tab"] || "tree"),
+  }),
 });
 
 type NetworkTab = "tree" | "downline" | "direct" | "levels";
 
 function NetworkPage() {
-  const [activeTab, setActiveTab] = useState<NetworkTab>("tree");
+  const search = Route.useSearch();
+  const tab = (search as any).tab as string || "tree";
+  const activeTab = (tab === "downline" || tab === "direct" || tab === "levels" ? tab : "tree") as NetworkTab;
 
   return (
     <div className="space-y-6">
       <h1 className="font-display text-3xl">
         My <span className="italic text-gold">Network</span>
       </h1>
-      <div className="flex gap-1 overflow-x-auto rounded border border-gold/20 bg-background p-1">
-        {([
-          { id: "tree" as const, label: "Tree View" },
-          { id: "downline" as const, label: "Downline Team" },
-          { id: "direct" as const, label: "My Direct" },
-          { id: "levels" as const, label: "Level Wise Tree" },
-        ]).map((tab) => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-            className={`whitespace-nowrap rounded px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all ${activeTab === tab.id ? "bg-gold text-cream" : "text-emerald/60 hover:bg-emerald/10 hover:text-emerald"}`}>
-            {tab.label}
-          </button>
-        ))}
-      </div>
       <div className="rounded border border-gold/20 bg-background p-6">
         {activeTab === "tree" && <TreeViewTab />}
         {activeTab === "downline" && <DownlineTab />}

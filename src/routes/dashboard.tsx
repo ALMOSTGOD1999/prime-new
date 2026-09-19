@@ -26,6 +26,7 @@ function DashboardLayout() {
   const [resetLoading, setResetLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [goldPrice, setGoldPrice] = useState<any>(null);
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
   const prevUnreadRef = useRef(0);
   const navigate = useNavigate();
 
@@ -135,16 +136,35 @@ function DashboardLayout() {
     );
   }
 
-  const navLinks = [
+  type NavLeaf = { to: string; label: string; icon: string; badge?: number };
+  type NavParent = { label: string; icon: string; children: { to: string; search: Record<string, string>; label: string }[] };
+  const navLinks: (NavLeaf | NavParent)[] = [
     { to: "/dashboard", label: "Dashboard", icon: "◈" },
     { to: "/dashboard/add-user", label: "Add User", icon: "➕" },
-    { to: "/dashboard/network", label: "My Network", icon: "🌐" },
+    {
+      label: "My Network", icon: "🌐",
+      children: [
+        { to: "/dashboard/network", search: { tab: "tree" }, label: "Tree View" },
+        { to: "/dashboard/network", search: { tab: "downline" }, label: "Downline Team" },
+        { to: "/dashboard/network", search: { tab: "direct" }, label: "My Direct" },
+        { to: "/dashboard/network", search: { tab: "levels" }, label: "Level Wise Tree" },
+      ],
+    },
     { to: "/dashboard/income", label: "Income", icon: "◆" },
     { to: "/dashboard/activate-account", label: "Activate Account", icon: "🔑" },
     { to: "/dashboard/purchase", label: "Purchase", icon: "🛒" },
     { to: "/dashboard/reports", label: "Reports", icon: "📊" },
     { to: "/dashboard/rewards", label: "Rewards", icon: "🏆" },
-    { to: "/dashboard/profile", label: "Profile", icon: "👤" },
+    {
+      label: "Profile", icon: "👤",
+      children: [
+        { to: "/dashboard/profile", search: { tab: "welcome" }, label: "Welcome" },
+        { to: "/dashboard/profile", search: { tab: "view" }, label: "View Profile" },
+        { to: "/dashboard/profile", search: { tab: "edit" }, label: "Update Profile" },
+        { to: "/dashboard/profile", search: { tab: "photo" }, label: "Profile Photo" },
+        { to: "/dashboard/profile", search: { tab: "password" }, label: "Change Password" },
+      ],
+    },
     { to: "/dashboard/kyc", label: "KYC", icon: "📋" },
     { to: "/dashboard/notifications", label: "Notifications", icon: "🔔", badge: unreadCount },
   ];
@@ -170,26 +190,61 @@ function DashboardLayout() {
           </div>
 
           <nav className="flex-1 space-y-1 overflow-y-auto p-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                activeOptions={{ exact: link.to === "/dashboard" }}
-                activeProps={{ className: "bg-background/10 text-gold" }}
-                className="flex items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-cream/70 transition-colors hover:bg-background/5 hover:text-cream"
-                onClick={() => setSidebarOpen(false)}
-              >
-                <div className="flex items-center space-x-3">
-                  <span>{link.icon}</span>
-                  <span>{link.label}</span>
-                </div>
-                {"badge" in link && link.badge > 0 && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-cream">
-                    {link.badge > 99 ? "99+" : link.badge}
-                  </span>
-                )}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              if ("children" in link) {
+                const isOpen = expandedMenu === link.label;
+                return (
+                  <div key={link.label}>
+                    <button
+                      onClick={() => setExpandedMenu(isOpen ? null : link.label)}
+                      className="flex w-full items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-cream/70 transition-colors hover:bg-background/5 hover:text-cream"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <span>{link.icon}</span>
+                        <span>{link.label}</span>
+                      </div>
+                      <span className={`text-[10px] transition-transform ${isOpen ? "rotate-90" : ""}`}>▶</span>
+                    </button>
+                    {isOpen && (
+                      <div className="ml-5 mt-1 space-y-0.5 border-l border-cream/10 pl-3">
+                        {link.children.map((child) => (
+                          <Link
+                            key={child.label}
+                            to={child.to}
+                            search={child.search}
+                            activeProps={{ className: "bg-background/10 text-gold" }}
+                            className="block rounded px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-cream/50 transition-colors hover:bg-background/5 hover:text-cream"
+                            onClick={() => setSidebarOpen(false)}
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  activeOptions={{ exact: link.to === "/dashboard" }}
+                  activeProps={{ className: "bg-background/10 text-gold" }}
+                  className="flex items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-cream/70 transition-colors hover:bg-background/5 hover:text-cream"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <span>{link.icon}</span>
+                    <span>{link.label}</span>
+                  </div>
+                  {"badge" in link && (link.badge ?? 0) > 0 && (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-cream">
+                      {link.badge! > 99 ? "99+" : link.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="border-t border-cream/10 p-4">

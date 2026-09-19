@@ -1,22 +1,35 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getProfile, updateProfile, changePassword } from "../../functions/user/profile";
 import { getRankInfo } from "../../functions/user/rank";
 
 export const Route = createFileRoute("/dashboard/profile")({
   component: ProfilePage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: String(search["tab"] || "welcome"),
+  }),
 });
 
 type Tab = "welcome" | "view" | "edit" | "password" | "photo";
 
+const tabConfig: { id: Tab; label: string }[] = [
+  { id: "welcome", label: "Welcome" },
+  { id: "view", label: "View Profile" },
+  { id: "edit", label: "Update Profile" },
+  { id: "photo", label: "Profile Photo" },
+  { id: "password", label: "Change Password" },
+];
+
 function ProfilePage() {
+  const search = Route.useSearch();
+  const tab = (search as any).tab as string || "welcome";
   const navigate = useNavigate();
+  const activeTab: Tab = (tabConfig.find((t) => t.id === tab) ? tab : "welcome") as Tab;
   const [user, setUser] = useState<any>(null);
   const [parent, setParent] = useState<any>(null);
   const [kyc, setKyc] = useState<any>(null);
   const [rankInfo, setRankInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<Tab>("welcome");
 
   // Edit form state
   const [editEmail, setEditEmail] = useState("");
@@ -132,19 +145,10 @@ function ProfilePage() {
     }
   };
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: "welcome", label: "Welcome" },
-    { id: "view", label: "View Profile" },
-    { id: "edit", label: "Update Profile" },
-    { id: "photo", label: "Profile Photo" },
-    { id: "password", label: "Change Password" },
-  ];
-
   if (loading) {
     return (
       <div className="space-y-6">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="h-10 w-full animate-pulse rounded bg-emerald/5" />
         <div className="h-64 animate-pulse rounded border border-gold/20 bg-background" />
       </div>
     );
@@ -152,27 +156,9 @@ function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <h1 className="font-display text-3xl">
         My <span className="italic text-gold">Profile</span>
       </h1>
-
-      {/* Tab Bar */}
-      <div className="flex gap-1 overflow-x-auto rounded border border-gold/20 bg-background p-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`whitespace-nowrap rounded px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all ${
-              activeTab === tab.id
-                ? "bg-gold text-cream"
-                : "text-emerald/60 hover:bg-emerald/10 hover:text-emerald"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
 
       {/* Tab Content */}
       <div className="rounded border border-gold/20 bg-background p-6">
