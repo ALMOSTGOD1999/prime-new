@@ -20,7 +20,7 @@ function NetworkPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl">
+      <h1 className="font-display text-2xl sm:text-3xl">
         My <span className="italic text-gold">Network</span>
       </h1>
       <div className="rounded border border-gold/20 bg-background p-6">
@@ -187,7 +187,7 @@ function TreeViewTab() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-lg border border-gold/20 bg-background p-0.5">
             <button onClick={() => setViewMode("binary")} className={`rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all ${viewMode === "binary" ? "bg-emerald text-cream shadow-sm" : "text-emerald/60 hover:text-emerald"}`}>Binary</button>
             <button onClick={() => setViewMode("level")} className={`rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all ${viewMode === "level" ? "bg-emerald text-cream shadow-sm" : "text-emerald/60 hover:text-emerald"}`}>Level</button>

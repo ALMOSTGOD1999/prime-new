@@ -129,7 +129,7 @@ function PurchasePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl">
+      <h1 className="font-display text-2xl sm:text-3xl">
         Make a <span className="italic text-gold">Purchase</span>
       </h1>
       <p className="text-xs text-emerald/70">
@@ -188,7 +188,7 @@ function PurchasePage() {
           {/* Weight Input */}
           <div className="rounded border border-gold/20 bg-background p-6">
             <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Weight (grams)</h3>
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 type="number"
                 step="0.1"

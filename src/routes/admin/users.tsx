@@ -89,7 +89,7 @@ function AdminUsers() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div>
-        <h1 className="font-display text-4xl tracking-tight">
+        <h1 className="font-display text-3xl sm:text-4xl tracking-tight">
           <span className="italic text-gold">User</span> Management
         </h1>
         <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">
@@ -98,7 +98,7 @@ function AdminUsers() {
       </div>
 
       {/* Search */}
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1">
           <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
@@ -134,16 +134,16 @@ function AdminUsers() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gold/10 text-xs uppercase tracking-[0.2em] text-emerald/60">
-                    <th className="px-6 py-3 text-left font-semibold">ID</th>
-                    <th className="px-6 py-3 text-left font-semibold">Name</th>
-                    <th className="px-6 py-3 text-left font-semibold">Email</th>
-                    <th className="px-6 py-3 text-left font-semibold">Code</th>
-                    <th className="px-6 py-3 text-left font-semibold">Position</th>
-                    <th className="px-6 py-3 text-left font-semibold">Status</th>
-                    <th className="px-6 py-3 text-left font-semibold">Admin</th>
-                    <th className="px-6 py-3 text-right font-semibold">Package</th>
-                    <th className="px-6 py-3 text-right font-semibold">Joined</th>
-                    <th className="px-6 py-3 text-right font-semibold">Action</th>
+                    <th className="px-3 sm:px-6 py-3 text-left font-semibold">ID</th>
+                    <th className="px-3 sm:px-6 py-3 text-left font-semibold">Name</th>
+                    <th className="px-3 sm:px-6 py-3 text-left font-semibold">Email</th>
+                    <th className="px-3 sm:px-6 py-3 text-left font-semibold">Code</th>
+                    <th className="px-3 sm:px-6 py-3 text-left font-semibold">Position</th>
+                    <th className="px-3 sm:px-6 py-3 text-left font-semibold">Status</th>
+                    <th className="px-3 sm:px-6 py-3 text-left font-semibold">Admin</th>
+                    <th className="px-3 sm:px-6 py-3 text-right font-semibold">Package</th>
+                    <th className="px-3 sm:px-6 py-3 text-right font-semibold">Joined</th>
+                    <th className="px-3 sm:px-6 py-3 text-right font-semibold">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -152,8 +152,8 @@ function AdminUsers() {
                       key={user.id}
                       className={`border-b border-gold/5 transition-all duration-200 hover:bg-gold/5 ${i % 2 === 0 ? "bg-emerald/[0.02]" : ""}`}
                     >
-                      <td className="px-6 py-3.5 font-mono text-xs text-emerald/60">#{user.id}</td>
-                      <td className="px-6 py-3.5">
+                      <td className="px-3 sm:px-6 py-3.5 font-mono text-xs text-emerald/60">#{user.id}</td>
+                      <td className="px-3 sm:px-6 py-3.5">
                         <div className="flex items-center gap-2.5">
                           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald/10 to-emerald/5 text-xs font-bold text-emerald ring-1 ring-emerald/15">
                             {user.name?.charAt(0)?.toUpperCase()}
@@ -161,11 +161,11 @@ function AdminUsers() {
                           <span className="text-xs font-semibold">{user.name}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-3.5 text-xs text-emerald/60">{user.email}</td>
-                      <td className="px-6 py-3.5">
+                      <td className="px-3 sm:px-6 py-3.5 text-xs text-emerald/60">{user.email}</td>
+                      <td className="px-3 sm:px-6 py-3.5">
                         <code className="rounded-md bg-emerald/5 px-2 py-0.5 text-xs font-semibold text-emerald/70">{user.referralCode}</code>
                       </td>
-                      <td className="px-6 py-3.5">
+                      <td className="px-3 sm:px-6 py-3.5">
                         {user.position ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-gold/5 px-2 py-0.5 text-xs font-semibold text-gold ring-1 ring-gold/15">
                             {user.position === "left" ? "←" : "→"} {user.position}
@@ -184,7 +184,7 @@ function AdminUsers() {
                           {user.isActive ? "Active" : "Inactive"}
                         </span>
                       </td>
-                      <td className="px-6 py-3.5">
+                      <td className="px-3 sm:px-6 py-3.5">
                         {user.isAdmin && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-gold/10 px-2.5 py-0.5 text-xs font-semibold text-gold ring-1 ring-gold/20">
                             <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
@@ -192,13 +192,13 @@ function AdminUsers() {
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-3.5 text-right text-xs font-semibold text-emerald/60">
+                      <td className="px-3 sm:px-6 py-3.5 text-right text-xs font-semibold text-emerald/60">
                         ₹{user.packageAmount?.toLocaleString("en-IN") || "0"}
                       </td>
-                      <td className="px-6 py-3.5 text-right text-xs text-emerald/60">
+                      <td className="px-3 sm:px-6 py-3.5 text-right text-xs text-emerald/60">
                         {new Date(user.createdAt).toLocaleDateString("en-IN")}
                       </td>
-                      <td className="px-6 py-3.5 text-right">
+                      <td className="px-3 sm:px-6 py-3.5 text-right">
                         {!user.isAdmin && (
                           <div className="flex items-center justify-end gap-2">
                             <button

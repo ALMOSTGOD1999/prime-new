@@ -170,23 +170,23 @@ function DashboardLayout() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-background dark:bg-emerald/5">
+    <div className="flex min-h-screen bg-background">
       <OnboardingTour />
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 bg-black/30 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-gold/20 bg-[oklch(0.22_0.06_165)] text-cream transition-transform lg:translate-x-0 lg:static lg:z-auto ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-gold/20 bg-background text-emerald transition-transform lg:translate-x-0 lg:static lg:z-auto ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex h-full flex-col">
-          <div className="border-b border-cream/10 p-6">
-            <Link to="/" className="text-cream">
+          <div className="border-b border-gold/10 p-6">
+            <Link to="/" className="text-emerald">
               <Wordmark className="text-lg font-bold uppercase" />
             </Link>
-            <p className="mt-2 text-[10px] uppercase tracking-widest text-cream/50">Dashboard</p>
+            <p className="mt-2 text-[10px] uppercase tracking-widest text-emerald/50">Dashboard</p>
           </div>
 
           <nav className="flex-1 space-y-1 overflow-y-auto p-4">
@@ -197,7 +197,7 @@ function DashboardLayout() {
                   <div key={link.label}>
                     <button
                       onClick={() => setExpandedMenu(isOpen ? null : link.label)}
-                      className="flex w-full items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-cream/70 transition-colors hover:bg-background/5 hover:text-cream"
+                      className="flex w-full items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-emerald/70 transition-colors hover:bg-gold/5 hover:text-emerald"
                     >
                       <div className="flex items-center space-x-3">
                         <span>{link.icon}</span>
@@ -206,14 +206,14 @@ function DashboardLayout() {
                       <span className={`text-[10px] transition-transform ${isOpen ? "rotate-90" : ""}`}>▶</span>
                     </button>
                     {isOpen && (
-                      <div className="ml-5 mt-1 space-y-0.5 border-l border-cream/10 pl-3">
+                      <div className="ml-5 mt-1 space-y-0.5 border-l border-gold/10 pl-3">
                         {link.children.map((child) => (
                           <Link
                             key={child.label}
                             to={child.to}
                             search={child.search}
-                            activeProps={{ className: "bg-background/10 text-gold" }}
-                            className="block rounded px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-cream/50 transition-colors hover:bg-background/5 hover:text-cream"
+                            activeProps={{ className: "bg-gold/10 text-gold" }}
+                            className="block rounded px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-emerald/50 transition-colors hover:bg-gold/5 hover:text-emerald"
                             onClick={() => setSidebarOpen(false)}
                           >
                             {child.label}
@@ -229,8 +229,8 @@ function DashboardLayout() {
                   key={link.to}
                   to={link.to}
                   activeOptions={{ exact: link.to === "/dashboard" }}
-                  activeProps={{ className: "bg-background/10 text-gold" }}
-                  className="flex items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-cream/70 transition-colors hover:bg-background/5 hover:text-cream"
+                  activeProps={{ className: "bg-gold/10 text-gold" }}
+                  className="flex items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-emerald/70 transition-colors hover:bg-gold/5 hover:text-emerald"
                   onClick={() => setSidebarOpen(false)}
                 >
                   <div className="flex items-center space-x-3">
@@ -247,11 +247,11 @@ function DashboardLayout() {
             })}
           </nav>
 
-          <div className="border-t border-cream/10 p-4">
+          <div className="border-t border-gold/10 p-4">
             <div className="mb-4 px-4">
-              <p className="text-[10px] uppercase tracking-widest text-cream/40">Logged in as</p>
-              <p className="truncate text-xs font-semibold text-cream">{user?.name}</p>
-              <p className="truncate text-[10px] text-cream/50">{user?.referralCode}</p>
+              <p className="text-[10px] uppercase tracking-widest text-emerald/40">Logged in as</p>
+              <p className="truncate text-xs font-semibold text-emerald">{user?.name}</p>
+              <p className="truncate text-[10px] text-emerald/50">{user?.referralCode}</p>
             </div>
             <div className="mb-3 px-4">
               <DarkModeToggle />
@@ -266,7 +266,7 @@ function DashboardLayout() {
             )}
             <button
               onClick={handleLogout}
-              className="w-full rounded border border-cream/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream/60 transition-colors hover:border-gold hover:text-gold"
+              className="w-full rounded border border-emerald/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-emerald/60 transition-colors hover:border-gold hover:text-gold"
             >
               Logout
             </button>
@@ -275,7 +275,7 @@ function DashboardLayout() {
       </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-gold/20 bg-background/90 px-4 py-3 backdrop-blur-md lg:hidden dark:bg-emerald/10">
+        <header className="flex items-center justify-between border-b border-gold/20 bg-background/90 px-4 py-3 backdrop-blur-md lg:hidden">
           <div className="flex items-center">
             <button onClick={() => setSidebarOpen(true)} className="mr-4 text-emerald">
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

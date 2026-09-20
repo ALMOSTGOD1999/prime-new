@@ -22,7 +22,7 @@ function IncomePage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-emerald/10" />
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-24 animate-pulse rounded border border-gold/20 bg-background" />
           ))}
@@ -39,7 +39,7 @@ function IncomePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl">
+      <h1 className="font-display text-2xl sm:text-3xl">
         <span className="italic text-gold">Income</span> Statement
       </h1>
 
@@ -130,10 +130,10 @@ function IncomePage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gold/10 text-xs uppercase tracking-widest text-emerald/70">
-                <th className="px-6 py-3 text-left">Type</th>
-                <th className="px-6 py-3 text-left">Description</th>
-                <th className="px-6 py-3 text-right">Amount</th>
-                <th className="px-6 py-3 text-right">Date</th>
+                <th className="px-3 sm:px-6 py-3 text-left">Type</th>
+                <th className="px-3 sm:px-6 py-3 text-left">Description</th>
+                <th className="px-3 sm:px-6 py-3 text-right">Amount</th>
+                <th className="px-3 sm:px-6 py-3 text-right">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -146,7 +146,7 @@ function IncomePage() {
               ) : (
                 filtered.map((item: any) => (
                   <tr key={item.id} className="border-b border-gold/5 transition-colors hover:bg-gold/5">
-                    <td className="px-6 py-3">
+                    <td className="px-3 sm:px-6 py-3">
                       <span
                         className={`inline-block rounded px-2 py-0.5 text-xs font-semibold uppercase ${
                           item.type === "direct"
@@ -159,11 +159,11 @@ function IncomePage() {
                         {item.type}
                       </span>
                     </td>
-                    <td className="px-6 py-3 text-xs text-emerald/70">{item.description}</td>
-                    <td className="px-6 py-3 text-right text-xs font-semibold text-emerald">
+                    <td className="px-3 sm:px-6 py-3 text-xs text-emerald/70">{item.description}</td>
+                    <td className="px-3 sm:px-6 py-3 text-right text-xs font-semibold text-emerald">
                       ₹{item.amount.toLocaleString("en-IN")}
                     </td>
-                    <td className="px-6 py-3 text-right text-xs text-emerald/70">
+                    <td className="px-3 sm:px-6 py-3 text-right text-xs text-emerald/70">
                       {new Date(item.createdAt).toLocaleDateString("en-IN")}
                     </td>
                   </tr>

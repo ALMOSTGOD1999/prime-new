@@ -75,13 +75,13 @@ function AdminLayout() {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-gold/10 bg-gradient-to-b from-[oklch(0.22_0.06_165)] via-[oklch(0.22_0.06_165)] to-[oklch(0.20_0.06_165)] text-cream shadow-2xl transition-all duration-300 lg:translate-x-0 lg:static lg:z-auto ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-gold/10 bg-background text-emerald shadow-2xl transition-all duration-300 lg:translate-x-0 lg:static lg:z-auto ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Brand */}
-        <div className="border-b border-cream/10 p-6">
-          <Link to="/" className="block text-cream transition-opacity hover:opacity-80">
+        <div className="border-b border-gold/10 p-6">
+          <Link to="/" className="block text-emerald transition-opacity hover:opacity-80">
             <Wordmark className="text-lg font-bold uppercase" />
           </Link>
           <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 ring-1 ring-gold/20">
@@ -102,7 +102,7 @@ function AdminLayout() {
                 className={`group flex items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold uppercase tracking-[0.15em] transition-all duration-200 ${
                   isActive
                     ? "bg-background/15 text-gold shadow-sm ring-1 ring-gold/20"
-                    : "text-cream/60 hover:bg-background/5 hover:text-cream"
+                    : "text-emerald/60 hover:bg-gold/5 hover:text-emerald"
                 }`}
                 onClick={() => setSidebarOpen(false)}
               >
@@ -119,14 +119,14 @@ function AdminLayout() {
         </nav>
 
         {/* User + Logout */}
-        <div className="border-t border-cream/10 p-4">
+        <div className="border-t border-gold/10 p-4">
           <div className="mb-4 flex items-center gap-3 rounded-lg bg-background/5 px-4 py-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-[11px] font-bold text-gold ring-1 ring-gold/30">
               {user?.name?.charAt(0)?.toUpperCase() || "A"}
             </div>
             <div className="min-w-0">
-              <p className="truncate text-xs font-semibold text-cream">{user?.name}</p>
-              <p className="truncate text-[10px] text-cream/40">{user?.referralCode}</p>
+              <p className="truncate text-xs font-semibold text-emerald">{user?.name}</p>
+              <p className="truncate text-[10px] text-emerald/40">{user?.referralCode}</p>
             </div>
           </div>
           <div className="mb-3">
@@ -134,7 +134,7 @@ function AdminLayout() {
           </div>
           <button
             onClick={handleLogout}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-cream/15 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream/50 transition-all duration-200 hover:border-red-400/40 hover:bg-red-400/10 hover:text-red-300"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-emerald/15 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-emerald/50 transition-all duration-200 hover:border-red-400/40 hover:bg-red-400/10 hover:text-red-400"
           >
             <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" /></svg>
             Logout

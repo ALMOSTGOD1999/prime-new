@@ -38,7 +38,7 @@ function RewardsPage() {
         {REWARDS.map((item) => (
           <div
             key={item.amount}
-            className="group relative overflow-hidden rounded-lg border border-gold/15 bg-[oklch(0.18_0.04_165)] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-gold/40 hover:shadow-lg hover:shadow-gold/5"
+            className="group relative overflow-hidden rounded-lg border border-gold/15 bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-gold/40 hover:shadow-lg hover:shadow-gold/5"
           >
             {/* Gold top accent */}
             <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-gold/60 via-gold to-gold/60" />

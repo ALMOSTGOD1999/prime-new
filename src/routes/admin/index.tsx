@@ -95,7 +95,7 @@ function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-display text-4xl tracking-tight">
+          <h1 className="font-display text-3xl sm:text-4xl tracking-tight">
             Admin <span className="italic text-gold">Dashboard</span>
           </h1>
           <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">Platform overview & analytics</p>
@@ -110,7 +110,7 @@ function AdminDashboard() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {stats.map((stat, i) => (
           <div
             key={stat.title}
@@ -131,14 +131,14 @@ function AdminDashboard() {
 
       {/* Monthly Cashback Payout */}
       <div className="overflow-hidden rounded-xl border border-gold/10 bg-background shadow-sm">
-        <div className="flex items-center justify-between border-b border-gold/10 px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-gold/10 p-2">
-              <svg className="h-4 w-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" /></svg>
-            </div>
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Monthly Cashback Payout</h3>
-              <p className="mt-0.5 text-xs text-emerald/60">Credits 30% of each active user's self business to their cashback wallet</p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-gold/10 px-4 sm:px-6 py-4">
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-gold/10 p-2">
+                  <svg className="h-4 w-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" /></svg>
+                </div>
+                <div>
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Monthly Cashback Payout</h3>
+                  <p className="mt-0.5 text-xs text-emerald/60">Credits 30% of each active user's self business to their cashback wallet</p>
             </div>
           </div>
           <button
@@ -224,12 +224,12 @@ function AdminDashboard() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gold/10 text-xs uppercase tracking-[0.2em] text-emerald/60">
-                <th className="px-6 py-3 text-left font-semibold">ID</th>
-                <th className="px-6 py-3 text-left font-semibold">Name</th>
-                <th className="px-6 py-3 text-left font-semibold">Email</th>
-                <th className="px-6 py-3 text-left font-semibold">Code</th>
-                <th className="px-6 py-3 text-left font-semibold">Status</th>
-                <th className="px-6 py-3 text-right font-semibold">Joined</th>
+                <th className="px-3 sm:px-6 py-3 text-left font-semibold">ID</th>
+                <th className="px-3 sm:px-6 py-3 text-left font-semibold">Name</th>
+                <th className="px-3 sm:px-6 py-3 text-left font-semibold">Email</th>
+                <th className="px-3 sm:px-6 py-3 text-left font-semibold">Code</th>
+                <th className="px-3 sm:px-6 py-3 text-left font-semibold">Status</th>
+                <th className="px-3 sm:px-6 py-3 text-right font-semibold">Joined</th>
               </tr>
             </thead>
             <tbody>
@@ -239,8 +239,8 @@ function AdminDashboard() {
                   className="border-b border-gold/5 transition-all duration-200 hover:bg-gold/5"
                   style={{ animationDelay: `${i * 30}ms` }}
                 >
-                  <td className="px-6 py-3.5 text-xs text-emerald/60 font-mono">#{user.id}</td>
-                  <td className="px-6 py-3.5">
+                  <td className="px-3 sm:px-6 py-3.5 text-xs text-emerald/60 font-mono">#{user.id}</td>
+                  <td className="px-3 sm:px-6 py-3.5">
                     <div className="flex items-center gap-2.5">
                       <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald/10 text-xs font-bold text-emerald">
                         {user.name?.charAt(0)?.toUpperCase()}
@@ -248,11 +248,11 @@ function AdminDashboard() {
                       <span className="text-xs font-semibold">{user.name}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-3.5 text-xs text-emerald/60">{user.email}</td>
-                  <td className="px-6 py-3.5">
+                  <td className="px-3 sm:px-6 py-3.5 text-xs text-emerald/60">{user.email}</td>
+                  <td className="px-3 sm:px-6 py-3.5">
                     <code className="rounded-md bg-emerald/5 px-2 py-0.5 text-xs font-semibold text-emerald/70">{user.referralCode}</code>
                   </td>
-                  <td className="px-6 py-3.5">
+                  <td className="px-3 sm:px-6 py-3.5">
                     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${
                       user.isActive
                         ? "bg-emerald/5 text-emerald ring-emerald/20"
@@ -262,7 +262,7 @@ function AdminDashboard() {
                       {user.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-6 py-3.5 text-right text-xs text-emerald/60">
+                  <td className="px-3 sm:px-6 py-3.5 text-right text-xs text-emerald/60">
                     {new Date(user.createdAt).toLocaleDateString("en-IN")}
                   </td>
                 </tr>

@@ -144,7 +144,7 @@ function PurchasesPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-display text-4xl tracking-tight">
+          <h1 className="font-display text-3xl sm:text-4xl tracking-tight">
             <span className="italic text-gold">Purchases</span>
           </h1>
           <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">
@@ -287,13 +287,13 @@ function PurchasesPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gold/10 text-xs uppercase tracking-[0.2em] text-emerald/60">
-                  <th className="px-6 py-3 text-left font-semibold">ID</th>
-                  <th className="px-6 py-3 text-left font-semibold">User</th>
-                  <th className="px-6 py-3 text-left font-semibold">Details</th>
-                  <th className="px-6 py-3 text-right font-semibold">Amount</th>
-                  <th className="px-6 py-3 text-center font-semibold">Status</th>
-                  <th className="px-6 py-3 text-right font-semibold">Date</th>
-                  <th className="px-6 py-3 text-center font-semibold">Actions</th>
+                  <th className="px-3 sm:px-6 py-3 text-left font-semibold">ID</th>
+                  <th className="px-3 sm:px-6 py-3 text-left font-semibold">User</th>
+                  <th className="px-3 sm:px-6 py-3 text-left font-semibold">Details</th>
+                  <th className="px-3 sm:px-6 py-3 text-right font-semibold">Amount</th>
+                  <th className="px-3 sm:px-6 py-3 text-center font-semibold">Status</th>
+                  <th className="px-3 sm:px-6 py-3 text-right font-semibold">Date</th>
+                  <th className="px-3 sm:px-6 py-3 text-center font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -303,20 +303,20 @@ function PurchasesPage() {
                     className="border-b border-gold/5 transition-all duration-200 hover:bg-gold/5 cursor-pointer"
                     onClick={() => setDetail(p)}
                   >
-                    <td className="px-6 py-3.5 text-xs font-mono text-emerald/60">#{p.id}</td>
-                    <td className="px-6 py-3.5">
+                    <td className="px-3 sm:px-6 py-3.5 text-xs font-mono text-emerald/60">#{p.id}</td>
+                    <td className="px-3 sm:px-6 py-3.5">
                       <div>
                         <p className="text-xs font-semibold">{p.userName}</p>
                         <p className="text-xs text-emerald/60">{p.userEmail}</p>
                       </div>
                     </td>
-                    <td className="px-6 py-3.5 text-xs text-emerald/70">
+                    <td className="px-3 sm:px-6 py-3.5 text-xs text-emerald/70">
                       {p.carat}K • {p.weight}g
                     </td>
-                    <td className="px-6 py-3.5 text-right">
+                    <td className="px-3 sm:px-6 py-3.5 text-right">
                       <span className="text-xs font-semibold text-gold">₹{p.totalAmount?.toLocaleString("en-IN")}</span>
                     </td>
-                    <td className="px-6 py-3.5 text-center">
+                    <td className="px-3 sm:px-6 py-3.5 text-center">
                       <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${getStatusColor(p)}`}>
                         <span className={`h-1 w-1 rounded-full ${
                           p.status === "approved" && !p.stoppedAt && !p.cancelledAt ? "bg-emerald" :
@@ -325,10 +325,10 @@ function PurchasesPage() {
                         {getStatusLabel(p)}
                       </span>
                     </td>
-                    <td className="px-6 py-3.5 text-right text-xs text-emerald/60">
+                    <td className="px-3 sm:px-6 py-3.5 text-right text-xs text-emerald/60">
                       {new Date(p.createdAt).toLocaleDateString("en-IN")}
                     </td>
-                    <td className="px-6 py-3.5 text-center" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-3 sm:px-6 py-3.5 text-center" onClick={(e) => e.stopPropagation()}>
                       <div className="flex gap-1 justify-center">
                         <button
                           onClick={(e) => handleDownloadPdf(p, e)}

@@ -71,7 +71,7 @@ function AdminAnnouncementsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl">
+      <h1 className="font-display text-2xl sm:text-3xl">
         <span className="italic text-gold">Announcements</span>
       </h1>
 

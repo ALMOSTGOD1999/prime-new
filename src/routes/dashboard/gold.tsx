@@ -70,19 +70,19 @@ function GoldPricePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl">
+      <h1 className="font-display text-2xl sm:text-3xl">
         Gold <span className="italic text-gold">Price</span>
       </h1>
 
       {/* Current Price */}
       <div className="rounded border border-gold/20 bg-background p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-widest text-emerald/70">Today's Gold Rate (per gram)</p>
             {priceData?.price > 0 ? (
-              <p className="mt-2 font-display text-4xl text-gold">₹{priceData.price.toLocaleString("en-IN")}</p>
+              <p className="mt-2 font-display text-3xl sm:text-4xl text-gold">₹{priceData.price.toLocaleString("en-IN")}</p>
             ) : (
-              <p className="mt-2 font-display text-4xl text-emerald/40">Not set yet</p>
+              <p className="mt-2 font-display text-3xl sm:text-4xl text-emerald/40">Not set yet</p>
             )}
           </div>
           <button onClick={loadPrice} className="border border-emerald/40 px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10">

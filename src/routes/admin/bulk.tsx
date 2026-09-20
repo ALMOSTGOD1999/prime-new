@@ -118,7 +118,7 @@ function AdminBulkPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl">
+      <h1 className="font-display text-2xl sm:text-3xl">
         Bulk <span className="italic text-gold">Actions</span>
       </h1>
 

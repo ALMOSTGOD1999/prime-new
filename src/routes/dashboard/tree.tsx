@@ -135,7 +135,7 @@ function TreePage() {
             {viewMode === "binary" ? "Scroll to zoom, drag to pan." : "Members organized by level."}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {/* View Mode Toggle */}
           <div className="flex rounded-lg border border-gold/20 bg-background p-0.5">
             <button

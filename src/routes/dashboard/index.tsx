@@ -285,18 +285,18 @@ function DashboardIndex() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gold/10 text-xs uppercase tracking-widest text-emerald/70">
-                    <th className="px-4 py-2 text-left">Amount</th>
-                    <th className="px-4 py-2 text-left">Status</th>
-                    <th className="px-4 py-2 text-right">Date</th>
+                    <th className="px-3 sm:px-6 py-2 text-left">Amount</th>
+                    <th className="px-3 sm:px-6 py-2 text-left">Status</th>
+                    <th className="px-3 sm:px-6 py-2 text-right">Date</th>
                   </tr>
                 </thead>
                 <tbody>
                   {withdrawHistory.map((w: any) => (
                     <tr key={w.id} className="border-b border-gold/5">
-                      <td className="px-4 py-2 text-xs font-semibold text-emerald">
+                      <td className="px-3 sm:px-6 py-2 text-xs font-semibold text-emerald">
                         ₹{w.amount.toLocaleString("en-IN")}
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-3 sm:px-6 py-2">
                         <span
                           className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${
                             w.status === "approved"
@@ -309,7 +309,7 @@ function DashboardIndex() {
                           {w.status}
                         </span>
                       </td>
-                      <td className="px-4 py-2 text-right text-xs text-emerald/70">
+                      <td className="px-3 sm:px-6 py-2 text-right text-xs text-emerald/70">
                         {new Date(w.requestedAt).toLocaleDateString("en-IN")}
                       </td>
                     </tr>
@@ -335,16 +335,16 @@ function DashboardIndex() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gold/10 text-xs uppercase tracking-widest text-emerald/70">
-                  <th className="px-6 py-3 text-left">Type</th>
-                  <th className="px-6 py-3 text-left">Description</th>
-                  <th className="px-6 py-3 text-right">Amount</th>
-                  <th className="px-6 py-3 text-right">Date</th>
+                  <th className="px-3 sm:px-6 py-3 text-left">Type</th>
+                  <th className="px-3 sm:px-6 py-3 text-left">Description</th>
+                  <th className="px-3 sm:px-6 py-3 text-right">Amount</th>
+                  <th className="px-3 sm:px-6 py-3 text-right">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {income.recentIncome.map((item: any) => (
                   <tr key={item.id} className="border-b border-gold/5 transition-colors hover:bg-gold/5">
-                    <td className="px-6 py-3">
+                    <td className="px-3 sm:px-6 py-3">
                       <span
                         className={`inline-block rounded px-2 py-0.5 text-xs font-semibold uppercase ${
                           item.type === "direct"
@@ -357,11 +357,11 @@ function DashboardIndex() {
                         {item.type}
                       </span>
                     </td>
-                    <td className="px-6 py-3 text-xs text-emerald/70">{item.description}</td>
-                    <td className="px-6 py-3 text-right text-xs font-semibold text-emerald">
+                    <td className="px-3 sm:px-6 py-3 text-xs text-emerald/70">{item.description}</td>
+                    <td className="px-3 sm:px-6 py-3 text-right text-xs font-semibold text-emerald">
                       ₹{item.amount.toLocaleString("en-IN")}
                     </td>
-                    <td className="px-6 py-3 text-right text-xs text-emerald/70">
+                    <td className="px-3 sm:px-6 py-3 text-right text-xs text-emerald/70">
                       {new Date(item.createdAt).toLocaleDateString("en-IN")}
                     </td>
                   </tr>

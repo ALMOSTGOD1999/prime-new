@@ -53,7 +53,7 @@ function AdminGoldRatePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl">
+      <h1 className="font-display text-2xl sm:text-3xl">
         Gold <span className="italic text-gold">Rate</span>
       </h1>
       <p className="text-xs text-emerald/70">

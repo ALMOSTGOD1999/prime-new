@@ -109,7 +109,7 @@ function DashboardAddUser() {
   return (
     <div className="mx-auto max-w-lg space-y-6">
       <div>
-        <h1 className="font-display text-3xl">
+        <h1 className="font-display text-2xl sm:text-3xl">
           <span className="italic text-gold">Add</span> User
         </h1>
         <p className="mt-1 text-xs text-emerald/70">

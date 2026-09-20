@@ -26,7 +26,7 @@ function AdminHistory() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h1 className="font-display text-4xl tracking-tight">
+        <h1 className="font-display text-3xl sm:text-4xl tracking-tight">
           <span className="italic text-gold">Activity</span> History
         </h1>
         <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">

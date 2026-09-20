@@ -125,7 +125,7 @@ function MakePurchasePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-3xl">
+        <h1 className="font-display text-2xl sm:text-3xl">
           Make <span className="italic text-gold">Purchase</span>
         </h1>
         <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">

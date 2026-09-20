@@ -44,7 +44,7 @@ function AdminIncome() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div>
-        <h1 className="font-display text-4xl tracking-tight">
+        <h1 className="font-display text-3xl sm:text-4xl tracking-tight">
           <span className="italic text-gold">Income</span> Overview
         </h1>
         <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">All commission & award payouts</p>
@@ -102,7 +102,7 @@ function AdminIncome() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {filters.map((f) => (
           <button
             key={f.key}
@@ -130,12 +130,12 @@ function AdminIncome() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gold/10 text-xs uppercase tracking-[0.2em] text-emerald/60">
-                  <th className="px-6 py-3 text-left font-semibold">ID</th>
-                  <th className="px-6 py-3 text-left font-semibold">User</th>
-                  <th className="px-6 py-3 text-left font-semibold">Type</th>
-                  <th className="px-6 py-3 text-left font-semibold">Description</th>
-                  <th className="px-6 py-3 text-right font-semibold">Amount</th>
-                  <th className="px-6 py-3 text-right font-semibold">Date</th>
+                  <th className="px-3 sm:px-6 py-3 text-left font-semibold">ID</th>
+                  <th className="px-3 sm:px-6 py-3 text-left font-semibold">User</th>
+                  <th className="px-3 sm:px-6 py-3 text-left font-semibold">Type</th>
+                  <th className="px-3 sm:px-6 py-3 text-left font-semibold">Description</th>
+                  <th className="px-3 sm:px-6 py-3 text-right font-semibold">Amount</th>
+                  <th className="px-3 sm:px-6 py-3 text-right font-semibold">Date</th>
                 </tr>
               </thead>
               <tbody>
@@ -156,8 +156,8 @@ function AdminIncome() {
                       key={item.id}
                       className={`border-b border-gold/5 transition-all duration-200 hover:bg-gold/5 ${i % 2 === 0 ? "bg-emerald/[0.02]" : ""}`}
                     >
-                      <td className="px-6 py-3.5 font-mono text-xs text-emerald/60">#{item.id}</td>
-                      <td className="px-6 py-3.5">
+                      <td className="px-3 sm:px-6 py-3.5 font-mono text-xs text-emerald/60">#{item.id}</td>
+                      <td className="px-3 sm:px-6 py-3.5">
                         <div className="flex items-center gap-2.5">
                           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald/10 text-xs font-bold text-emerald">
                             {(item.userName || "U")?.charAt(0)?.toUpperCase()}
@@ -165,7 +165,7 @@ function AdminIncome() {
                           <span className="text-xs font-semibold">{item.userName || `User #${item.userId}`}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-3.5">
+                      <td className="px-3 sm:px-6 py-3.5">
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${
                           item.type === "direct"
                             ? "bg-emerald/5 text-emerald ring-emerald/20"
@@ -178,11 +178,11 @@ function AdminIncome() {
                           {item.type}
                         </span>
                       </td>
-                      <td className="px-6 py-3.5 text-xs text-emerald/60">{item.description}</td>
-                      <td className="px-6 py-3.5 text-right text-xs font-bold text-emerald">
+                      <td className="px-3 sm:px-6 py-3.5 text-xs text-emerald/60">{item.description}</td>
+                      <td className="px-3 sm:px-6 py-3.5 text-right text-xs font-bold text-emerald">
                         {item.amount > 0 ? `₹${item.amount.toLocaleString("en-IN")}` : "—"}
                       </td>
-                      <td className="px-6 py-3.5 text-right text-xs text-emerald/60">
+                      <td className="px-3 sm:px-6 py-3.5 text-right text-xs text-emerald/60">
                         {new Date(item.createdAt).toLocaleDateString("en-IN")}
                       </td>
                     </tr>
