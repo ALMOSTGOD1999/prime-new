@@ -5,6 +5,7 @@ import { getAdminIncome } from "../../functions/admin/income";
 import { monthlyCashbackPayout } from "../../functions/admin/cashback";
 import { processMonthlyReturns } from "../../functions/admin/investment";
 import { getTotalBusiness } from "../../functions/admin/business";
+import { DashCard } from "../../components/DashCard";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
@@ -81,14 +82,13 @@ function AdminDashboard() {
   const totalDirect = summary.find((s: any) => s.type === "direct")?.total || 0;
   const totalMatching = summary.find((s: any) => s.type === "matching")?.total || 0;
 
-  const stats = [
-    { title: "Total Users", value: String(totalUsers), gradient: "from-emerald/10 to-emerald/5", border: "border-emerald/15", iconBg: "bg-emerald/10 text-emerald", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg> },
-    { title: "Active Users", value: String(activeUsers), gradient: "from-gold/10 to-gold/5", border: "border-gold/15", iconBg: "bg-gold/10 text-gold", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg> },
-    { title: "Total Business", value: `₹${(businessData?.totalBusiness || 0).toLocaleString("en-IN")}`, gradient: "from-gold/15 to-gold/5", border: "border-gold/20", iconBg: "bg-gold/15 text-gold", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v12m-3-2.818.879.659 1.171-1.671.48-.642A3 3 0 0 1 15.96 12H18a3 3 0 0 1 3 3v.342M3 9.342A3 3 0 0 1 5.96 6H8.04c.734 0 1.413.468 1.658 1.165l.637 1.787M3 9.342V15a3 3 0 0 0 3 3h.64M12 6V3" /></svg> },
-    { title: "Purchase Business", value: `₹${(businessData?.totalPurchaseBusiness || 0).toLocaleString("en-IN")}`, gradient: "from-emerald/10 to-emerald/5", border: "border-emerald/15", iconBg: "bg-emerald/10 text-emerald", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121 0 2.09-.773 2.34-1.872l1.836-8.073a1.125 1.125 0 0 0-1.1-1.372H6.518M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75-3a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg> },
-    { title: "Direct Paid", value: `₹${totalDirect.toLocaleString("en-IN")}`, gradient: "from-emerald/10 to-emerald/5", border: "border-emerald/15", iconBg: "bg-emerald/10 text-emerald", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v12m-3-2.818.879.659 1.171-1.671.48-.642A3 3 0 0 1 15.96 12H18a3 3 0 0 1 3 3v.342M3 9.342A3 3 0 0 1 5.96 6H8.04c.734 0 1.413.468 1.658 1.165l.637 1.787M3 9.342V15a3 3 0 0 0 3 3h.64M12 6V3" /></svg> },
-    { title: "Matching Paid", value: `₹${totalMatching.toLocaleString("en-IN")}`, gradient: "from-gold/10 to-gold/5", border: "border-gold/15", iconBg: "bg-gold/10 text-gold", icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg> },
-  ];
+  const gradients = {
+    pink: "from-rose-400 to-pink-500",
+    green: "from-emerald-400 to-green-500",
+    blue: "from-sky-400 to-blue-500",
+    orange: "from-amber-400 to-orange-500",
+    red: "from-red-400 to-rose-500",
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -109,24 +109,82 @@ function AdminDashboard() {
         </Link>
       </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {stats.map((stat, i) => (
-          <div
-            key={stat.title}
-            className={`group relative overflow-hidden rounded-xl border ${stat.border} bg-gradient-to-br ${stat.gradient} p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5`}
-            style={{ animationDelay: `${i * 80}ms` }}
-          >
-            <div className="flex items-start justify-between">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald/70">{stat.title}</p>
-              <div className={`rounded-lg p-2 ${stat.iconBg} transition-transform duration-300 group-hover:scale-110`}>
-                {stat.icon}
-              </div>
-            </div>
-            <p className="mt-3 font-display text-3xl tracking-tight">{stat.value}</p>
-            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
-          </div>
-        ))}
+      {/* Stat Cards - Row 1: Users + Business */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <DashCard
+          title="Total Users"
+          value={String(totalUsers)}
+          gradient={gradients.pink}
+          icon="👥"
+          details={<>
+            <p>Active: {activeUsers}</p>
+            <p>Inactive: {totalUsers - activeUsers}</p>
+          </>}
+        />
+        <DashCard
+          title="Total Business"
+          value={`₹${(businessData?.totalBusiness || 0).toLocaleString("en-IN")}`}
+          gradient={gradients.green}
+          icon="💰"
+          details={<>
+            <p>Purchase business: ₹{(businessData?.totalPurchaseBusiness || 0).toLocaleString("en-IN")}</p>
+            <p>Total volume from all sources</p>
+          </>}
+        />
+        <DashCard
+          title="Purchase Business"
+          value={`₹${(businessData?.totalPurchaseBusiness || 0).toLocaleString("en-IN")}`}
+          gradient={gradients.blue}
+          icon="🛍"
+          details={<>
+            <p>Gold/jewellery purchase volume</p>
+            <p>All approved purchases included</p>
+          </>}
+        />
+        <DashCard
+          title="Active Users"
+          value={String(activeUsers)}
+          gradient={gradients.orange}
+          icon="✅"
+          details={<>
+            <p>Accounts with active status</p>
+            <p>Eligible for matching income</p>
+          </>}
+        />
+      </div>
+
+      {/* Stat Cards - Row 2: Income */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <DashCard
+          title="Direct Paid"
+          value={`₹${totalDirect.toLocaleString("en-IN")}`}
+          gradient={gradients.red}
+          icon="💸"
+          details={<>
+            <p>Total direct referral commissions paid</p>
+            <p>Percentage of referred user purchases</p>
+          </>}
+        />
+        <DashCard
+          title="Matching Paid"
+          value={`₹${totalMatching.toLocaleString("en-IN")}`}
+          gradient={gradients.blue}
+          icon="🤝"
+          details={<>
+            <p>Total binary matching commissions paid</p>
+            <p>Based on weaker leg pair matching</p>
+          </>}
+        />
+        <DashCard
+          title="Total Income Paid"
+          value={`₹${(totalDirect + totalMatching).toLocaleString("en-IN")}`}
+          gradient={gradients.green}
+          icon="📊"
+          details={<>
+            <p>Direct: ₹${totalDirect.toLocaleString("en-IN")}</p>
+            <p>Matching: ₹${totalMatching.toLocaleString("en-IN")}</p>
+          </>}
+        />
       </div>
 
       {/* Monthly Cashback Payout */}
