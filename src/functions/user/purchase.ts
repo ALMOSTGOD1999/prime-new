@@ -5,7 +5,8 @@ import { eq, and, sql, desc } from "drizzle-orm";
 import { getCookie } from "@tanstack/react-start/server";
 
 const MIN_PURCHASE = 10000;
-const GST_PCT = 18;
+const CGST_PCT = 9;
+const SGST_PCT = 9;
 const HALLMARK_CHARGES = 500;
 const MAKING_CHARGES_PCT = 8; // 8% of gold value
 
@@ -31,7 +32,7 @@ async function getLatestGoldRate(): Promise<number> {
 }
 
 // ── Compute billing from carat + weight ──
-function computeBilling(carat: number, weight: number, goldRatePerGram: number) {
+function computeBilling(carat: number, weight: number, goldRatePerGram: number, additionalCharges: number = 0) {
   // Carat adjustment: 24K = 100%, 22K = 91.67%, 18K = 75%
   const purityMap: Record<number, number> = { 24: 1.0, 22: 0.9167, 18: 0.75 };
   const purity = purityMap[carat];
@@ -41,8 +42,10 @@ function computeBilling(carat: number, weight: number, goldRatePerGram: number) 
   const goldValue = effectiveRate * weight;
   const makingCharges = Math.round(goldValue * MAKING_CHARGES_PCT / 100);
   const subtotal = goldValue + makingCharges;
-  const gst = Math.round(subtotal * GST_PCT / 100);
-  const total = Math.round(subtotal + gst + HALLMARK_CHARGES);
+  const cgst = Math.round(subtotal * CGST_PCT / 100);
+  const sgst = Math.round(subtotal * SGST_PCT / 100);
+  const gst = cgst + sgst;
+  const total = Math.round(subtotal + gst + HALLMARK_CHARGES + additionalCharges);
 
   return {
     carat,
@@ -51,7 +54,10 @@ function computeBilling(carat: number, weight: number, goldRatePerGram: number) 
     effectiveRate: Math.round(effectiveRate),
     goldValue: Math.round(goldValue),
     makingCharges,
+    cgst,
+    sgst,
     gst,
+    additionalCharges,
     hallmarkCharges: HALLMARK_CHARGES,
     total,
   };
@@ -87,20 +93,21 @@ async function findPackage(totalAmount: number) {
 
 // ── User: Preview billing (dry run) ──
 export const previewPurchase = createServerFn({ method: "POST" })
-  .validator((data: { carat: number; weight: number }) => data)
+  .validator((data: { carat: number; weight: number; additionalCharges?: number }) => data)
   .handler(async ({ data }) => {
-    const { carat, weight } = data;
+    const { carat, weight, additionalCharges = 0 } = data;
     if (!weight || weight <= 0) throw new Error("Invalid weight");
     if (![18, 22, 24].includes(carat)) throw new Error("Invalid carat. Must be 18, 22, or 24.");
 
     const goldRate = await getLatestGoldRate();
-    const billing = computeBilling(carat, weight, goldRate);
+    const billing = computeBilling(carat, weight, goldRate, additionalCharges);
 
     if (billing.total < MIN_PURCHASE) {
       throw new Error(`Minimum purchase is ₹${MIN_PURCHASE.toLocaleString("en-IN")}. Current total: ₹${billing.total.toLocaleString("en-IN")}`);
     }
 
     const pkg = await findPackage(billing.total);
+    if (!pkg) throw new Error("No matching package found");
     const monthlyReturn = Math.round(billing.total * pkg.monthlyReturnPct / 100);
 
     return {
@@ -113,22 +120,23 @@ export const previewPurchase = createServerFn({ method: "POST" })
 
 // ── User: Confirm purchase (auto-approved) ──
 export const confirmPurchase = createServerFn({ method: "POST" })
-  .validator((data: { carat: number; weight: number }) => data)
+  .validator((data: { carat: number; weight: number; additionalCharges?: number }) => data)
   .handler(async ({ data }) => {
     const userId = await getUserId();
-    const { carat, weight } = data;
+    const { carat, weight, additionalCharges = 0 } = data;
 
     if (!weight || weight <= 0) throw new Error("Invalid weight");
     if (![18, 22, 24].includes(carat)) throw new Error("Invalid carat. Must be 18, 22, or 24.");
 
     const goldRate = await getLatestGoldRate();
-    const billing = computeBilling(carat, weight, goldRate);
+    const billing = computeBilling(carat, weight, goldRate, additionalCharges);
 
     if (billing.total < MIN_PURCHASE) {
       throw new Error(`Minimum purchase is ₹${MIN_PURCHASE.toLocaleString("en-IN")}`);
     }
 
     const pkg = await findPackage(billing.total);
+    if (!pkg) throw new Error("No matching package found");
     const monthlyReturnAmount = Math.round(billing.total * pkg.monthlyReturnPct / 100);
 
     // Create purchase record (auto-approved)
@@ -142,6 +150,9 @@ export const confirmPurchase = createServerFn({ method: "POST" })
         goldValue: billing.goldValue,
         makingCharges: billing.makingCharges,
         gst: billing.gst,
+        cgst: billing.cgst,
+        sgst: billing.sgst,
+        additionalCharges: billing.additionalCharges,
         hallmarkCharges: billing.hallmarkCharges,
         totalAmount: billing.total,
         status: "approved",

@@ -17,6 +17,9 @@ export interface PurchaseBillData {
   goldValue?: number;
   makingCharges?: number;
   gst?: number;
+  cgst?: number;
+  sgst?: number;
+  additionalCharges?: number;
   hallmarkCharges?: number;
   totalAmount: number;
   status: string;
@@ -42,6 +45,28 @@ function formatDate(iso: string): string {
   return `${day}/${month}/${year}`;
 }
 
+// ── Draw logo (two diamonds + PRIME text) ──
+function drawLogo(doc: jsPDF, cx: number, cy: number, scale: number = 1) {
+  const s = scale;
+  doc.setDrawColor(...GOLD);
+  doc.setLineWidth(1.8 * s);
+  doc.setLineJoin("round");
+
+  // Left diamond
+  const lcx = cx - 10 * s;
+  doc.line(lcx, cy - 12 * s, lcx + 10 * s, cy);
+  doc.line(lcx + 10 * s, cy, lcx, cy + 12 * s);
+  doc.line(lcx, cy + 12 * s, lcx - 10 * s, cy);
+  doc.line(lcx - 10 * s, cy, lcx, cy - 12 * s);
+
+  // Right diamond
+  const rcx = cx + 10 * s;
+  doc.line(rcx, cy - 12 * s, rcx + 10 * s, cy);
+  doc.line(rcx + 10 * s, cy, rcx, cy + 12 * s);
+  doc.line(rcx, cy + 12 * s, rcx - 10 * s, cy);
+  doc.line(rcx - 10 * s, cy, rcx, cy - 12 * s);
+}
+
 // ── Main generator ──
 export function generatePurchaseBill(data: PurchaseBillData): void {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
@@ -61,27 +86,25 @@ export function generatePurchaseBill(data: PurchaseBillData): void {
   doc.setFillColor(...LIGHT_GOLD);
   doc.rect(12, 12, pageW - 24, 297 - 24, "F");
 
-  // ── Top gold banner ──
+  // ── Top gold banner with logo ──
   doc.setFillColor(...GOLD);
-  doc.rect(12, 12, pageW - 24, 28, "F");
-  y = 22;
+  doc.rect(12, 12, pageW - 24, 30, "F");
+  y = 24;
 
-  // ── Company name ──
+  // Draw logo diamonds
+  drawLogo(doc, pageW / 2 - 28, y + 2, 0.8);
+
+  // Company name next to logo
   doc.setTextColor(...WHITE);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(28);
-  doc.text("PRIME", pageW / 2, y + 2, { align: "center" });
+  doc.setFontSize(24);
+  doc.text("PRIME", pageW / 2 + 4, y);
 
-  doc.setFontSize(9);
+  doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
-  doc.text("JEWELLERY & INVESTMENTS", pageW / 2, y + 9, { align: "center" });
+  doc.text("JEWELLERY & INVESTMENTS", pageW / 2 + 4, y + 6);
 
-  // ── Gold decorative line ──
-  doc.setDrawColor(...NAVY);
-  doc.setLineWidth(0.3);
-  doc.line(margin + 30, y + 14, pageW - margin - 30, y + 14);
-
-  y = 46;
+  y = 48;
 
   // ── Invoice title bar ──
   doc.setFillColor(...NAVY);
@@ -168,9 +191,11 @@ export function generatePurchaseBill(data: PurchaseBillData): void {
   if (data.weight) rows.push([`Weight`, `${data.weight}g`]);
   if (data.goldRatePerGram) rows.push([`Gold Rate per Gram`, formatINR(data.goldRatePerGram)]);
   if (data.goldValue) rows.push([`Gold Value`, formatINR(data.goldValue)]);
-  if (data.makingCharges) rows.push([`Making Charges (8%)`, formatINR(data.makingCharges)]);
-  if (data.gst) rows.push([`GST (18%)`, formatINR(data.gst)]);
+  if (data.makingCharges) rows.push([`Making Charges (${8}%)`, formatINR(data.makingCharges)]);
+  if (data.cgst) rows.push([`CGST (${9}%)`, formatINR(data.cgst)]);
+  if (data.sgst) rows.push([`SGST (${9}%)`, formatINR(data.sgst)]);
   if (data.hallmarkCharges) rows.push([`Hallmark Charges`, formatINR(data.hallmarkCharges)]);
+  if (data.additionalCharges && data.additionalCharges > 0) rows.push([`Additional Charges`, formatINR(data.additionalCharges)]);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
@@ -206,6 +231,26 @@ export function generatePurchaseBill(data: PurchaseBillData): void {
   doc.setFontSize(13);
   doc.text(formatINR(data.totalAmount), pageW - margin - 10, y + 8, { align: "right" });
   y += 18;
+
+  // ── Tax summary box ──
+  if (data.cgst || data.sgst) {
+    doc.setFillColor(...WHITE);
+    doc.setDrawColor(...GOLD);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(margin + 4, y, contentW - 8, 14, 1, 1, "FD");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(...NAVY);
+    doc.text("TAX SUMMARY", margin + 8, y + 5);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...GRAY);
+    if (data.cgst) doc.text(`CGST @9%: ${formatINR(data.cgst)}`, margin + 8, y + 11);
+    if (data.sgst) doc.text(`SGST @9%: ${formatINR(data.sgst)}`, pageW / 2, y + 11);
+    y += 18;
+  }
 
   // ── Investment returns box ──
   if (data.monthlyReturnAmount) {

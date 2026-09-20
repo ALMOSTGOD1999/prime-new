@@ -10,6 +10,7 @@ export const Route = createFileRoute("/dashboard/purchase")({
 function PurchasePage() {
   const [carat, setCarat] = useState<18 | 22 | 24>(22);
   const [weight, setWeight] = useState("");
+  const [additionalCharges, setAdditionalCharges] = useState("");
   const [preview, setPreview] = useState<any>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -36,9 +37,10 @@ function PurchasePage() {
   const handlePreview = async () => {
     const w = parseFloat(weight);
     if (!w || w <= 0) return alert("Enter a valid weight in grams");
+    const addl = parseFloat(additionalCharges) || 0;
     setPreviewLoading(true);
     try {
-      const data = await previewPurchase({ data: { carat, weight: w } });
+      const data = await previewPurchase({ data: { carat, weight: w, additionalCharges: addl } });
       setPreview(data);
     } catch (err: any) {
       alert(err.message || "Failed to compute billing");
@@ -52,9 +54,10 @@ function PurchasePage() {
     if (!w || w <= 0) return alert("Enter a valid weight in grams");
     if (!confirm("Are you sure you want to confirm this purchase?")) return;
 
+    const addl = parseFloat(additionalCharges) || 0;
     setConfirmLoading(true);
     try {
-      const result = await confirmPurchase({ data: { carat, weight: w } });
+      const result = await confirmPurchase({ data: { carat, weight: w, additionalCharges: addl } });
       alert(`Purchase successful! ID: #${result.purchaseId}\nTotal: ₹${result.totalAmount.toLocaleString("en-IN")}\nMonthly Return: ₹${result.monthlyReturnAmount.toLocaleString("en-IN")}`);
       // Auto-generate PDF bill
       try {
@@ -66,6 +69,9 @@ function PurchasePage() {
           goldValue: preview?.goldValue,
           makingCharges: preview?.makingCharges,
           gst: preview?.gst,
+          cgst: preview?.cgst,
+          sgst: preview?.sgst,
+          additionalCharges: preview?.additionalCharges,
           hallmarkCharges: preview?.hallmarkCharges,
           totalAmount: result.totalAmount,
           status: "approved",
@@ -76,6 +82,7 @@ function PurchasePage() {
         });
       } catch { /* PDF generation is best-effort */ }
       setWeight("");
+      setAdditionalCharges("");
       setPreview(null);
       setActiveTab("history");
       await loadHistory();
@@ -112,6 +119,9 @@ function PurchasePage() {
         goldValue: p.goldValue,
         makingCharges: p.makingCharges,
         gst: p.gst,
+        cgst: p.cgst,
+        sgst: p.sgst,
+        additionalCharges: p.additionalCharges,
         hallmarkCharges: p.hallmarkCharges,
         totalAmount: p.totalAmount,
         status: p.status,
@@ -185,28 +195,44 @@ function PurchasePage() {
             </div>
           </div>
 
-          {/* Weight Input */}
+          {/* Weight + Additional Charges Input */}
           <div className="rounded border border-gold/20 bg-background p-6">
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Weight (grams)</h3>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <input
-                type="number"
-                step="0.1"
-                min="0.5"
-                value={weight}
-                onChange={(e) => { setWeight(e.target.value); setPreview(null); }}
-                placeholder="Enter weight in grams"
-                className="flex-1 border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/60 focus:border-gold"
-              />
-              <button
-                onClick={handlePreview}
-                disabled={previewLoading || !weight}
-                className="border border-emerald/40 px-6 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10 disabled:opacity-50"
-              >
-                {previewLoading ? "Computing..." : "Preview Billing"}
-              </button>
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gold">Purchase Details</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="mb-2 block text-xs uppercase tracking-widest text-emerald/70">Weight (grams)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0.5"
+                  value={weight}
+                  onChange={(e) => { setWeight(e.target.value); setPreview(null); }}
+                  placeholder="Enter weight in grams"
+                  className="w-full border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/60 focus:border-gold"
+                />
+              </div>
+              <div>
+                <label className="mb-2 block text-xs uppercase tracking-widest text-emerald/70">Additional Charges (₹) <span className="text-emerald/40 normal-case">optional</span></label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={additionalCharges}
+                  onChange={(e) => { setAdditionalCharges(e.target.value); setPreview(null); }}
+                  placeholder="0"
+                  className="w-full border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/60 focus:border-gold"
+                />
+                <p className="mt-1 text-xs text-emerald/50">Any extra charges (stone charges, labour, etc.)</p>
+              </div>
             </div>
             <p className="mt-2 text-xs text-emerald/50">Minimum purchase: ₹10,000</p>
+            <button
+              onClick={handlePreview}
+              disabled={previewLoading || !weight}
+              className="mt-4 border border-emerald/40 px-6 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10 disabled:opacity-50"
+            >
+              {previewLoading ? "Computing..." : "Preview Billing"}
+            </button>
           </div>
 
           {/* Billing Preview */}
@@ -236,13 +262,23 @@ function PurchasePage() {
                   <span className="font-semibold">₹{preview.makingCharges.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-emerald/70">GST (18%)</span>
-                  <span className="font-semibold">₹{preview.gst.toLocaleString("en-IN")}</span>
+                  <span className="text-emerald/70">CGST (9%)</span>
+                  <span className="font-semibold">₹{(preview.cgst || 0).toLocaleString("en-IN")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-emerald/70">SGST (9%)</span>
+                  <span className="font-semibold">₹{(preview.sgst || 0).toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-emerald/70">Hallmark</span>
                   <span className="font-semibold">₹{preview.hallmarkCharges.toLocaleString("en-IN")}</span>
                 </div>
+                {(preview.additionalCharges || 0) > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-emerald/70">Additional Charges</span>
+                    <span className="font-semibold">₹{preview.additionalCharges.toLocaleString("en-IN")}</span>
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-gold/20 pt-4">
