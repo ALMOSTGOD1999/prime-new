@@ -2,10 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getDashboard } from "../../functions/user/dashboard";
 import { requestWithdrawal, getWithdrawals, getWithdrawalInfo } from "../../functions/user/withdraw";
-import { getLegBalance } from "../../functions/user/legbalance";
 import { getRankInfo } from "../../functions/user/rank";
 import { getTeamStats } from "../../functions/user/tree";
-import { activateDailyReward, getDailyActivationStatus } from "../../functions/user/daily-activation";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardIndex,
@@ -15,16 +13,12 @@ function DashboardIndex() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState<"" | "left" | "right">("");
-  // Withdrawal state
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [withdrawHistory, setWithdrawHistory] = useState<any[]>([]);
   const [withdrawInfo, setWithdrawInfo] = useState<any>(null);
-  const [legBalance, setLegBalance] = useState<any>(null);
   const [rankInfo, setRankInfo] = useState<any>(null);
   const [teamStats, setTeamStats] = useState<any>(null);
-  const [dailyActivation, setDailyActivation] = useState<any>(null);
-  const [dailyActivationLoading, setDailyActivationLoading] = useState(false);
 
   useEffect(() => {
     getDashboard()
@@ -37,17 +31,11 @@ function DashboardIndex() {
     getWithdrawals()
       .then((d) => setWithdrawHistory(d.withdrawals || []))
       .catch(() => {});
-    getLegBalance()
-      .then(setLegBalance)
-      .catch(() => {});
     getRankInfo()
       .then(setRankInfo)
       .catch(() => {});
     getTeamStats()
       .then(setTeamStats)
-      .catch(() => {});
-    getDailyActivationStatus()
-      .then(setDailyActivation)
       .catch(() => {});
   }, []);
 
@@ -56,24 +44,6 @@ function DashboardIndex() {
     navigator.clipboard.writeText(url);
     setCopied(leg);
     setTimeout(() => setCopied(""), 2000);
-  };
-
-  const handleDailyActivation = async () => {
-    setDailyActivationLoading(true);
-    try {
-      const result = await activateDailyReward();
-      alert(`Daily activation successful! ₹${result.rewardAmount} credited to your income wallet.`);
-      // Refresh daily activation status
-      const status = await getDailyActivationStatus();
-      setDailyActivation(status);
-      // Refresh dashboard data
-      const dashData = await getDashboard();
-      setData(dashData);
-    } catch (err: any) {
-      alert(err.message || "Daily activation failed");
-    } finally {
-      setDailyActivationLoading(false);
-    }
   };
 
   const handleWithdraw = async () => {
@@ -87,7 +57,6 @@ function DashboardIndex() {
       const result = await requestWithdrawal({ data: { amount } });
       alert(`Withdrawal requested! Remaining balance: ₹${result.remainingBalance.toLocaleString("en-IN")}`);
       setWithdrawAmount("");
-      // Refresh data
       const [dashData, histData] = await Promise.all([getDashboard(), getWithdrawals()]);
       setData(dashData);
       setWithdrawHistory(histData.withdrawals || []);
@@ -130,7 +99,7 @@ function DashboardIndex() {
           <h1 className="font-display text-2xl sm:text-3xl">
             Welcome, <span className="italic text-gold">{user.name}</span>
           </h1>
-          <p className="mt-1 text-xs sm:text-xs uppercase tracking-widest text-emerald/70">
+          <p className="mt-1 text-xs uppercase tracking-widest text-emerald/70">
             Member since {new Date(user.createdAt).toLocaleDateString("en-IN")}
           </p>
         </div>
@@ -158,11 +127,11 @@ function DashboardIndex() {
         </div>
       </div>
 
-      {/* Gradient stat cards — 4 rows matching reference */}
+      {/* Gradient stat cards */}
       {teamStats && (
         <>
           {/* Row 1: Team counts */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <DashCard title="Total Downline" value={teamStats.totalTeam ?? 0} gradient={gradients.pink} icon="🛍" details={<>
               <p>Active: {teamStats.activeTeam ?? 0}</p>
               <p>Inactive: {(teamStats.totalTeam ?? 0) - (teamStats.activeTeam ?? 0)}</p>
@@ -177,7 +146,7 @@ function DashboardIndex() {
               <p>Active: {teamStats.teamLeftActive ?? 0}</p>
               <p>Business: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}</p>
             </>} />
-            <DashCard title={`Team Right : ${teamStats.teamRight ?? 0}`} value={`Team Right Active : ${teamStats.teamRightActive ?? 0}`} gradient={gradients.orange} icon="📊" details={<>
+            <DashCard title={`Team Right: ${teamStats.teamRight ?? 0}`} value={`Team Right Active: ${teamStats.teamRightActive ?? 0}`} gradient={gradients.orange} icon="📊" details={<>
               <p>Total members: {teamStats.teamRight ?? 0}</p>
               <p>Active: {teamStats.teamRightActive ?? 0}</p>
               <p>Business: ₹{(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}</p>
@@ -185,17 +154,17 @@ function DashboardIndex() {
           </div>
 
           {/* Row 2: Left business */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <DashCard title="Total Business Team Left" value={`₹${(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="📊" details={<>
               <p>Total business volume from left leg members</p>
               <p>Active business: ₹{(teamStats.teamBusinessLeftActive ?? 0).toLocaleString("en-IN")}</p>
             </>} />
-            <DashCard title="Team Business left Active" value={`₹${(teamStats.teamBusinessLeftActive ?? 0).toLocaleString("en-IN")}`} gradient={gradients.blue} icon="📊" details={<>
+            <DashCard title="Team Business Left Active" value={`₹${(teamStats.teamBusinessLeftActive ?? 0).toLocaleString("en-IN")}`} gradient={gradients.blue} icon="📊" details={<>
               <p>Only active members who have made purchases</p>
               <p>Gold/Platinum: ₹{(teamStats.teamBusinessLeftGold ?? 0).toLocaleString("en-IN")}</p>
             </>} />
-            <DashCard title="Team Business left Gold" value={`₹${(teamStats.teamBusinessLeftGold ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" details={<>
-              <p>Purchase volume from Gold & Platinum ranked members</p>
+            <DashCard title="Team Business Left Gold" value={`₹${(teamStats.teamBusinessLeftGold ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" details={<>
+              <p>Purchase volume from Gold and Platinum ranked members</p>
               <p>Total left business: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}</p>
             </>} />
             <DashCard title="Total Business Team Right" value={`₹${(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="📊" details={<>
@@ -205,13 +174,13 @@ function DashboardIndex() {
           </div>
 
           {/* Row 3: Right business + cashback + awards */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <DashCard title="Total Right Business joining" value={`₹${(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" details={<>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <DashCard title="Total Right Business Joining" value={`₹${(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" details={<>
               <p>Joining and purchase amount from right leg</p>
               <p>Gold/Platinum: ₹{(teamStats.teamBusinessRightGold ?? 0).toLocaleString("en-IN")}</p>
             </>} />
             <DashCard title="Team Business Right Gold" value={`₹${(teamStats.teamBusinessRightGold ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="📊" details={<>
-              <p>Purchase volume from Gold & Platinum ranked members</p>
+              <p>Purchase volume from Gold and Platinum ranked members</p>
               <p>Total right business: ₹{(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}</p>
             </>} />
             <DashCard title="Cash Back Income" value={`₹${(income.cashbackBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="📊" details={<>
@@ -220,13 +189,14 @@ function DashboardIndex() {
             </>} />
             <DashCard title="Joining Awards" value={income.awards?.length ?? 0} gradient={gradients.blue} icon="📊" details={<>
               <p>Milestone rewards for pair matching</p>
-              <p>Bag at 100 · Phone at 500 · Laptop at 1000</p>
-              <p>Scooty at 2000 · Car at 10000</p>
+              <p>Bag at 100 pairs · Phone at 500</p>
+              <p>Laptop at 1000 · Scooty at 2000</p>
+              <p>Car at 10000 pairs</p>
             </>} />
           </div>
 
           {/* Row 4: Ratio, Rank, Matching */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <DashCard title="60 : 40 Ratio" value={`${(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")} : ${(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="📊" details={<>
               <p>Left business volume vs Right business volume</p>
               <p>Income calculated on the weaker leg (60:40 split)</p>
@@ -245,60 +215,13 @@ function DashboardIndex() {
         </>
       )}
 
-      {/* Daily ID Activation Reward */}
-      {user.isActive && dailyActivation && (
-        <div className="rounded border border-gold/20 bg-background p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Daily ID Activation</h3>
-              <p className="mt-1 text-xs text-emerald/70">
-                Activate your ID daily between 12:00 PM — 12:00 AM IST to earn ₹100 reward.
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-xs text-emerald/60">Today's Reward</p>
-                <p className="font-display text-lg text-gold">₹{dailyActivation.rewardAmount}</p>
-              </div>
-              <button
-                onClick={handleDailyActivation}
-                disabled={dailyActivationLoading || dailyActivation.activatedToday || !dailyActivation.isWithdrawalTime}
-                className={`whitespace-nowrap px-6 py-2 text-xs font-semibold uppercase tracking-widest transition-all ${
-                  dailyActivation.activatedToday
-                    ? "bg-emerald/20 text-emerald cursor-not-allowed"
-                    : dailyActivation.isWithdrawalTime
-                      ? "bg-gold text-cream hover:bg-emerald"
-                      : "bg-emerald/20 text-emerald cursor-not-allowed"
-                }`}
-              >
-                {dailyActivationLoading
-                  ? "Processing..."
-                  : dailyActivation.activatedToday
-                    ? "✓ Activated Today"
-                    : dailyActivation.isWithdrawalTime
-                      ? "Activate Now"
-                      : `Opens at ${dailyActivation.nextActivationTime}`}
-              </button>
-            </div>
-          </div>
-          {!dailyActivation.isWithdrawalTime && !dailyActivation.activatedToday && (
-            <p className="mt-3 text-xs text-gold">
-              ⏰ Withdrawal window: 12:00 PM — 12:00 AM IST daily
-            </p>
-          )}
-        </div>
-      )}
-
+      {/* Account Inactive */}
       {!user.isActive && (
         <div className="rounded border-2 border-gold/40 bg-gold/5 p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="font-display text-xl text-gold">Account Inactive</h3>
-              <p className="mt-1 text-xs text-emerald/60">
-                Contact admin to activate your account and unlock binary matching income.
-              </p>
-            </div>
-          </div>
+          <h3 className="font-display text-xl text-gold">Account Inactive</h3>
+          <p className="mt-1 text-xs text-emerald/60">
+            Contact admin to activate your account and unlock binary matching income.
+          </p>
         </div>
       )}
 
@@ -317,7 +240,7 @@ function DashboardIndex() {
         </div>
       </div>
 
-      {/* Withdrawal Section — from Income Wallet only */}
+      {/* Withdrawal Section */}
       <div className="rounded border border-gold/20 bg-background p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -455,7 +378,7 @@ function DashboardIndex() {
           className="block rounded border border-gold/20 bg-background p-6 text-center transition-colors hover:border-gold/40"
         >
           <p className="text-xs font-semibold uppercase tracking-widest text-gold">Admin Panel</p>
-          <p className="mt-1 text-xs text-emerald/60">Manage users, purchases & more</p>
+          <p className="mt-1 text-xs text-emerald/60">Manage users, purchases and more</p>
         </Link>
       )}
     </div>
@@ -488,7 +411,10 @@ function DashCard({
       <p className="mt-1 text-xs font-semibold opacity-90">{title}</p>
       {details && (
         <>
-          <div className="mt-3 border-t border-white/20 pt-2" onClick={() => setExpanded(!expanded)} role="button">
+          <div
+            className="mt-3 cursor-pointer border-t border-white/20 pt-2"
+            onClick={() => setExpanded(!expanded)}
+          >
             <p className="text-[10px] font-semibold uppercase tracking-wider opacity-80">
               {expanded ? "Less info ↑" : "More info →"}
             </p>
