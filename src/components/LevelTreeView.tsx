@@ -36,7 +36,7 @@ export function LevelTreeView({ levels, rootId, startExpanded = false }: { level
     return (
       <div className="rounded-lg border border-gold/15 bg-card p-12 text-center">
         <p className="text-4xl">🌳</p>
-        <p className="mt-3 text-sm text-emerald/60">No team data yet. Share your referral code to start building!</p>
+        <p className="mt-3 text-xs text-emerald/60">No team data yet. Share your referral code to start building!</p>
       </div>
     );
   }
@@ -47,10 +47,10 @@ export function LevelTreeView({ levels, rootId, startExpanded = false }: { level
     <div className="space-y-4">
       {/* Summary */}
       <div className="flex flex-wrap items-center gap-3">
-        <span className="rounded-full bg-emerald/10 px-3 py-1 text-xs font-semibold text-emerald">
+        <span className="rounded-full bg-emerald/10 px-3 py-1 text-[10px] font-semibold text-emerald">
           {totalMembers} total members
         </span>
-        <span className="rounded-full bg-gold/10 px-3 py-1 text-xs font-semibold text-gold">
+        <span className="rounded-full bg-gold/10 px-3 py-1 text-[10px] font-semibold text-gold">
           {levels.length} levels deep
         </span>
       </div>
@@ -68,23 +68,23 @@ export function LevelTreeView({ levels, rootId, startExpanded = false }: { level
               className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-gold/5"
             >
               <div className="flex items-center gap-3">
-                <span className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
+                <span className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold ${
                   levelIdx === 0 ? "bg-gold text-cream" : "bg-emerald/10 text-emerald"
                 }`}>
-                  L{levelIdx + 1}
+                  L{levelIdx}
                 </span>
                 <div className="text-left">
-                  <p className="text-sm font-semibold">
-                    Level {levelIdx + 1}
+                  <p className="text-xs font-semibold">
+                    Level {levelIdx === 0 ? "0 (You)" : levelIdx}
                   </p>
-                  <p className="text-xs text-emerald/60">
+                  <p className="text-[10px] text-emerald/60">
                     {levelUsers.length} member{levelUsers.length !== 1 ? "s" : ""}
                     {levelIdx > 0 && ` · ${activeCount} active`}
                   </p>
                 </div>
               </div>
               <svg
-                className={`h-5 w-5 text-emerald/40 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                className={`h-4 w-4 text-emerald/40 transition-transform ${isExpanded ? "rotate-180" : ""}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -109,7 +109,7 @@ export function LevelTreeView({ levels, rootId, startExpanded = false }: { level
                       }`}
                     >
                       {/* Avatar */}
-                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold ring-1 ${
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ring-1 ${
                         user.id === rootId
                           ? "bg-gold/20 text-gold ring-gold/30"
                           : "bg-gradient-to-br from-emerald/10 to-emerald/5 text-emerald ring-emerald/15"
@@ -119,11 +119,11 @@ export function LevelTreeView({ levels, rootId, startExpanded = false }: { level
 
                       {/* Info */}
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold">{user.name}</p>
+                        <p className="truncate text-xs font-semibold">{user.name}</p>
                         <div className="flex items-center gap-1.5">
-                          <code className="text-xs font-mono text-emerald/50">{user.referralCode}</code>
+                          <code className="text-[9px] font-mono text-emerald/50">{user.referralCode}</code>
                           {user.position && (
-                            <span className="text-xs text-emerald/40">
+                            <span className="text-[9px] text-emerald/40">
                               {user.position === "left" ? "←L" : "→R"}
                             </span>
                           )}
@@ -132,13 +132,13 @@ export function LevelTreeView({ levels, rootId, startExpanded = false }: { level
 
                       {/* Status */}
                       <div className="flex shrink-0 flex-col items-end gap-1">
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                        <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[7px] font-semibold ${
                           user.isActive ? "bg-emerald/10 text-emerald-700" : "bg-destructive/10 text-red-500"
                         }`}>
                           <span className={`mr-0.5 h-1 w-1 rounded-full ${user.isActive ? "bg-emerald-500" : "bg-red-400"}`} />
                           {user.isActive ? "Active" : "Inact"}
                         </span>
-                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset ${
+                        <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[7px] font-semibold ring-1 ring-inset ${
                           rankColors[user.rank] || "bg-slate-50 text-slate-600 ring-slate-200"
                         }`}>
                           {user.rank}
