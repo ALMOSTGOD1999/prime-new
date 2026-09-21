@@ -109,7 +109,7 @@ export async function generatePurchaseBill(data: PurchaseBillData): Promise<void
 
   doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
-  doc.text("JEWELLERY & INVESTMENTS", pageW / 2 + 4, y + 6);
+  doc.text("JEWELLERY", pageW / 2 + 4, y + 6);
 
   y = 48;
 
@@ -238,11 +238,11 @@ export async function generatePurchaseBill(data: PurchaseBillData): Promise<void
   doc.setFillColor(...GOLD);
   doc.roundedRect(margin + 4, y, contentW - 8, 12, 1.5, 1.5, "F");
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
+  doc.setFontSize(10);
   doc.setTextColor(...WHITE);
   doc.text("TOTAL AMOUNT", margin + 10, y + 8);
-  doc.setFontSize(12);
-  doc.text(formatINR(data.totalAmount), pageW - margin - 4, y + 8, { align: "right" });
+  doc.setFontSize(11);
+  doc.text(formatINR(data.totalAmount), pageW - margin - 6, y + 8, { align: "right" });
   y += 18;
 
   // ── Tax summary box ──
