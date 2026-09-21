@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { previewPurchase, confirmPurchase, getMyPurchases } from "../../functions/user/purchase";
 import { generatePurchaseBill, type PurchaseBillData } from "../../lib/pdf-bill";
+import { getMe } from "../../functions/auth/me";
 
 export const Route = createFileRoute("/dashboard/purchase")({
   component: PurchasePage,
@@ -18,9 +19,11 @@ function PurchasePage() {
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [activeTab, setActiveTab] = useState<"purchase" | "history">("purchase");
   const [generatingPdfId, setGeneratingPdfId] = useState<number | null>(null);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     loadHistory();
+    getMe().then((d) => setUser(d.user)).catch(() => {});
   }, []);
 
   const loadHistory = async () => {
@@ -76,6 +79,9 @@ function PurchasePage() {
           totalAmount: result.totalAmount,
           status: "approved",
           createdAt: new Date().toISOString(),
+          userName: user?.name,
+          userEmail: user?.email,
+          userId: user?.id,
           monthlyReturnAmount: result.monthlyReturnAmount,
           monthlyReturnPct: preview?.monthlyReturnPct,
           packageName: preview?.packageName,
@@ -126,6 +132,9 @@ function PurchasePage() {
         totalAmount: p.totalAmount,
         status: p.status,
         createdAt: p.createdAt,
+        userName: user?.name,
+        userEmail: user?.email,
+        userId: user?.id,
         monthlyReturnAmount: p.investment?.monthlyReturnAmount,
         monthlyReturnPct: p.investment?.monthlyReturnPct,
         packageName: p.investment?.packageName,

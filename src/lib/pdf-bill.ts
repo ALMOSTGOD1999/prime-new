@@ -167,6 +167,12 @@ export async function generatePurchaseBill(data: PurchaseBillData): Promise<void
     doc.text(`User ID: ${data.userId}`, margin + 4, y);
     y += 5;
   }
+  // If no customer info at all, show placeholder
+  if (!data.userName && !data.userEmail && !data.userId) {
+    doc.setTextColor(...GRAY);
+    doc.text("Valued Customer", margin + 4, y);
+    y += 5;
+  }
   y += 4;
 
   // ── Thin separator ──
@@ -188,7 +194,7 @@ export async function generatePurchaseBill(data: PurchaseBillData): Promise<void
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...WHITE);
   doc.text("DESCRIPTION", margin + 8, y + 1);
-  doc.text("VALUE", pageW - margin - 8, y + 1, { align: "right" });
+  doc.text("VALUE", pageW - margin - 4, y + 1, { align: "right" });
   y += 8;
 
   // Table rows
@@ -205,7 +211,7 @@ export async function generatePurchaseBill(data: PurchaseBillData): Promise<void
   if (data.additionalCharges && data.additionalCharges > 0) rows.push([`Additional Charges`, formatINR(data.additionalCharges)]);
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
+  doc.setFontSize(8);
 
   rows.forEach((row, i) => {
     const rowY = y + i * 7;
@@ -217,7 +223,7 @@ export async function generatePurchaseBill(data: PurchaseBillData): Promise<void
     doc.setTextColor(...NAVY);
     doc.text(row[0], margin + 8, rowY + 1);
     doc.setTextColor(...GRAY);
-    doc.text(row[1], pageW - margin - 8, rowY + 1, { align: "right" });
+    doc.text(row[1], pageW - margin - 4, rowY + 1, { align: "right" });
   });
 
   y += rows.length * 7 + 2;
@@ -235,8 +241,8 @@ export async function generatePurchaseBill(data: PurchaseBillData): Promise<void
   doc.setFontSize(11);
   doc.setTextColor(...WHITE);
   doc.text("TOTAL AMOUNT", margin + 10, y + 8);
-  doc.setFontSize(13);
-  doc.text(formatINR(data.totalAmount), pageW - margin - 10, y + 8, { align: "right" });
+  doc.setFontSize(12);
+  doc.text(formatINR(data.totalAmount), pageW - margin - 4, y + 8, { align: "right" });
   y += 18;
 
   // ── Tax summary box ──
