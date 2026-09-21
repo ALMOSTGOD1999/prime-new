@@ -45,30 +45,36 @@ function formatDate(iso: string): string {
   return `${day}/${month}/${year}`;
 }
 
-// ── Draw logo (two diamonds + PRIME text) ──
-function drawLogo(doc: jsPDF, cx: number, cy: number, scale: number = 1) {
-  const s = scale;
-  doc.setDrawColor(...GOLD);
-  doc.setLineWidth(1.8 * s);
-  doc.setLineJoin("round");
+// ── Load logo SVG → PNG data URL via canvas ──
+let cachedLogoDataUrl: string | null = null;
 
-  // Left diamond
-  const lcx = cx - 10 * s;
-  doc.line(lcx, cy - 12 * s, lcx + 10 * s, cy);
-  doc.line(lcx + 10 * s, cy, lcx, cy + 12 * s);
-  doc.line(lcx, cy + 12 * s, lcx - 10 * s, cy);
-  doc.line(lcx - 10 * s, cy, lcx, cy - 12 * s);
-
-  // Right diamond
-  const rcx = cx + 10 * s;
-  doc.line(rcx, cy - 12 * s, rcx + 10 * s, cy);
-  doc.line(rcx + 10 * s, cy, rcx, cy + 12 * s);
-  doc.line(rcx, cy + 12 * s, rcx - 10 * s, cy);
-  doc.line(rcx - 10 * s, cy, rcx, cy - 12 * s);
+function loadLogoImage(): Promise<string> {
+  if (cachedLogoDataUrl) return Promise.resolve(cachedLogoDataUrl);
+  return fetch("/logo.svg")
+    .then((r) => r.text())
+    .then(
+      (svg) =>
+        new Promise<string>((resolve) => {
+          const blob = new Blob([svg], { type: "image/svg+xml" });
+          const url = URL.createObjectURL(blob);
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = 200;
+            canvas.height = 220;
+            const ctx = canvas.getContext("2d")!;
+            ctx.drawImage(img, 0, 0, 200, 220);
+            URL.revokeObjectURL(url);
+            cachedLogoDataUrl = canvas.toDataURL("image/png");
+            resolve(cachedLogoDataUrl);
+          };
+          img.src = url;
+        })
+    );
 }
 
 // ── Main generator ──
-export function generatePurchaseBill(data: PurchaseBillData): void {
+export async function generatePurchaseBill(data: PurchaseBillData): Promise<void> {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageW = 210;
   const margin = 20;
@@ -91,8 +97,9 @@ export function generatePurchaseBill(data: PurchaseBillData): void {
   doc.rect(12, 12, pageW - 24, 30, "F");
   y = 24;
 
-  // Draw logo diamonds
-  drawLogo(doc, pageW / 2 - 28, y + 2, 0.8);
+  // Load actual logo image
+  const logoDataUrl = await loadLogoImage();
+  doc.addImage(logoDataUrl, "PNG", pageW / 2 - 26, y - 6, 22, 24);
 
   // Company name next to logo
   doc.setTextColor(...WHITE);
@@ -252,40 +259,30 @@ export function generatePurchaseBill(data: PurchaseBillData): void {
     y += 18;
   }
 
-  // ── Investment returns box ──
-  if (data.monthlyReturnAmount) {
-    doc.setFillColor(...WHITE);
-    doc.setDrawColor(...GOLD);
-    doc.setLineWidth(0.5);
-    doc.roundedRect(margin + 4, y, contentW - 8, 24, 2, 2, "FD");
+  // ── Customer Signature section ──
+  y += 8;
+  doc.setDrawColor(...GOLD);
+  doc.setLineWidth(0.3);
+  doc.line(margin + 4, y, pageW - margin - 4, y);
+  y += 16;
 
-    // Small gold accent on left
-    doc.setFillColor(...GOLD);
-    doc.rect(margin + 4, y, 3, 24, "F");
+  // Left signature: Customer
+  const sigLineW = 55;
+  const leftSigX = margin + 10;
+  const rightSigX = pageW / 2 + 15;
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(...GOLD);
-    doc.text("MONTHLY INVESTMENT RETURN", margin + 12, y + 6);
+  doc.setDrawColor(...NAVY);
+  doc.setLineWidth(0.4);
+  doc.line(leftSigX, y, leftSigX + sigLineW, y);
 
-    doc.setFontSize(16);
-    doc.setTextColor(...NAVY);
-    doc.text(formatINR(data.monthlyReturnAmount), margin + 12, y + 16);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(...NAVY);
+  doc.text("Customer Signature", leftSigX + sigLineW / 2, y + 6, { align: "center" });
 
-    if (data.monthlyReturnPct && data.packageName) {
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...GRAY);
-      doc.text(
-        `${data.monthlyReturnPct}% per month \u2022 Package: ${data.packageName}`,
-        pageW - margin - 10,
-        y + 16,
-        { align: "right" }
-      );
-    }
-
-    y += 30;
-  }
+  // Right signature: Authorized Signatory
+  doc.line(rightSigX, y, rightSigX + sigLineW, y);
+  doc.text("Authorized Signatory", rightSigX + sigLineW / 2, y + 6, { align: "center" });
 
   // ── Footer ──
   const footerY = 297 - 40;

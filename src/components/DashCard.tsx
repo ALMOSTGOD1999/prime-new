@@ -17,21 +17,21 @@ export function DashCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} p-5 text-white shadow-lg transition-transform hover:scale-[1.02]`}
+      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} p-3 sm:p-5 text-white shadow-lg transition-transform hover:scale-[1.02] min-w-0`}
     >
       {icon && (
-        <span className="absolute right-4 top-4 text-4xl opacity-30">{icon}</span>
+        <span className="absolute right-3 top-3 text-3xl sm:text-4xl opacity-30">{icon}</span>
       )}
-      <p className="text-sm font-bold">{value}</p>
-      <p className="mt-1 text-xs font-semibold opacity-90">{title}</p>
+      <p className="text-base sm:text-sm font-bold break-words">{value}</p>
+      <p className="mt-1 text-[11px] sm:text-xs font-semibold opacity-90 break-words">{title}</p>
       {details && (
         <>
           <div
-            className="mt-3 cursor-pointer border-t border-white/20 pt-2"
+            className="mt-2 sm:mt-3 cursor-pointer border-t border-white/20 pt-2"
             onClick={() => setExpanded(!expanded)}
           >
             <p className="text-[10px] font-semibold uppercase tracking-wider opacity-80">
-              {expanded ? "Less info ↑" : "More info →"}
+              {expanded ? "Less ↑" : "More →"}
             </p>
           </div>
           {expanded && (

@@ -139,8 +139,18 @@ function DashboardLayout() {
   type NavLeaf = { to: string; label: string; icon: string; badge?: number };
   type NavParent = { label: string; icon: string; children: { to: string; search: Record<string, string>; label: string }[] };
   const navLinks: (NavLeaf | NavParent)[] = [
+    // ── Primary nav ──
     { to: "/dashboard", label: "Dashboard", icon: "◈" },
-    { to: "/dashboard/add-user", label: "Add User", icon: "➕" },
+    {
+      label: "My Profile", icon: "👤",
+      children: [
+        { to: "/dashboard/profile", search: { tab: "welcome" }, label: "Welcome" },
+        { to: "/dashboard/profile", search: { tab: "view" }, label: "View Profile" },
+        { to: "/dashboard/profile", search: { tab: "edit" }, label: "Update Profile" },
+        { to: "/dashboard/profile", search: { tab: "photo" }, label: "Profile Photo" },
+        { to: "/dashboard/profile", search: { tab: "password" }, label: "Change Password" },
+      ],
+    },
     {
       label: "My Network", icon: "🌐",
       children: [
@@ -150,22 +160,14 @@ function DashboardLayout() {
         { to: "/dashboard/network", search: { tab: "levels" }, label: "Level Wise Tree" },
       ],
     },
-    { to: "/dashboard/income", label: "Income", icon: "◆" },
+    { to: "/dashboard/purchase", label: "Gold Purchase", icon: "🛒" },
+    { to: "/dashboard/income", label: "Wallet", icon: "💰" },
+    { to: "/dashboard/reports", label: "Report", icon: "📊" },
+    { to: "/dashboard/kyc", label: "KYC Update", icon: "📋" },
+    // ── Secondary nav ──
+    { to: "/dashboard/add-user", label: "Add User", icon: "➕" },
     { to: "/dashboard/activate-account", label: "Activate Account", icon: "🔑" },
-    { to: "/dashboard/purchase", label: "Purchase", icon: "🛒" },
-    { to: "/dashboard/reports", label: "Reports", icon: "📊" },
     { to: "/dashboard/rewards", label: "Rewards", icon: "🏆" },
-    {
-      label: "Profile", icon: "👤",
-      children: [
-        { to: "/dashboard/profile", search: { tab: "welcome" }, label: "Welcome" },
-        { to: "/dashboard/profile", search: { tab: "view" }, label: "View Profile" },
-        { to: "/dashboard/profile", search: { tab: "edit" }, label: "Update Profile" },
-        { to: "/dashboard/profile", search: { tab: "photo" }, label: "Profile Photo" },
-        { to: "/dashboard/profile", search: { tab: "password" }, label: "Change Password" },
-      ],
-    },
-    { to: "/dashboard/kyc", label: "KYC", icon: "📋" },
     { to: "/dashboard/notifications", label: "Notifications", icon: "🔔", badge: unreadCount },
   ];
 
@@ -190,7 +192,13 @@ function DashboardLayout() {
           </div>
 
           <nav className="flex-1 space-y-1 overflow-y-auto p-4">
-            {navLinks.map((link) => {
+            {navLinks.map((link, idx) => {
+              // Separator between primary and secondary nav
+              if (idx === 7) {
+                return (
+                  <div key="separator" className="my-3 border-t border-gold/10" />
+                );
+              }
               if ("children" in link) {
                 const isOpen = expandedMenu === link.label;
                 return (
@@ -321,7 +329,7 @@ function DashboardLayout() {
           </div>
         )}
 
-        <main className="flex-1 p-6 pb-20 lg:p-8 lg:pb-8">
+        <main className="flex-1 p-4 pb-20 sm:p-6 lg:p-8 lg:pb-8">
           {/* Gold Price Ticker */}
           {goldPrice?.price && (
             <div className="mb-6 overflow-hidden rounded border border-gold/20 bg-gradient-to-r from-gold/10 via-gold/5 to-gold/10">

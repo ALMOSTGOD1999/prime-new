@@ -372,6 +372,10 @@ export async function getIncomeSummary(userId: number) {
     .filter((i) => i.type === "matching")
     .reduce((sum, i) => sum + i.amount, 0);
 
+  const referral = allIncome
+    .filter((i) => i.type === "referral")
+    .reduce((sum, i) => sum + i.amount, 0);
+
   const awards = allIncome.filter((i) => i.type === "award");
 
   const walletRow = await db.select().from(wallet).where(eq(wallet.userId, userId));
@@ -379,7 +383,8 @@ export async function getIncomeSummary(userId: number) {
   return {
     direct,
     matching,
-    totalIncome: direct + matching,
+    referral,
+    totalIncome: direct + matching + referral,
     workingBalance: walletRow[0]?.workingBalance ?? 0,   // Gross income (no deductions)
     incomeBalance: walletRow[0]?.incomeBalance ?? 0,      // Net income (after 20%+10% deductions)
     repurchaseBalance: walletRow[0]?.repurchaseBalance ?? 0, // 20% (spendable on products)

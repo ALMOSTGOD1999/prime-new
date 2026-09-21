@@ -67,11 +67,11 @@ function PurchasesPage() {
     return p.status;
   };
 
-  const handleDownloadPdf = (p: any, e?: React.MouseEvent) => {
+  const handleDownloadPdf = async (p: any, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setGeneratingPdfId(p.id);
     try {
-      generatePurchaseBill({
+      await generatePurchaseBill({
         purchaseId: p.id,
         carat: p.carat,
         weight: p.weight,
@@ -94,13 +94,13 @@ function PurchasesPage() {
     }
   };
 
-  const handleDownloadPdfFromDetail = () => {
+  const handleDownloadPdfFromDetail = async () => {
     if (!detail) return;
     const p = detail.purchase;
     const u = detail.user;
     setGeneratingPdfId(p.id);
     try {
-      generatePurchaseBill({
+      await generatePurchaseBill({
         purchaseId: p.id,
         carat: p.carat,
         weight: p.weight,

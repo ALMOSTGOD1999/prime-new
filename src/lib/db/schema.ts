@@ -35,7 +35,7 @@ export const pairs = pgTable("pairs", {
 export const income = pgTable("income", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  type: text("type", { enum: ["direct", "matching", "award", "cashback", "daily_activation"] }).notNull(),
+  type: text("type", { enum: ["direct", "matching", "award", "cashback", "daily_activation", "referral"] }).notNull(),
   amount: integer("amount").notNull(),
   pairId: integer("pair_id").references(() => pairs.id),
   description: text("description").notNull(),

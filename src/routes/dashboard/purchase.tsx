@@ -61,7 +61,7 @@ function PurchasePage() {
       alert(`Purchase successful! ID: #${result.purchaseId}\nTotal: ₹${result.totalAmount.toLocaleString("en-IN")}\nMonthly Return: ₹${result.monthlyReturnAmount.toLocaleString("en-IN")}`);
       // Auto-generate PDF bill
       try {
-        generatePurchaseBill({
+        await generatePurchaseBill({
           purchaseId: result.purchaseId,
           carat,
           weight: w,
@@ -108,10 +108,10 @@ function PurchasePage() {
     return p.status;
   };
 
-  const handleDownloadPdf = (p: any) => {
+  const handleDownloadPdf = async (p: any) => {
     setGeneratingPdfId(p.id);
     try {
-      generatePurchaseBill({
+      await generatePurchaseBill({
         purchaseId: p.id,
         carat: p.carat,
         weight: p.weight,

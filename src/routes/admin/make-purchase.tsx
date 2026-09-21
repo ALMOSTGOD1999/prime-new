@@ -89,7 +89,7 @@ function MakePurchasePage() {
 
       // Auto-generate PDF bill
       try {
-        generatePurchaseBill({
+        await generatePurchaseBill({
           purchaseId: result.purchaseId,
           carat: method === "weight" ? carat : 0,
           weight: method === "weight" ? parseFloat(weight) : undefined,
