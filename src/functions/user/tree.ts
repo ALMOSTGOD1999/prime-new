@@ -184,24 +184,31 @@ async function fetchAllUsersInTree(rootId: number): Promise<FlatUser[]> {
 }
 
 // ── Build tree from flat user list (zero DB queries) ──
-// Display fix: all direct referrals (referredBy == rootId) are forced to
-// ONLY the extreme outer spines, vertical one-below-another, never middle.
-// First 2 → left/right under root. Rest → alternate extreme left/right bottom.
+// Display fix: EVERY user's direct referrals (referredBy) are forced to
+// ONLY the extreme outer spines per stored `position`, never middle.
+// For each referrer: 1st → left, 2nd → right, rest → vertical stack on extreme leg matching position.
 function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | null {
   const userMap = new Map<number, FlatUser>();
   for (const u of descendants) userMap.set(u.id, u);
 
-  // Collect directs of the root (the tree owner) — these must go only on outer legs
-  const directs = descendants
-    .filter((u) => u.referredBy === rootId)
-    .sort((a, b) => a.id - b.id);
-  const directIds = new Set(directs.map((d) => d.id));
+  // Group all directs by referrer (referredBy), sorted by id
+  const directsByReferrer = new Map<number, FlatUser[]>();
+  for (const u of descendants) {
+    if (u.referredBy != null) {
+      const list = directsByReferrer.get(u.referredBy) || [];
+      list.push(u);
+      directsByReferrer.set(u.referredBy, list);
+    }
+  }
+  for (const [, list] of directsByReferrer) list.sort((a, b) => a.id - b.id);
+  const allDirectIds = new Set<number>();
+  for (const list of directsByReferrer.values()) for (const d of list) allDirectIds.add(d.id);
 
-  // Build parent→children map for NON-direct nodes first (leave directs out for remap)
+  // Build parent→children map for any non-direct nodes (normally only root + orphans)
   const childrenByParent = new Map<number, FlatUser[]>();
   for (const u of descendants) {
     if (u.id === rootId) continue;
-    if (directIds.has(u.id)) continue; // will be re-inserted at extremes
+    if (allDirectIds.has(u.id)) continue; // will be re-inserted respecting position
     if (u.parentId) {
       const list = childrenByParent.get(u.parentId) || [];
       list.push(u);
@@ -220,22 +227,27 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
     }
   }
 
-  // Re-insert directs at extremes (in-memory only — fixes display, DB fixed by migration)
-  if (directs.length > 0) {
-    // Need to keep childrenByParent updated as we insert so findExtremeLeaf sees new nodes
+  // Re-insert directs for EVERY referrer in id order (parents before children)
+  // so deeper extremes see already-placed ancestors.
+  const referrersSorted = [...directsByReferrer.keys()].sort((a, b) => a - b);
+  for (const referrerId of referrersSorted) {
+    // Only rebuild if referrer is inside this tree (is descendant of root or is root)
+    if (!userMap.has(referrerId)) continue;
+    const directs = directsByReferrer.get(referrerId)!;
+    if (directs.length === 0) continue;
+
     if (directs[0]) {
       directs[0].position = "left";
-      const list = childrenByParent.get(rootId) || [];
+      const list = childrenByParent.get(referrerId) || [];
       list.push(directs[0]);
-      childrenByParent.set(rootId, list);
+      childrenByParent.set(referrerId, list);
     }
     if (directs[1]) {
       directs[1].position = "right";
-      const list = childrenByParent.get(rootId) || [];
+      const list = childrenByParent.get(referrerId) || [];
       list.push(directs[1]);
-      childrenByParent.set(rootId, list);
+      childrenByParent.set(referrerId, list);
     }
-    // Remaining directs → on extreme leg as per their stored position (left/right), vertical stack
     for (let i = 2; i < directs.length; i++) {
       const stored = directs[i]!.position;
       const targetSide: "left" | "right" =
