@@ -228,7 +228,7 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       finalRight = unpositioned.filter((_, i) => i % 2 === 1);
     }
 
-    // Build left subtree: first child in left slot, extras chain under it
+    // Build left subtree: first child in left slot, extras chain to EXTREME LEFT (always left)
     let leftNode: TreeNode | null = null;
     if (finalLeft.length > 0) {
       leftNode = buildNode(finalLeft[0]!.id);
@@ -236,6 +236,7 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       for (let i = 1; i < finalLeft.length; i++) {
         const childNode = buildNode(finalLeft[i]!.id);
         if (childNode && current) {
+          // Chain to extreme left — always fill left side
           if (!current.left) current.left = childNode;
           else if (!current.right) current.right = childNode;
           current = childNode;
@@ -243,7 +244,7 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       }
     }
 
-    // Build right subtree: first child in right slot, extras chain under it
+    // Build right subtree: first child in right slot, extras chain to EXTREME RIGHT (always right)
     let rightNode: TreeNode | null = null;
     if (finalRight.length > 0) {
       rightNode = buildNode(finalRight[0]!.id);
@@ -251,6 +252,7 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       for (let i = 1; i < finalRight.length; i++) {
         const childNode = buildNode(finalRight[i]!.id);
         if (childNode && current) {
+          // Chain to extreme right — always fill right side
           if (!current.right) current.right = childNode;
           else if (!current.left) current.left = childNode;
           current = childNode;

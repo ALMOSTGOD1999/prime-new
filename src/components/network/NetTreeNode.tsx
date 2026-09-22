@@ -20,10 +20,11 @@ type Props = {
 };
 
 /* ── Person SVG Avatar ── */
-function PersonAvatar({ size = 56 }: { size?: number }) {
+function PersonAvatar({ size = 56, isActive = true }: { size?: number; isActive?: boolean }) {
+  const color = isActive ? "#16a34a" : "#dc2626"; // green = active, red = inactive
   return (
     <svg width={size} height={size} viewBox="0 0 56 56" fill="none">
-      <circle cx="28" cy="28" r="28" fill="#dc2626" />
+      <circle cx="28" cy="28" r="28" fill={color} />
       <circle cx="28" cy="22" r="8" fill="white" opacity="0.9" />
       <ellipse cx="28" cy="42" rx="14" ry="10" fill="white" opacity="0.9" />
     </svg>
@@ -79,7 +80,7 @@ export function NetTreeNode({ node, isRoot, collapsed, toggleCollapse, searchQue
     <div className="flex flex-col items-center">
       {/* Node card */}
       <div className={`flex flex-col items-center rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all ${isRoot ? "ring-2 ring-gold/30" : ""} ${isHighlighted ? "scale-110 shadow-lg ring-2 ring-gold" : ""}`}>
-        <PersonAvatar size={56} />
+        <PersonAvatar size={56} isActive={node.isActive} />
         <p className="mt-1.5 text-[11px] font-mono font-bold text-slate-800">{node.referralCode}</p>
         <p className="max-w-[110px] truncate text-center text-[10px] text-slate-500">{node.name}</p>
         <p className="text-[9px] text-slate-400">({joinDate})</p>
