@@ -37,6 +37,7 @@ type TreeNode = {
   isActive: boolean;
   rank: string;
   position: string | null;
+  parentId: number | null;
   createdAt: Date | null;
   left: TreeNode | null;
   right: TreeNode | null;
@@ -264,6 +265,7 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       isActive: user.isActive,
       rank: user.rank || "bronze",
       position: user.position,
+      parentId: user.parentId,
       createdAt: user.createdAt,
       left: leftNode,
       right: rightNode,

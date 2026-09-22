@@ -132,7 +132,7 @@ function DashboardIndex() {
       {teamStats && (
         <>
           {/* Row 1: Team counts */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-4">
             <DashCard title="Total Downline" value={teamStats.totalTeam ?? 0} gradient={gradients.pink} icon="🛍" details={<>
               <p>Active: {teamStats.activeTeam ?? 0}</p>
               <p>Inactive: {(teamStats.totalTeam ?? 0) - (teamStats.activeTeam ?? 0)}</p>
@@ -155,7 +155,7 @@ function DashboardIndex() {
           </div>
 
           {/* Row 2: Business + income + awards */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-4">
             <DashCard title="Left Gold Business" value={`₹${(teamStats.teamBusinessLeftGold ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" details={<>
               <p>Gold/Platinum purchase volume</p>
               <p>Total left: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}</p>
@@ -175,7 +175,7 @@ function DashboardIndex() {
           </div>
 
           {/* Row 3: Awards */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-4">
             <DashCard title="Joining Awards" value={income.awards?.length ?? 0} gradient={gradients.blue} icon="🏆" details={<>
               <p>Milestone rewards for pair matching</p>
               <p>Bag at 100 pairs · Phone at 500</p>

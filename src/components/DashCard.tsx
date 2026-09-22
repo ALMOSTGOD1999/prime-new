@@ -17,29 +17,31 @@ export function DashCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br ${gradient} p-3 sm:p-5 text-white shadow-lg transition-transform hover:scale-[1.02] min-w-0`}
+      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} text-white shadow-lg transition-transform hover:scale-[1.01]`}
     >
-      {icon && (
-        <span className="absolute right-2 top-2 text-2xl sm:text-4xl opacity-30">{icon}</span>
-      )}
-      <p className="text-lg sm:text-sm font-bold break-words leading-tight">{value}</p>
-      <p className="mt-0.5 text-xs sm:text-xs font-semibold opacity-90 break-words">{title}</p>
+      {/* Main content — centered */}
+      <div className="flex flex-col items-center justify-center px-5 py-6 sm:py-8 text-center">
+        <p className="text-3xl sm:text-4xl font-bold leading-tight">{value}</p>
+        <p className="mt-1 text-sm sm:text-base font-semibold opacity-90">{title}</p>
+      </div>
+
+      {/* More info button */}
       {details && (
-        <>
-          <div
-            className="mt-2 sm:mt-3 cursor-pointer border-t border-white/20 pt-2"
-            onClick={() => setExpanded(!expanded)}
-          >
-            <p className="text-[11px] sm:text-[10px] font-semibold uppercase tracking-wider opacity-80">
-              {expanded ? "Less ↑" : "More →"}
-            </p>
-          </div>
-          {expanded && (
-            <div className="mt-2 border-t border-white/10 pt-2 text-[11px] sm:text-[11px] leading-relaxed opacity-90">
-              {details}
-            </div>
-          )}
-        </>
+        <div
+          className="cursor-pointer border-t border-white/20 bg-white/10 px-5 py-3 text-center transition-colors hover:bg-white/20"
+          onClick={() => setExpanded(!expanded)}
+        >
+          <p className="text-xs sm:text-sm font-semibold tracking-wide">
+            {expanded ? "Less ↑" : "More info →"}
+          </p>
+        </div>
+      )}
+
+      {/* Expanded details */}
+      {expanded && details && (
+        <div className="border-t border-white/10 px-5 py-3 text-xs sm:text-sm leading-relaxed opacity-90">
+          {details}
+        </div>
       )}
     </div>
   );
