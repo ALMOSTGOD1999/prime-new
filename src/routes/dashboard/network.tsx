@@ -111,6 +111,7 @@ function TreeViewTab() {
   const lastPos = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const [collapsed, setCollapsed] = useState<Set<number>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     Promise.all([getTreeVisualization(), getLevelTree(), getTeamStats()])
@@ -214,10 +215,28 @@ function TreeViewTab() {
           <MiniStat label="Active Rate" value={stats.totalTeam > 0 ? `${Math.round((stats.activeTeam / stats.totalTeam) * 100)}%` : "\u2014"} sub="Team activity" />
         </div>
       )}
+      {viewMode === "binary" && (
+        <div className="flex items-center gap-2">
+          <span className="whitespace-nowrap text-xs font-semibold text-emerald/70">by Code</span>
+          <input
+            type="text"
+            placeholder=""
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 rounded border border-gold/20 bg-white px-3 py-2 text-sm outline-none focus:border-gold/40"
+          />
+          <button
+            onClick={() => {}}
+            className="rounded bg-emerald px-4 py-2 text-xs font-bold text-white hover:bg-emerald/90"
+          >
+            Search
+          </button>
+        </div>
+      )}
       {viewMode === "binary" && (tree ? (
         <div ref={containerRef} className="overflow-hidden rounded-lg border border-gold/15 bg-card shadow-sm" style={{ cursor: dragging ? "grabbing" : "grab", minHeight: "500px" }} onWheel={handleWheel} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove}>
           <div className="origin-top-left p-4 sm:p-6" style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`, transition: dragging ? "none" : "transform 0.15s ease-out", transformOrigin: "0 0" }}>
-            <NetTreeNode node={tree} isRoot={true} collapsed={collapsed} toggleCollapse={toggleCollapse} />
+            <NetTreeNode node={tree} isRoot={true} collapsed={collapsed} toggleCollapse={toggleCollapse} searchQuery={searchQuery} />
           </div>
         </div>
       ) : (<div className="rounded-lg border border-gold/15 bg-card p-12 text-center"><p className="text-4xl">{"\uD83C\uDF33"}</p><p className="mt-3 text-xs text-emerald/60">No team data yet. Share your referral code to start building!</p></div>))}

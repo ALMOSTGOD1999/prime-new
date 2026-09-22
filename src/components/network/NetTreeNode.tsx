@@ -5,6 +5,7 @@ type TreeNodeData = {
   isActive: boolean;
   rank: string;
   position: string | null;
+  parentId: number | null;
   createdAt: Date | null;
   left: TreeNodeData | null;
   right: TreeNodeData | null;
@@ -15,18 +16,43 @@ type Props = {
   isRoot?: boolean;
   collapsed: Set<number>;
   toggleCollapse: (id: number) => void;
+  searchQuery?: string;
 };
 
-export function NetTreeNode({ node, isRoot, collapsed, toggleCollapse }: Props) {
+/* ── Person SVG Avatar ── */
+function PersonAvatar({ size = 56 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 56 56" fill="none">
+      <circle cx="28" cy="28" r="28" fill="#dc2626" />
+      <circle cx="28" cy="22" r="8" fill="white" opacity="0.9" />
+      <ellipse cx="28" cy="42" rx="14" ry="10" fill="white" opacity="0.9" />
+    </svg>
+  );
+}
+
+function EmptyAvatar({ size = 56 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 56 56" fill="none">
+      <circle cx="28" cy="28" r="28" fill="#3b82f6" />
+      <circle cx="28" cy="22" r="8" fill="white" opacity="0.9" />
+      <ellipse cx="28" cy="42" rx="14" ry="10" fill="white" opacity="0.9" />
+    </svg>
+  );
+}
+
+/* ── Count team size recursively ── */
+function countTeam(n: TreeNodeData | null): number {
+  if (!n) return 0;
+  return 1 + countTeam(n.left) + countTeam(n.right);
+}
+
+export function NetTreeNode({ node, isRoot, collapsed, toggleCollapse, searchQuery }: Props) {
+  // Empty slot
   if (!node) {
     return (
       <div className="flex flex-col items-center">
-        <div className="flex h-28 w-32 flex-col items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-blue-50">
-          <svg className="h-8 w-8 text-blue-300" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-          </svg>
-          <p className="mt-1 text-xs font-semibold text-blue-500">Join Now</p>
-        </div>
+        <EmptyAvatar size={56} />
+        <p className="mt-1 text-[11px] font-semibold text-blue-500">Join Now</p>
       </div>
     );
   }
@@ -36,84 +62,58 @@ export function NetTreeNode({ node, isRoot, collapsed, toggleCollapse }: Props) 
   const hasChildren = hasLeft || hasRight;
   const isCollapsed = collapsed.has(node.id);
 
-  // Green = active+registered, Red = registered but not activated
-  const statusColor = node.isActive
-    ? { border: "border-emerald-500", bg: "bg-emerald-50", iconBg: "bg-emerald-500", ring: "ring-emerald-200" }
-    : { border: "border-red-500", bg: "bg-red-50", iconBg: "bg-red-500", ring: "ring-red-200" };
+  const leftCount = hasLeft ? countTeam(node.left) - 1 : 0;
+  const rightCount = hasRight ? countTeam(node.right) - 1 : 0;
 
-  const regDate = node.createdAt
-    ? new Date(node.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "2-digit" })
-    : "N/A";
+  const joinDate = node.createdAt
+    ? new Date(node.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "numeric" })
+    : "";
+
+  const isHighlighted = searchQuery && (
+    node.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    node.referralCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    String(node.id).includes(searchQuery)
+  );
 
   return (
     <div className="flex flex-col items-center">
-      {/* Node Card */}
-      <div
-        className={`relative flex w-36 flex-col items-center rounded-lg border-2 ${statusColor.border} ${statusColor.bg} p-3 shadow-sm transition-all hover:shadow-md ${isRoot ? "ring-2 ring-gold/30" : ""}`}
-      >
-        {isRoot && (
-          <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gold px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-cream shadow">
-            You
-          </span>
-        )}
-
-        {/* Avatar */}
-        <div className={`flex h-12 w-12 items-center justify-center rounded-full ${statusColor.iconBg} text-lg font-bold text-white shadow`}>
-          {node.name?.charAt(0)?.toUpperCase()}
-        </div>
-
-        {/* Info */}
-        <p className="mt-2 text-center text-[10px] font-bold font-mono text-slate-800">{node.referralCode}</p>
-        <p className="mt-0.5 text-center text-xs font-bold leading-tight text-slate-800">{node.name}</p>
-        <p className="mt-1 text-[10px] text-slate-600">{regDate}</p>
+      {/* Node card */}
+      <div className={`flex flex-col items-center rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all ${isRoot ? "ring-2 ring-gold/30" : ""} ${isHighlighted ? "scale-110 shadow-lg ring-2 ring-gold" : ""}`}>
+        <PersonAvatar size={56} />
+        <p className="mt-1.5 text-[11px] font-mono font-bold text-slate-800">{node.referralCode}</p>
+        <p className="max-w-[110px] truncate text-center text-[10px] text-slate-500">{node.name}</p>
+        <p className="text-[9px] text-slate-400">({joinDate})</p>
+        <p className="text-[9px] font-semibold text-slate-600">(L:{leftCount},R:{rightCount})</p>
       </div>
 
-      {/* Children */}
+      {/* Children with connecting lines */}
       {hasChildren && !isCollapsed && (
-        <div className="relative mt-2">
-          {/* Vertical line from parent */}
-          <div className="absolute left-1/2 top-0 h-4 w-px -translate-x-px bg-slate-300" />
-
-          {/* Horizontal connector */}
-          {hasLeft && hasRight && (
-            <div className="absolute left-[25%] right-[25%] top-4 h-px bg-slate-300" />
-          )}
-          {!hasLeft && hasRight && (
-            <div className="absolute left-1/2 right-[25%] top-4 h-px bg-slate-300" />
-          )}
-          {hasLeft && !hasRight && (
-            <div className="absolute left-[25%] right-1/2 top-4 h-px bg-slate-300" />
+        <div className="relative mt-0">
+          <div className="absolute left-1/2 top-0 h-4 w-px bg-slate-300" />
+          {(hasLeft || hasRight) && (
+            <div className="absolute top-4 h-px bg-slate-300" style={{ left: hasLeft ? "25%" : "50%", right: hasRight ? "25%" : "50%" }} />
           )}
 
           <div className="flex gap-6 pt-4 sm:gap-10">
-            {/* Left */}
             <div className="relative flex flex-1 flex-col items-center">
-              <div className="absolute left-1/2 top-0 h-4 w-px -translate-x-px bg-slate-300" />
-              <span className="mb-2 rounded bg-emerald/10 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-700">Left</span>
-              <NetTreeNode node={node.left} collapsed={collapsed} toggleCollapse={toggleCollapse} />
+              <div className="absolute h-4 w-px bg-slate-300" style={{ left: "50%" }} />
+              <NetTreeNode node={node.left} collapsed={collapsed} toggleCollapse={toggleCollapse} searchQuery={searchQuery} />
             </div>
-
-            {/* Right */}
             <div className="relative flex flex-1 flex-col items-center">
-              <div className="absolute left-1/2 top-0 h-4 w-px -translate-x-px bg-slate-300" />
-              <span className="mb-2 rounded bg-gold/10 px-2 py-0.5 text-[10px] font-bold uppercase text-gold-700">Right</span>
-              <NetTreeNode node={node.right} collapsed={collapsed} toggleCollapse={toggleCollapse} />
+              <div className="absolute h-4 w-px bg-slate-300" style={{ left: "50%" }} />
+              <NetTreeNode node={node.right} collapsed={collapsed} toggleCollapse={toggleCollapse} searchQuery={searchQuery} />
             </div>
           </div>
         </div>
       )}
 
-      {/* Expand/Collapse button */}
+      {/* Expand/collapse */}
       {hasChildren && (
         <button
           onClick={() => toggleCollapse(node.id)}
-          className={`mt-3 rounded-full border-2 px-4 py-1 text-xs font-semibold transition-all ${
-            isCollapsed
-              ? "border-emerald-400 bg-emerald-500 text-white hover:bg-emerald-600"
-              : "border-gold/40 bg-gold text-cream hover:bg-gold/80"
-          }`}
+          className="mt-2 text-[10px] font-bold text-emerald underline hover:text-emerald/80"
         >
-          {isCollapsed ? "Expand" : "Collapse"}
+          {isCollapsed ? "+ expand" : "− collapse"}
         </button>
       )}
     </div>
