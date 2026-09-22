@@ -91,18 +91,18 @@ function AdminDashboard() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-5 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-display text-3xl sm:text-4xl tracking-tight">
+          <h1 className="font-display text-2xl sm:text-4xl tracking-tight">
             Admin <span className="italic text-gold">Dashboard</span>
           </h1>
-          <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">Platform overview & analytics</p>
+          <p className="mt-1 text-[11px] sm:text-xs uppercase tracking-[0.2em] text-emerald/60">Platform overview & analytics</p>
         </div>
         <Link
           to="/admin/users"
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md hover:shadow-emerald/30 hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald px-4 sm:px-5 py-2.5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md hover:shadow-emerald/30 hover:-translate-y-0.5"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" /></svg>
           Manage Users
@@ -110,7 +110,7 @@ function AdminDashboard() {
       </div>
 
       {/* Stat Cards - Row 1: Users + Business */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <DashCard
           title="Total Users"
           value={String(totalUsers)}
@@ -154,7 +154,7 @@ function AdminDashboard() {
       </div>
 
       {/* Stat Cards - Row 2: Income */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <DashCard
           title="Direct Paid"
           value={`₹${totalDirect.toLocaleString("en-IN")}`}
@@ -195,14 +195,14 @@ function AdminDashboard() {
                   <svg className="h-4 w-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" /></svg>
                 </div>
                 <div>
-                  <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Monthly Cashback Payout</h3>
-                  <p className="mt-0.5 text-xs text-emerald/60">Credits 30% of each active user's self business to their cashback wallet</p>
+                  <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-gold">Monthly Cashback Payout</h3>
+                  <p className="mt-0.5 text-[11px] sm:text-xs text-emerald/60">Credits 30% of each active user's self business to their cashback wallet</p>
             </div>
           </div>
           <button
             onClick={handleCashbackPayout}
             disabled={cashbackLoading}
-            className="inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-gold/20 transition-all duration-200 hover:bg-gold/90 hover:shadow-md hover:shadow-gold/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 rounded-lg bg-gold px-4 sm:px-5 py-2.5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-gold/20 transition-all duration-200 hover:bg-gold/90 hover:shadow-md hover:shadow-gold/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {cashbackLoading ? (
               <>
@@ -234,14 +234,14 @@ function AdminDashboard() {
               <svg className="h-4 w-4 text-emerald" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" /></svg>
             </div>
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Monthly Investment Returns</h3>
-              <p className="mt-0.5 text-xs text-emerald/60">Credits monthly returns from active investments to user wallets (70/20/10 split)</p>
+              <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-gold">Monthly Investment Returns</h3>
+              <p className="mt-0.5 text-[11px] sm:text-xs text-emerald/60">Credits monthly returns from active investments to user wallets (70/20/10 split)</p>
             </div>
           </div>
           <button
             onClick={handleProcessReturns}
             disabled={returnsLoading}
-            className="inline-flex items-center gap-2 rounded-lg bg-emerald px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md hover:shadow-emerald/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald px-4 sm:px-5 py-2.5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-emerald/20 transition-all duration-200 hover:bg-emerald/90 hover:shadow-md hover:shadow-emerald/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {returnsLoading ? (
               <>
@@ -263,71 +263,6 @@ function AdminDashboard() {
             </p>
           </div>
         )}
-      </div>
-
-      {/* Recent Users Table */}
-      <div className="overflow-hidden rounded-xl border border-gold/10 bg-background shadow-sm">
-        <div className="flex items-center justify-between border-b border-gold/10 px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-gold/10 p-2">
-              <svg className="h-4 w-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg>
-            </div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">Recent Users</h3>
-          </div>
-          <Link to="/admin/users" className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald/70 transition-colors hover:text-emerald">
-            View all →
-          </Link>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gold/10 text-xs uppercase tracking-[0.2em] text-emerald/60">
-                <th className="px-3 sm:px-6 py-3 text-left font-semibold">ID</th>
-                <th className="px-3 sm:px-6 py-3 text-left font-semibold">Name</th>
-                <th className="px-3 sm:px-6 py-3 text-left font-semibold">Email</th>
-                <th className="px-3 sm:px-6 py-3 text-left font-semibold">Code</th>
-                <th className="px-3 sm:px-6 py-3 text-left font-semibold">Status</th>
-                <th className="px-3 sm:px-6 py-3 text-right font-semibold">Joined</th>
-              </tr>
-            </thead>
-            <tbody>
-              {usersData.users?.slice(0, 10).map((user: any, i: number) => (
-                <tr
-                  key={user.id}
-                  className="border-b border-gold/5 transition-all duration-200 hover:bg-gold/5"
-                  style={{ animationDelay: `${i * 30}ms` }}
-                >
-                  <td className="px-3 sm:px-6 py-3.5 text-xs text-emerald/60 font-mono">#{user.id}</td>
-                  <td className="px-3 sm:px-6 py-3.5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald/10 text-xs font-bold text-emerald">
-                        {user.name?.charAt(0)?.toUpperCase()}
-                      </div>
-                      <span className="text-xs font-semibold">{user.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-3 sm:px-6 py-3.5 text-xs text-emerald/60">{user.email}</td>
-                  <td className="px-3 sm:px-6 py-3.5">
-                    <code className="rounded-md bg-emerald/5 px-2 py-0.5 text-xs font-semibold text-emerald/70">{user.referralCode}</code>
-                  </td>
-                  <td className="px-3 sm:px-6 py-3.5">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${
-                      user.isActive
-                        ? "bg-emerald/5 text-emerald ring-emerald/20"
-                        : "bg-destructive/10 text-red-600 ring-destructive/20"
-                    }`}>
-                      <span className={`h-1 w-1 rounded-full ${user.isActive ? "bg-emerald" : "bg-red-400"}`} />
-                      {user.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-3 sm:px-6 py-3.5 text-right text-xs text-emerald/60">
-                    {new Date(user.createdAt).toLocaleDateString("en-IN")}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
   );
