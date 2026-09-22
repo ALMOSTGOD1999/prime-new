@@ -184,17 +184,69 @@ async function fetchAllUsersInTree(rootId: number): Promise<FlatUser[]> {
 }
 
 // ── Build tree from flat user list (zero DB queries) ──
+// Display fix: all direct referrals (referredBy == rootId) are forced to
+// ONLY the extreme outer spines, vertical one-below-another, never middle.
+// First 2 → left/right under root. Rest → alternate extreme left/right bottom.
 function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | null {
   const userMap = new Map<number, FlatUser>();
   for (const u of descendants) userMap.set(u.id, u);
 
-  // Group ALL children by parentId
+  // Collect directs of the root (the tree owner) — these must go only on outer legs
+  const directs = descendants
+    .filter((u) => u.referredBy === rootId)
+    .sort((a, b) => a.id - b.id);
+  const directIds = new Set(directs.map((d) => d.id));
+
+  // Build parent→children map for NON-direct nodes first (leave directs out for remap)
   const childrenByParent = new Map<number, FlatUser[]>();
   for (const u of descendants) {
+    if (u.id === rootId) continue;
+    if (directIds.has(u.id)) continue; // will be re-inserted at extremes
     if (u.parentId) {
       const list = childrenByParent.get(u.parentId) || [];
       list.push(u);
       childrenByParent.set(u.parentId, list);
+    }
+  }
+
+  // Helper: find bottommost leaf on outer spine (always follow same side)
+  function findExtremeLeafSync(sideRootId: number, side: "left" | "right"): number {
+    let cur = sideRootId;
+    while (true) {
+      const kids = childrenByParent.get(cur) || [];
+      const sideChild = kids.find((k) => k.position === side);
+      if (!sideChild) return cur;
+      cur = sideChild.id;
+    }
+  }
+
+  // Re-insert directs at extremes (in-memory only — fixes display, DB fixed by migration)
+  if (directs.length > 0) {
+    // Need to keep childrenByParent updated as we insert so findExtremeLeaf sees new nodes
+    if (directs[0]) {
+      directs[0].position = "left";
+      const list = childrenByParent.get(rootId) || [];
+      list.push(directs[0]);
+      childrenByParent.set(rootId, list);
+    }
+    if (directs[1]) {
+      directs[1].position = "right";
+      const list = childrenByParent.get(rootId) || [];
+      list.push(directs[1]);
+      childrenByParent.set(rootId, list);
+    }
+    // Remaining 20 → alternate extreme left / extreme right bottom
+    for (let i = 2; i < directs.length; i++) {
+      const isLeft = directs.length === 1 ? true : i % 2 === 0;
+      const targetSide: "left" | "right" = isLeft ? "left" : "right";
+      const sideRootId = targetSide === "left" ? directs[0]!.id : directs[1]!.id;
+      // If sideRoot doesn't exist (only 1 direct), fall back to directs[0]
+      const effectiveRoot = sideRootId ?? directs[0]!.id;
+      const parentId = findExtremeLeafSync(effectiveRoot, targetSide);
+      directs[i]!.position = targetSide;
+      const list = childrenByParent.get(parentId) || [];
+      list.push(directs[i]!);
+      childrenByParent.set(parentId, list);
     }
   }
 

@@ -30,34 +30,20 @@ type DBUser = {
 
 type Slot = { parentId: number; position: "left" | "right" };
 
-// ── Find first empty slot in a subtree (BFS left-first) ──
-function findEmptySlotSync(
-  rootId: number,
+// ── Find extreme outer leaf on a given side (always follow same side) ──
+function findExtremeSlotSync(
+  sideRootId: number,
+  side: "left" | "right",
   childrenMap: Map<number, { left: number | null; right: number | null }>
 ): Slot {
-  const queue = [rootId];
-
-  while (queue.length > 0) {
-    const currentId = queue.shift()!;
-    const slots = childrenMap.get(currentId);
-
-    if (!slots) {
-      // Node has no entry yet — both slots are empty
-      return { parentId: currentId, position: "left" };
-    }
-
-    if (slots.left === null) {
-      return { parentId: currentId, position: "left" };
-    }
-    if (slots.right === null) {
-      return { parentId: currentId, position: "right" };
-    }
-
-    // Both slots taken — enqueue children
-    queue.push(slots.left, slots.right);
+  let cur = sideRootId;
+  while (true) {
+    const slots = childrenMap.get(cur);
+    if (!slots) return { parentId: cur, position: side };
+    const sideChild = side === "left" ? slots.left : slots.right;
+    if (sideChild === null || sideChild === undefined) return { parentId: cur, position: side };
+    cur = sideChild;
   }
-
-  throw new Error(`No empty slot found starting from user ${rootId}`);
 }
 
 async function main() {
@@ -92,11 +78,12 @@ async function main() {
     else slots.right = childId;
   }
 
-  // 4. Process each user
+  // 4. Process each user — extreme outer-leg logic
   let placed = 0;
   let skipped = 0;
   let rootUsers = 0;
   const updates: { userId: number; parentId: number; position: string }[] = [];
+  const directCountMap = new Map<number, number>(); // referrerId -> how many directs already placed
 
   for (const user of allUsers) {
     const referrerId = referredByMap.get(user.id);
@@ -107,21 +94,37 @@ async function main() {
       continue;
     }
 
-    // Find spillover slot under the referrer
+    // Determine slot using extreme outer-leg rule:
+    // 1st direct -> left under referrer, 2nd -> right, rest -> alternate extreme bottom
+    const count = directCountMap.get(referrerId) ?? 0;
     let slot: Slot;
     try {
-      slot = findEmptySlotSync(referrerId, childrenMap);
+      if (count === 0) {
+        slot = { parentId: referrerId, position: "left" };
+      } else if (count === 1) {
+        slot = { parentId: referrerId, position: "right" };
+      } else {
+        const targetSide: "left" | "right" = count % 2 === 0 ? "left" : "right";
+        const refSlots = childrenMap.get(referrerId);
+        const sideRootId = targetSide === "left" ? refSlots?.left : refSlots?.right;
+        if (!sideRootId) throw new Error(`Referrer ${referrerId} missing ${targetSide} leg for extreme spill`);
+        slot = findExtremeSlotSync(sideRootId, targetSide, childrenMap);
+      }
     } catch (e: any) {
       console.log(`  SKIP user ${user.id} (${user.name}): ${e.message}`);
       skipped++;
       continue;
     }
 
-    // If the user is already correctly placed, skip
+    // If the user is already correctly placed, skip but still count it
     if (user.parent_id === slot.parentId && user.position === slot.position) {
       registerPlacement(slot.parentId, user.id, slot.position);
+      directCountMap.set(referrerId, count + 1);
       continue;
     }
+
+    // Track direct count for this referrer
+    directCountMap.set(referrerId, count + 1);
 
     // Record the update
     updates.push({ userId: user.id, parentId: slot.parentId, position: slot.position });
