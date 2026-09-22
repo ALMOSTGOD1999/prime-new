@@ -235,12 +235,12 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       list.push(directs[1]);
       childrenByParent.set(rootId, list);
     }
-    // Remaining 20 → alternate extreme left / extreme right bottom
+    // Remaining directs → on extreme leg as per their stored position (left/right), vertical stack
     for (let i = 2; i < directs.length; i++) {
-      const isLeft = directs.length === 1 ? true : i % 2 === 0;
-      const targetSide: "left" | "right" = isLeft ? "left" : "right";
+      const stored = directs[i]!.position;
+      const targetSide: "left" | "right" =
+        stored === "left" || stored === "right" ? stored : i % 2 === 0 ? "left" : "right";
       const sideRootId = targetSide === "left" ? directs[0]!.id : directs[1]!.id;
-      // If sideRoot doesn't exist (only 1 direct), fall back to directs[0]
       const effectiveRoot = sideRootId ?? directs[0]!.id;
       const parentId = findExtremeLeafSync(effectiveRoot, targetSide);
       directs[i]!.position = targetSide;

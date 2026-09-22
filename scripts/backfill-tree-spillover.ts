@@ -104,7 +104,9 @@ async function main() {
       } else if (count === 1) {
         slot = { parentId: referrerId, position: "right" };
       } else {
-        const targetSide: "left" | "right" = count % 2 === 0 ? "left" : "right";
+        const storedPos = user.position as "left" | "right" | null;
+        const targetSide: "left" | "right" =
+          storedPos === "left" || storedPos === "right" ? storedPos : count % 2 === 0 ? "left" : "right";
         const refSlots = childrenMap.get(referrerId);
         const sideRootId = targetSide === "left" ? refSlots?.left : refSlots?.right;
         if (!sideRootId) throw new Error(`Referrer ${referrerId} missing ${targetSide} leg for extreme spill`);
