@@ -385,12 +385,13 @@ export const getTeamStats = createServerFn({ method: "GET" })
     classify(userId, "left");
     classify(userId, "right");
 
-    // Direct team = immediate children
-    const directTeam = descendants.filter((u) => u.parentId === userId);
+    // Direct team = people the user personally referred (not just tree children)
+    const directTeam = descendants.filter((u) => u.referredBy === userId);
     const totalTeam = descendants.length;
     const activeTeam = descendants.filter((u) => u.isActive).length;
-    const leftCount = directTeam.filter((u) => u.position === "left").length;
-    const rightCount = directTeam.filter((u) => u.position === "right").length;
+    // How many direct referrals ended up on each leg
+    const leftCount = directTeam.filter((u) => leftLeg.some((l) => l.id === u.id)).length;
+    const rightCount = directTeam.filter((u) => rightLeg.some((r) => r.id === u.id)).length;
 
     // Left leg stats
     const teamLeftActive = leftLeg.filter((u) => u.isActive).length;
