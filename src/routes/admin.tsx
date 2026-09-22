@@ -157,7 +157,7 @@ function AdminLayout() {
           <Wordmark className="text-sm font-bold uppercase" />
         </header>
 
-        <main className="flex-1 p-3 pb-20 sm:p-6 lg:p-8 lg:pb-8">
+        <main className="flex-1 px-4 py-4 pb-20 sm:p-6 lg:p-8 lg:pb-8">
           <Outlet />
           <div className="mt-12 border-t border-gold/10 pt-6 text-center">
             <Typewriter

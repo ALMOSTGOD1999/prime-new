@@ -110,7 +110,7 @@ function AdminDashboard() {
       </div>
 
       {/* Stat Cards - Row 1: Users + Business */}
-      <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-4">
+      <div className="max-w-lg space-y-3 sm:space-y-4 lg:mx-0 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-5">
         <DashCard
           title="Total Users"
           value={String(totalUsers)}
@@ -154,7 +154,7 @@ function AdminDashboard() {
       </div>
 
       {/* Stat Cards - Row 2: Income */}
-      <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-3">
+      <div className="max-w-lg space-y-3 sm:space-y-4 lg:mx-0 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-5">
         <DashCard
           title="Direct Paid"
           value={`₹${totalDirect.toLocaleString("en-IN")}`}

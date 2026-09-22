@@ -329,7 +329,7 @@ function DashboardLayout() {
           </div>
         )}
 
-        <main className="flex-1 p-4 pb-20 sm:p-6 lg:p-8 lg:pb-8">
+        <main className="flex-1 px-4 py-4 pb-20 sm:p-6 lg:p-8 lg:pb-8">
           {/* Gold Price Ticker */}
           {goldPrice?.price && (
             <div className="mb-6 overflow-hidden rounded border border-gold/20 bg-gradient-to-r from-gold/10 via-gold/5 to-gold/10">
