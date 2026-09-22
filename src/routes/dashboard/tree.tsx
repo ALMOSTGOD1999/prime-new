@@ -284,13 +284,14 @@ function DashboardTreePage() {
 }
 
 /* ── Person SVG Avatar ── */
-function PersonAvatar({ size = 60 }: { size?: number }) {
+function PersonAvatar({ size = 60, isActive = true }: { size?: number; isActive?: boolean }) {
+  const color = isActive ? "#16a34a" : "#dc2626";
   return (
     <svg width={size} height={size} viewBox="0 0 60 60" fill="none">
-      <circle cx="30" cy="30" r="30" fill="#dc2626" />
+      <circle cx="30" cy="30" r="30" fill={color} />
       <circle cx="30" cy="23" r="8" fill="white" opacity="0.9" />
       <ellipse cx="30" cy="44" rx="14" ry="10" fill="white" opacity="0.9" />
-      <rect x="22" y="36" width="16" height="3" rx="1" fill="#dc2626" opacity="0.4" />
+      <rect x="22" y="36" width="16" height="3" rx="1" fill={color} opacity="0.4" />
     </svg>
   );
 }
@@ -364,7 +365,7 @@ function TreeNode({
           isHighlighted ? "scale-110 shadow-lg ring-2 ring-gold" : "shadow-sm"
         }`}
       >
-        <PersonAvatar size={60} />
+        <PersonAvatar size={60} isActive={node.isActive} />
 
         <p className="mt-2 text-xs font-bold text-slate-800">
           {node.referralCode}

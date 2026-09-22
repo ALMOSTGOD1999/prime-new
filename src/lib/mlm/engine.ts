@@ -32,61 +32,80 @@ export async function placeInTree(
     .where(eq(users.id, newUserId));
 }
 
-// ── Find first empty slot in a subtree (BFS, left-first) ──
-async function findEmptySlot(
-  rootId: number,
+// ── Find extreme outer leaf on a given side ──
+// Walk straight down the outer spine (always follow same side)
+// until we hit a node whose `side` child is empty.
+async function findExtremeSlot(
+  sideRootId: number,
+  side: "left" | "right",
 ): Promise<{ parentId: number; position: "left" | "right" }> {
-  const queue = [rootId];
-
-  while (queue.length > 0) {
-    const currentId = queue.shift()!;
-
-    // Fetch all children of this node in one query
-    const children = await db
-      .select({ id: users.id, position: users.position })
+  let currentId = sideRootId;
+  while (true) {
+    const child = await db
+      .select({ id: users.id })
       .from(users)
-      .where(eq(users.parentId, currentId));
-
-    const hasLeft = children.some((c) => c.position === "left");
-    const hasRight = children.some((c) => c.position === "right");
-
-    if (!hasLeft) return { parentId: currentId, position: "left" };
-    if (!hasRight) return { parentId: currentId, position: "right" };
-
-    // Both slots taken — enqueue children for next level
-    for (const child of children) {
-      queue.push(child.id);
-    }
+      .where(and(eq(users.parentId, currentId), eq(users.position, side)));
+    if (child.length === 0) return { parentId: currentId, position: side };
+    currentId = child[0].id;
   }
-
-  throw new Error("No empty slot found in tree");
 }
 
-// ── Auto-place in binary tree with spillover ──────────
-// The user picks a leg (left/right). If that leg slot on the
-// referrer is empty, place directly. If taken, spill to the
-// first empty slot in that leg's subtree (BFS left-first).
+// ── Auto-place in binary tree with extreme-leg spillover ──
+// Rule: first 2 directs fill left/right directly under referrer.
+// All later directs spill ONE BY ONE to the BOTTOM of the
+// extreme left leg or extreme right leg (outermost spine).
+// If preferredLeg is given the user chooses the side;
+// otherwise we alternate left/right so 22 directs → 11 each side.
 export async function autoPlace(
   newUserId: number,
   referrerId: number,
   preferredLeg?: "left" | "right",
 ): Promise<"left" | "right"> {
-  const leg = preferredLeg ?? "left";
-
-  // Check if the preferred leg slot on referrer is empty
-  const legChild = await db
+  // Fetch both direct children
+  const leftChild = await db
     .select({ id: users.id })
     .from(users)
-    .where(and(eq(users.parentId, referrerId), eq(users.position, leg)));
+    .where(and(eq(users.parentId, referrerId), eq(users.position, "left")));
+  const rightChild = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(and(eq(users.parentId, referrerId), eq(users.position, "right")));
 
-  if (legChild.length === 0) {
-    // Slot is empty — place directly
+  const hasLeft = leftChild.length > 0;
+  const hasRight = rightChild.length > 0;
+
+  // Both empty — first join
+  if (!hasLeft && !hasRight) {
+    const leg = preferredLeg ?? "left";
     await placeInTree(newUserId, referrerId, leg);
     return leg;
   }
+  // One side empty — fill it regardless of preference
+  if (!hasLeft) {
+    await placeInTree(newUserId, referrerId, "left");
+    return "left";
+  }
+  if (!hasRight) {
+    await placeInTree(newUserId, referrerId, "right");
+    return "right";
+  }
 
-  // Slot is taken — find first empty slot in that leg's subtree
-  const slot = await findEmptySlot(legChild[0].id);
+  // Both legs occupied — spill to extreme outer bottom
+  let targetLeg: "left" | "right";
+  if (preferredLeg) {
+    targetLeg = preferredLeg;
+  } else {
+    // Alternate: count existing directs to balance 20 → 10 left / 10 right
+    const directs = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.referredBy, referrerId));
+    // directs.length is 2 before 3rd insertion → even → left, then right, etc.
+    targetLeg = directs.length % 2 === 0 ? "left" : "right";
+  }
+
+  const sideRootId = targetLeg === "left" ? leftChild[0]!.id : rightChild[0]!.id;
+  const slot = await findExtremeSlot(sideRootId, targetLeg);
   await placeInTree(newUserId, slot.parentId, slot.position);
   return slot.position;
 }
