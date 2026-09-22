@@ -68,18 +68,13 @@ export function LevelTreeView({ levels, rootId, startExpanded = false }: { level
               className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-gold/5"
             >
               <div className="flex items-center gap-3">
-                <span className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold ${
-                  levelIdx === 0 ? "bg-gold text-cream" : "bg-emerald/10 text-emerald"
-                }`}>
-                  L{levelIdx}
+                <span className="flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold bg-emerald/10 text-emerald">
+                  L{levelIdx + 1}
                 </span>
                 <div className="text-left">
-                  <p className="text-xs font-semibold">
-                    Level {levelIdx === 0 ? "0 (You)" : levelIdx}
-                  </p>
+                  <p className="text-xs font-semibold">Level {levelIdx + 1}</p>
                   <p className="text-[10px] text-emerald/60">
-                    {levelUsers.length} member{levelUsers.length !== 1 ? "s" : ""}
-                    {levelIdx > 0 && ` · ${activeCount} active`}
+                    {levelUsers.length} member{levelUsers.length !== 1 ? "s" : ""} · {activeCount} active
                   </p>
                 </div>
               </div>
