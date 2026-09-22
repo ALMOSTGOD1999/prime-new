@@ -86,11 +86,11 @@ function DashboardIndex() {
   const { user, income } = data;
 
   const gradients = {
-    pink: "from-rose-400 to-pink-500",
-    green: "from-emerald-400 to-green-500",
-    blue: "from-sky-400 to-blue-500",
-    orange: "from-amber-400 to-orange-500",
-    red: "from-red-400 to-rose-500",
+    pink: "from-rose-400 via-pink-400 to-orange-300",
+    green: "from-emerald-500 via-green-500 to-teal-400",
+    blue: "from-sky-400 via-blue-500 to-indigo-400",
+    orange: "from-amber-400 via-orange-400 to-yellow-300",
+    red: "from-red-400 via-rose-400 to-pink-300",
   };
 
   return (

@@ -143,7 +143,7 @@ function AdminLayout() {
       </aside>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Mobile header */}
         <header className="flex items-center border-b border-gold/10 bg-background/80 px-4 py-3 backdrop-blur-md lg:hidden">
           <button

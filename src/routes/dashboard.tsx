@@ -282,7 +282,7 @@ function DashboardLayout() {
         </div>
       </aside>
 
-      <div className="flex flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header className="flex items-center justify-between border-b border-gold/20 bg-background/90 px-4 py-3 backdrop-blur-md lg:hidden">
           <div className="flex items-center">
             <button onClick={() => setSidebarOpen(true)} className="mr-4 text-emerald">
