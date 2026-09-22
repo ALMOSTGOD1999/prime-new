@@ -94,33 +94,33 @@ function DashboardIndex() {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-6 overflow-hidden">
+      <div className="flex flex-col gap-3">
         <div>
-          <h1 className="font-display text-2xl sm:text-3xl">
+          <h1 className="font-display text-xl sm:text-3xl">
             Welcome, <span className="italic text-gold">{user.name}</span>
           </h1>
-          <p className="mt-1 text-xs uppercase tracking-widest text-emerald/70">
+          <p className="mt-1 text-[10px] uppercase tracking-widest text-emerald/70">
             Member since {new Date(user.createdAt).toLocaleDateString("en-IN")}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2 sm:gap-3">
+        <div className="flex flex-col gap-2">
           <button
             onClick={() => copyReferral("left")}
-            className="border border-emerald/40 px-3 sm:px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10"
+            className="w-full border border-emerald/40 px-3 py-2.5 text-[11px] font-semibold uppercase tracking-widest transition-all hover:bg-emerald/10"
           >
             {copied === "left" ? "Copied!" : "Share Left Leg Link"}
           </button>
           <button
             onClick={() => copyReferral("right")}
-            className="border border-gold/40 px-3 sm:px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all hover:bg-gold/10"
+            className="w-full border border-gold/40 px-3 py-2.5 text-[11px] font-semibold uppercase tracking-widest transition-all hover:bg-gold/10"
           >
             {copied === "right" ? "Copied!" : "Share Right Leg Link"}
           </button>
           {user.isAdmin && (
             <Link
               to="/admin"
-              className="bg-emerald px-3 sm:px-4 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
+              className="w-full bg-emerald px-3 py-2.5 text-center text-[11px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
             >
               Admin Panel
             </Link>
@@ -132,7 +132,7 @@ function DashboardIndex() {
       {teamStats && (
         <>
           {/* Row 1: Team counts */}
-          <div className="max-w-lg space-y-3 sm:space-y-4 lg:mx-0 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-5">
+          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
             <DashCard title="Total Downline" value={teamStats.totalTeam ?? 0} gradient={gradients.pink} icon="🛍" details={<>
               <p>Active: {teamStats.activeTeam ?? 0}</p>
               <p>Inactive: {(teamStats.totalTeam ?? 0) - (teamStats.activeTeam ?? 0)}</p>
@@ -155,7 +155,7 @@ function DashboardIndex() {
           </div>
 
           {/* Row 2: Business + income + awards */}
-          <div className="max-w-lg space-y-3 sm:space-y-4 lg:mx-0 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-5">
+          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
             <DashCard title="Left Gold Business" value={`₹${(teamStats.teamBusinessLeftGold ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" details={<>
               <p>Gold/Platinum purchase volume</p>
               <p>Total left: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}</p>
@@ -175,7 +175,7 @@ function DashboardIndex() {
           </div>
 
           {/* Row 3: Awards */}
-          <div className="max-w-lg space-y-3 sm:space-y-4 lg:mx-0 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-5">
+          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
             <DashCard title="Joining Awards" value={income.awards?.length ?? 0} gradient={gradients.blue} icon="🏆" details={<>
               <p>Milestone rewards for pair matching</p>
               <p>Bag at 100 pairs · Phone at 500</p>
@@ -185,7 +185,7 @@ function DashboardIndex() {
           </div>
 
           {/* Row 4: Ratio, Rank, Matching */}
-          <div className="max-w-lg space-y-3 sm:space-y-4 lg:mx-0 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-5">
+          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
             <DashCard title="60:40 Ratio" value="Business Split" gradient={gradients.red} icon="⚖️" details={<>
               <p>Left: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}</p>
               <p>Right: ₹{(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}</p>
