@@ -72,6 +72,8 @@ function UserTable({ users, title }: { users: any[]; title: string }) {
                 <th className="px-3 py-2">Status</th>
                 <th className="px-3 py-2">Rank</th>
                 <th className="px-3 py-2">Business</th>
+                <th className="px-3 py-2">Date of Joining</th>
+                <th className="px-3 py-2">Sponsor ID</th>
               </tr>
             </thead>
             <tbody>
@@ -88,6 +90,8 @@ function UserTable({ users, title }: { users: any[]; title: string }) {
                   </td>
                   <td className="px-3 py-2 capitalize">{u.rank}</td>
                   <td className="px-3 py-2">{"\u20B9"}{(u.packageAmount || 0).toLocaleString("en-IN")}</td>
+                  <td className="px-3 py-2 text-[10px] text-emerald/70">{u.createdAt ? new Date(u.createdAt).toLocaleDateString("en-IN") : "—"}</td>
+                  <td className="px-3 py-2 font-mono text-[10px] text-emerald/70">{u.sponsorId || "—"}</td>
                 </tr>
               ))}
             </tbody>
@@ -187,34 +191,7 @@ function TreeViewTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex rounded-lg border border-gold/20 bg-background p-0.5">
-            <button onClick={() => setViewMode("binary")} className={`rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all ${viewMode === "binary" ? "bg-emerald text-cream shadow-sm" : "text-emerald/60 hover:text-emerald"}`}>Binary</button>
-            <button onClick={() => setViewMode("level")} className={`rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all ${viewMode === "level" ? "bg-emerald text-cream shadow-sm" : "text-emerald/60 hover:text-emerald"}`}>Level</button>
-          </div>
-          {viewMode === "binary" && (
-            <div className="flex items-center gap-1.5">
-              <button onClick={expandAll} className="rounded border border-emerald/30 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Expand</button>
-              <button onClick={collapseAll} className="rounded border border-gold/30 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-gold hover:bg-gold/5">Collapse</button>
-              <div className="flex items-center gap-1 rounded border border-gold/30 px-1.5 py-0.5">
-                <button onClick={() => setZoom((z) => Math.min(3, z + 0.15))} className="rounded px-1.5 py-0.5 text-xs font-bold text-emerald hover:bg-emerald/10">+</button>
-                <span className="min-w-[36px] text-center text-xs text-emerald/60">{Math.round(zoom * 100)}%</span>
-                <button onClick={() => setZoom((z) => Math.max(0.1, z - 0.15))} className="rounded px-1.5 py-0.5 text-xs font-bold text-emerald hover:bg-emerald/10">-</button>
-              </div>
-              <button onClick={resetView} className="rounded border border-emerald/30 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-emerald hover:bg-emerald/5">Reset</button>
-            </div>
-          )}
-        </div>
-      </div>
-      {stats && (
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-          <MiniStat label="Direct" value={stats.directTeam} sub={`L: ${stats.leftCount} \u00B7 R: ${stats.rightCount}`} />
-          <MiniStat label="Total Team" value={stats.totalTeam} sub={`${stats.activeTeam} active`} />
-          <MiniStat label="Business" value={`\u20B9${stats.totalBusiness.toLocaleString("en-IN")}`} sub="Package value" />
-          <MiniStat label="Active Rate" value={stats.totalTeam > 0 ? `${Math.round((stats.activeTeam / stats.totalTeam) * 100)}%` : "\u2014"} sub="Team activity" />
-        </div>
-      )}
+      {/* Search only — header and stats removed per request */}
       {viewMode === "binary" && (
         <div className="flex items-center gap-2">
           <span className="whitespace-nowrap text-xs font-semibold text-emerald/70">by Code</span>

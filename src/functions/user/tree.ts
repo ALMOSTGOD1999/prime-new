@@ -506,18 +506,24 @@ export const getDownlineUsers = createServerFn({ method: "GET" })
   .handler(async () => {
     const userId = await getAuthUserId();
     const descendants = await fetchAllUsersInTree(userId);
+    const userMap = new Map(descendants.map((u) => [u.id, u]));
     return descendants
       .filter((u) => u.id !== userId)
-      .map((u) => ({
-        id: u.id,
-        name: u.name,
-        referralCode: u.referralCode,
-        isActive: u.isActive,
-        rank: u.rank,
-        position: u.position,
-        parentId: u.parentId,
-        packageAmount: u.packageAmount,
-      }));
+      .map((u) => {
+        const sponsor = u.referredBy ? userMap.get(u.referredBy) : null;
+        return {
+          id: u.id,
+          name: u.name,
+          referralCode: u.referralCode,
+          isActive: u.isActive,
+          rank: u.rank,
+          position: u.position,
+          parentId: u.parentId,
+          packageAmount: u.packageAmount,
+          createdAt: u.createdAt,
+          sponsorId: sponsor?.referralCode || u.referredBy?.toString() || "—",
+        };
+      });
   });
 
 // ── Get direct referral users (people YOU referred, not tree children) ──
@@ -525,6 +531,9 @@ export const getDirectUsers = createServerFn({ method: "GET" })
   .handler(async () => {
     const userId = await getAuthUserId();
     const descendants = await fetchAllUsersInTree(userId);
+    const userMap = new Map(descendants.map((u) => [u.id, u]));
+    const me = userMap.get(userId);
+    const myCode = me?.referralCode || userId.toString();
     return descendants
       .filter((u) => u.referredBy === userId)
       .map((u) => ({
@@ -535,5 +544,7 @@ export const getDirectUsers = createServerFn({ method: "GET" })
         rank: u.rank,
         position: u.position,
         packageAmount: u.packageAmount,
+        createdAt: u.createdAt,
+        sponsorId: myCode,
       }));
   });
