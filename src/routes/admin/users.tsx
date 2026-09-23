@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getAdminUsers } from "../../functions/admin/users";
+import { getAdminUsers, updateUserPosition } from "../../functions/admin/users";
 import { impersonateUser } from "../../functions/admin/impersonate";
 import { deleteUser } from "../../functions/admin/deleteuser";
 import { toggleUserActivation } from "../../functions/admin/activate";
@@ -19,6 +19,7 @@ function AdminUsers() {
   const [deleteKey, setDeleteKey] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [activatingId, setActivatingId] = useState<number | null>(null);
+  const [updatingPosId, setUpdatingPosId] = useState<number | null>(null);
   const navigate = useNavigate();
 
   const fetchUsers = (s: string, p: number) => {
@@ -80,6 +81,21 @@ function AdminUsers() {
       alert(err.message || "Failed to update user");
     } finally {
       setActivatingId(null);
+    }
+  };
+
+  const handleChangePosition = async (userId: number, name: string, currentPos: string | null, newPos: "left" | "right") => {
+    if (currentPos === newPos) return;
+    if (!confirm(`Change ${name} (#${userId}) from ${currentPos || "none"} → ${newPos}? This moves them to the extreme ${newPos} leaf.`)) return;
+    setUpdatingPosId(userId);
+    try {
+      await updateUserPosition({ data: { userId, newPosition: newPos } });
+      alert(`${name} moved to ${newPos}`);
+      fetchUsers(search, page);
+    } catch (err: any) {
+      alert(err.message || "Failed to change position");
+    } finally {
+      setUpdatingPosId(null);
     }
   };
 
@@ -166,13 +182,27 @@ function AdminUsers() {
                         <code className="rounded-md bg-emerald/5 px-2 py-0.5 text-xs font-semibold text-emerald/70">{user.referralCode}</code>
                       </td>
                       <td className="px-3 sm:px-6 py-3.5">
-                        {user.position ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-gold/5 px-2 py-0.5 text-xs font-semibold text-gold ring-1 ring-gold/15">
-                            {user.position === "left" ? "←" : "→"} {user.position}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-emerald/25">—</span>
-                        )}
+                        <div className="flex items-center gap-1">
+                          {user.position ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-gold/5 px-2 py-0.5 text-xs font-semibold text-gold ring-1 ring-gold/15">
+                              {user.position === "left" ? "←" : "→"} {user.position}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-emerald/25">—</span>
+                          )}
+                          {!user.isAdmin && (
+                            <select
+                              value={user.position || ""}
+                              onChange={(e) => handleChangePosition(user.id, user.name, user.position, e.target.value as "left" | "right")}
+                              disabled={updatingPosId === user.id}
+                              className="rounded border border-gold/20 bg-white px-1 py-0.5 text-[10px] font-bold uppercase text-emerald disabled:opacity-40"
+                            >
+                              <option value="">—</option>
+                              <option value="left">L</option>
+                              <option value="right">R</option>
+                            </select>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-3.5">
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${

@@ -348,17 +348,18 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
   return buildNode(rootId);
 }
 
-// ── Build level tree from flat user list (BFS grouping) ──
+// ── Build level tree by JOINING (referredBy generations), not binary parent ──
+// Level 1 = all directs (referredBy == root), Level 2 = directs of directs, etc.
 function buildLevelTree(rootId: number, descendants: FlatUser[]): LevelUser[][] {
   const userMap = new Map<number, FlatUser>();
-  const childrenOf = new Map<number, FlatUser[]>();
+  const childrenByReferred = new Map<number, FlatUser[]>();
 
   for (const u of descendants) {
     userMap.set(u.id, u);
-    if (u.parentId) {
-      const list = childrenOf.get(u.parentId) || [];
+    if (u.referredBy) {
+      const list = childrenByReferred.get(u.referredBy) || [];
       list.push(u);
-      childrenOf.set(u.parentId, list);
+      childrenByReferred.set(u.referredBy, list);
     }
   }
 
@@ -370,7 +371,7 @@ function buildLevelTree(rootId: number, descendants: FlatUser[]): LevelUser[][] 
     const nextQueue: number[] = [];
 
     for (const id of queue) {
-      const kids = childrenOf.get(id) || [];
+      const kids = childrenByReferred.get(id) || [];
       for (const kid of kids) {
         levelUsers.push({
           id: kid.id,
