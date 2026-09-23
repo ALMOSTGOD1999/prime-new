@@ -54,6 +54,49 @@ export const getAdminUsers = createServerFn({ method: "GET" })
     return { users: allUsers, total, page, limit };
   });
 
+// Limited search for PR0006 — only for position manager (no other admin data)
+export const getUsersForPositionManager = createServerFn({ method: "GET" })
+  .validator((data: { search?: string; page?: number }) => data)
+  .handler(async ({ data }) => {
+    const token = getCookie("auth_token");
+    if (!token) throw new Error("Not authenticated");
+    const { verifyJwt } = await import("../../lib/auth");
+    const payload = await verifyJwt(token);
+    if (!payload || typeof (payload as any)["userId"] !== "number") throw new Error("Not authenticated");
+    const callerId = (payload as any)["userId"] as number;
+    const caller = await db.select({ isAdmin: users.isAdmin, referralCode: users.referralCode }).from(users).where(eq(users.id, callerId));
+    if (!caller.length || (!caller[0].isAdmin && caller[0].referralCode !== "PR0006")) throw new Error("Forbidden");
+
+    const search = data.search || "";
+    const page = data.page || 1;
+    const limit = 20;
+    const offset = (page - 1) * limit;
+
+    let query = db.select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      referralCode: users.referralCode,
+      position: users.position,
+      isActive: users.isActive,
+      createdAt: users.createdAt,
+    }).from(users);
+
+    if (search) {
+      const numId = Number(search.replace(/^#/, ""));
+      if (!isNaN(numId) && numId > 0) {
+        query = query.where(sql`${users.id} = ${numId} OR ${users.referralCode} ILIKE ${`%${search}%`} OR ${users.name} ILIKE ${`%${search}%`}`);
+      } else {
+        query = query.where(sql`${users.referralCode} ILIKE ${`%${search}%`} OR ${users.name} ILIKE ${`%${search}%`}`);
+      }
+    }
+
+    const allUsers = await query.limit(limit).offset(offset);
+    const countResult = await db.select({ count: sql<number>`count(*)::int` }).from(users);
+    const total = countResult[0]?.count ?? 0;
+    return { users: allUsers, total, page, limit };
+  });
+
 // ── Admin: change a user's left/right position (only parent_id moves to correct extreme, position preserved as chosen)
 export const updateUserPosition = createServerFn({ method: "POST" })
   .validator((data: { userId: number; newPosition: "left" | "right" }) => data)
@@ -64,8 +107,8 @@ export const updateUserPosition = createServerFn({ method: "POST" })
     const payload = await verifyJwt(token);
     if (!payload || typeof (payload as any)["userId"] !== "number") throw new Error("Not authenticated");
     const adminId = (payload as any)["userId"] as number;
-    const adminCheck = await db.select({ isAdmin: users.isAdmin }).from(users).where(eq(users.id, adminId));
-    if (!adminCheck.length || !adminCheck[0].isAdmin) throw new Error("Forbidden");
+    const caller = await db.select({ isAdmin: users.isAdmin, referralCode: users.referralCode }).from(users).where(eq(users.id, adminId));
+    if (!caller.length || (!caller[0].isAdmin && caller[0].referralCode !== "PR0006")) throw new Error("Forbidden");
 
     const { userId, newPosition } = data;
     const target = await db.select().from(users).where(eq(users.id, userId));
