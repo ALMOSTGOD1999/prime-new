@@ -31,6 +31,7 @@ import { Route as AdminPayoutRouteImport } from './routes/admin/payout'
 import { Route as AdminPurchasesRouteImport } from './routes/admin/purchases'
 import { Route as AdminReportsRouteImport } from './routes/admin/reports'
 import { Route as AdminRevenueRouteImport } from './routes/admin/revenue'
+import { Route as AdminSendPinsRouteImport } from './routes/admin/send-pins'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminTreeRouteImport } from './routes/admin/tree'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
@@ -50,6 +51,7 @@ import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile
 import { Route as DashboardPurchaseRouteImport } from './routes/dashboard/purchase'
 import { Route as DashboardReportsRouteImport } from './routes/dashboard/reports'
 import { Route as DashboardRewardsRouteImport } from './routes/dashboard/rewards'
+import { Route as DashboardSendPinsRouteImport } from './routes/dashboard/send-pins'
 import { Route as DashboardTeamRouteImport } from './routes/dashboard/team'
 import { Route as DashboardTreeRouteImport } from './routes/dashboard/tree'
 
@@ -163,6 +165,11 @@ const AdminRevenueRoute = AdminRevenueRouteImport.update({
   path: '/revenue',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSendPinsRoute = AdminSendPinsRouteImport.update({
+  id: '/send-pins',
+  path: '/send-pins',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -260,6 +267,11 @@ const DashboardRewardsRoute = DashboardRewardsRouteImport.update({
   path: '/rewards',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardSendPinsRoute = DashboardSendPinsRouteImport.update({
+  id: '/send-pins',
+  path: '/send-pins',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardTeamRoute = DashboardTeamRouteImport.update({
   id: '/team',
   path: '/team',
@@ -293,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/admin/purchases': typeof AdminPurchasesRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
+  '/admin/send-pins': typeof AdminSendPinsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tree': typeof AdminTreeRoute
   '/admin/users': typeof AdminUsersRoute
@@ -311,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/purchase': typeof DashboardPurchaseRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
+  '/dashboard/send-pins': typeof DashboardSendPinsRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/dashboard/tree': typeof DashboardTreeRoute
   '/admin/': typeof AdminIndexRoute
@@ -336,6 +350,7 @@ export interface FileRoutesByTo {
   '/admin/purchases': typeof AdminPurchasesRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
+  '/admin/send-pins': typeof AdminSendPinsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tree': typeof AdminTreeRoute
   '/admin/users': typeof AdminUsersRoute
@@ -354,6 +369,7 @@ export interface FileRoutesByTo {
   '/dashboard/purchase': typeof DashboardPurchaseRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
+  '/dashboard/send-pins': typeof DashboardSendPinsRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/dashboard/tree': typeof DashboardTreeRoute
   '/admin': typeof AdminIndexRoute
@@ -382,6 +398,7 @@ export interface FileRoutesById {
   '/admin/purchases': typeof AdminPurchasesRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
+  '/admin/send-pins': typeof AdminSendPinsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tree': typeof AdminTreeRoute
   '/admin/users': typeof AdminUsersRoute
@@ -400,6 +417,7 @@ export interface FileRoutesById {
   '/dashboard/purchase': typeof DashboardPurchaseRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
+  '/dashboard/send-pins': typeof DashboardSendPinsRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/dashboard/tree': typeof DashboardTreeRoute
   '/admin/': typeof AdminIndexRoute
@@ -429,6 +447,7 @@ export interface FileRouteTypes {
     | '/admin/purchases'
     | '/admin/reports'
     | '/admin/revenue'
+    | '/admin/send-pins'
     | '/admin/settings'
     | '/admin/tree'
     | '/admin/users'
@@ -447,6 +466,7 @@ export interface FileRouteTypes {
     | '/dashboard/purchase'
     | '/dashboard/reports'
     | '/dashboard/rewards'
+    | '/dashboard/send-pins'
     | '/dashboard/team'
     | '/dashboard/tree'
     | '/admin/'
@@ -472,6 +492,7 @@ export interface FileRouteTypes {
     | '/admin/purchases'
     | '/admin/reports'
     | '/admin/revenue'
+    | '/admin/send-pins'
     | '/admin/settings'
     | '/admin/tree'
     | '/admin/users'
@@ -490,6 +511,7 @@ export interface FileRouteTypes {
     | '/dashboard/purchase'
     | '/dashboard/reports'
     | '/dashboard/rewards'
+    | '/dashboard/send-pins'
     | '/dashboard/team'
     | '/dashboard/tree'
     | '/admin'
@@ -517,6 +539,7 @@ export interface FileRouteTypes {
     | '/admin/purchases'
     | '/admin/reports'
     | '/admin/revenue'
+    | '/admin/send-pins'
     | '/admin/settings'
     | '/admin/tree'
     | '/admin/users'
@@ -535,6 +558,7 @@ export interface FileRouteTypes {
     | '/dashboard/purchase'
     | '/dashboard/reports'
     | '/dashboard/rewards'
+    | '/dashboard/send-pins'
     | '/dashboard/team'
     | '/dashboard/tree'
     | '/admin/'
@@ -708,6 +732,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRevenueRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/send-pins': {
+      id: '/admin/send-pins'
+      path: '/send-pins'
+      fullPath: '/admin/send-pins'
+      preLoaderRoute: typeof AdminSendPinsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -841,6 +872,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRewardsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/send-pins': {
+      id: '/dashboard/send-pins'
+      path: '/send-pins'
+      fullPath: '/dashboard/send-pins'
+      preLoaderRoute: typeof DashboardSendPinsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/team': {
       id: '/dashboard/team'
       path: '/team'
@@ -872,6 +910,7 @@ interface AdminRouteChildren {
   AdminPurchasesRoute: typeof AdminPurchasesRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRevenueRoute: typeof AdminRevenueRoute
+  AdminSendPinsRoute: typeof AdminSendPinsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTreeRoute: typeof AdminTreeRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -892,6 +931,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPurchasesRoute: AdminPurchasesRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminRevenueRoute: AdminRevenueRoute,
+  AdminSendPinsRoute: AdminSendPinsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTreeRoute: AdminTreeRoute,
   AdminUsersRoute: AdminUsersRoute,
@@ -916,6 +956,7 @@ interface DashboardRouteChildren {
   DashboardPurchaseRoute: typeof DashboardPurchaseRoute
   DashboardReportsRoute: typeof DashboardReportsRoute
   DashboardRewardsRoute: typeof DashboardRewardsRoute
+  DashboardSendPinsRoute: typeof DashboardSendPinsRoute
   DashboardTeamRoute: typeof DashboardTeamRoute
   DashboardTreeRoute: typeof DashboardTreeRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -937,6 +978,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardPurchaseRoute: DashboardPurchaseRoute,
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardRewardsRoute: DashboardRewardsRoute,
+  DashboardSendPinsRoute: DashboardSendPinsRoute,
   DashboardTeamRoute: DashboardTeamRoute,
   DashboardTreeRoute: DashboardTreeRoute,
   DashboardIndexRoute: DashboardIndexRoute,

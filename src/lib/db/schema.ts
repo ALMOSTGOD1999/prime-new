@@ -179,8 +179,18 @@ export const activationPins = pgTable("activation_pins", {
   pin: text("pin").notNull().unique(),
   isUsed: boolean("is_used").default(false).notNull(),
   generatedBy: integer("generated_by").references(() => users.id).notNull(),
+  ownerId: integer("owner_id").references(() => users.id, { onDelete: "set null" }),
   usedBy: integer("used_by").references(() => users.id, { onDelete: "set null" }),
   usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ── Pin Transfers (send history) ───────────────────────
+export const pinTransfers = pgTable("pin_transfers", {
+  id: serial("id").primaryKey(),
+  pinId: integer("pin_id").references(() => activationPins.id, { onDelete: "cascade" }).notNull(),
+  fromUserId: integer("from_user_id").references(() => users.id).notNull(),
+  toUserId: integer("to_user_id").references(() => users.id).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

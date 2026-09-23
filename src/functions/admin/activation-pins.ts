@@ -38,11 +38,12 @@ export const generateActivationPins = createServerFn({ method: "POST" })
       pins.push(pin);
     }
 
-    // Batch insert
+    // Batch insert — owner is admin initially
     const values = pins.map((pin) => ({
       pin,
       isUsed: false,
       generatedBy: adminId,
+      ownerId: adminId,
     }));
 
     await db.insert(activationPins).values(values);

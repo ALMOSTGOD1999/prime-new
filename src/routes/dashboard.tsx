@@ -167,6 +167,8 @@ function DashboardLayout() {
     // ── Secondary nav ──
     { to: "/dashboard/add-user", label: "Add User", icon: "➕" },
     { to: "/dashboard/activate-account", label: "Activate Account", icon: "🔑" },
+    { to: "/dashboard/send-pins", label: "Send PINs", icon: "✉️" },
+    { to: "/dashboard/manage-positions", label: "Manage Positions", icon: "🔀" },
     { to: "/dashboard/rewards", label: "Rewards", icon: "🏆" },
     { to: "/dashboard/notifications", label: "Notifications", icon: "🔔", badge: unreadCount },
   ];
