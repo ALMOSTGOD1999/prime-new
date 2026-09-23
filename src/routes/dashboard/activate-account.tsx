@@ -1,21 +1,27 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { activateWithPin } from "../../functions/user/activate-with-pin";
 import { getMyPins, getPinsHistory, activateAccountWithPin } from "../../functions/user/pins";
 import { getDashboard } from "../../functions/user/dashboard";
 
 export const Route = createFileRoute("/dashboard/activate-account")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: ((search as any)["tab"] as "activation" | "my-pins" | "history") || "activation",
+  }),
   component: ActivateAccount,
 });
 
 function ActivateAccount() {
+  const { tab } = Route.useSearch();
+  const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [pin, setPin] = useState("");
   const [activating, setActivating] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"activation" | "my-pins" | "history">("activation");
+  const setTab = (t: "activation" | "my-pins" | "history") =>
+    navigate({ to: "/dashboard/activate-account", search: { tab: t } as any });
   const [myPins, setMyPins] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
   const [pinsLoading, setPinsLoading] = useState(false);

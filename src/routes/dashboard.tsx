@@ -166,7 +166,14 @@ function DashboardLayout() {
     { to: "/dashboard/kyc", label: "KYC Update", icon: "📋" },
     // ── Secondary nav ──
     { to: "/dashboard/add-user", label: "Add User", icon: "➕" },
-    { to: "/dashboard/activate-account", label: "Activate Account", icon: "🔑" },
+    {
+      label: "Activate Account", icon: "🔑",
+      children: [
+        { to: "/dashboard/activate-account", search: { tab: "activation" }, label: "Activation" },
+        { to: "/dashboard/activate-account", search: { tab: "my-pins" }, label: "My Pins" },
+        { to: "/dashboard/activate-account", search: { tab: "history" }, label: "Pins History" },
+      ],
+    },
     { to: "/dashboard/send-pins", label: "Send PINs", icon: "✉️" },
     { to: "/dashboard/manage-positions", label: "Manage Positions", icon: "🔀" },
     { to: "/dashboard/rewards", label: "Rewards", icon: "🏆" },
