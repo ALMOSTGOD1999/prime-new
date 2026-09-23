@@ -65,7 +65,8 @@ export const getUsersForPositionManager = createServerFn({ method: "GET" })
     if (!payload || typeof (payload as any)["userId"] !== "number") throw new Error("Not authenticated");
     const callerId = (payload as any)["userId"] as number;
     const caller = await db.select({ isAdmin: users.isAdmin, referralCode: users.referralCode }).from(users).where(eq(users.id, callerId));
-    if (!caller.length || (!caller[0].isAdmin && caller[0].referralCode !== "PR0006")) throw new Error("Forbidden");
+    const isPR0006 = caller.length && (caller[0].referralCode?.toUpperCase() === "PR0006" || callerId === 12);
+    if (!caller.length || (!caller[0].isAdmin && !isPR0006)) throw new Error("Forbidden: only PR0006 or admin can manage positions");
 
     const search = data.search || "";
     const page = data.page || 1;
@@ -108,7 +109,8 @@ export const updateUserPosition = createServerFn({ method: "POST" })
     if (!payload || typeof (payload as any)["userId"] !== "number") throw new Error("Not authenticated");
     const adminId = (payload as any)["userId"] as number;
     const caller = await db.select({ isAdmin: users.isAdmin, referralCode: users.referralCode }).from(users).where(eq(users.id, adminId));
-    if (!caller.length || (!caller[0].isAdmin && caller[0].referralCode !== "PR0006")) throw new Error("Forbidden");
+    const isPR0006b = caller.length && (caller[0].referralCode?.toUpperCase() === "PR0006" || adminId === 12);
+    if (!caller.length || (!caller[0].isAdmin && !isPR0006b)) throw new Error("Forbidden: only PR0006 or admin can manage positions");
 
     const { userId, newPosition } = data;
     const target = await db.select().from(users).where(eq(users.id, userId));
