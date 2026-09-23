@@ -231,34 +231,41 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
   // so deeper extremes see already-placed ancestors.
   const referrersSorted = [...directsByReferrer.keys()].sort((a, b) => a - b);
   for (const referrerId of referrersSorted) {
-    // Only rebuild if referrer is inside this tree (is descendant of root or is root)
     if (!userMap.has(referrerId)) continue;
     const directs = directsByReferrer.get(referrerId)!;
     if (directs.length === 0) continue;
 
-    if (directs[0]) {
-      directs[0].position = "left";
-      const list = childrenByParent.get(referrerId) || [];
-      list.push(directs[0]);
-      childrenByParent.set(referrerId, list);
-    }
-    if (directs[1]) {
-      directs[1].position = "right";
-      const list = childrenByParent.get(referrerId) || [];
-      list.push(directs[1]);
-      childrenByParent.set(referrerId, list);
-    }
-    for (let i = 2; i < directs.length; i++) {
-      const stored = directs[i]!.position;
-      const targetSide: "left" | "right" =
-        stored === "left" || stored === "right" ? stored : i % 2 === 0 ? "left" : "right";
-      const sideRootId = targetSide === "left" ? directs[0]!.id : directs[1]!.id;
-      const effectiveRoot = sideRootId ?? directs[0]!.id;
-      const parentId = findExtremeLeafSync(effectiveRoot, targetSide);
-      directs[i]!.position = targetSide;
-      const list = childrenByParent.get(parentId) || [];
-      list.push(directs[i]!);
-      childrenByParent.set(parentId, list);
+    // Preserve original position — never overwrite left/right choice made at signup.
+    // Place each direct on its stored side's extreme outer spine, vertical stack.
+    for (const direct of directs) {
+      const storedPos = direct.position as "left" | "right" | null;
+      // If position is null/invalid, fall back to alternating to avoid crash
+      let targetSide: "left" | "right";
+      if (storedPos === "left" || storedPos === "right") targetSide = storedPos;
+      else {
+        // Fallback: count already placed on left vs right for this referrer
+        const placed = childrenByParent.get(referrerId) || [];
+        const leftCnt = placed.filter((k) => k.position === "left").length;
+        const rightCnt = placed.filter((k) => k.position === "right").length;
+        targetSide = leftCnt <= rightCnt ? "left" : "right";
+      }
+
+      const refChildren = childrenByParent.get(referrerId) || [];
+      const hasSlot = refChildren.some((k) => k.position === targetSide);
+      if (!hasSlot) {
+        // Direct slot empty — place directly under referrer, keep original position
+        const list = childrenByParent.get(referrerId) || [];
+        list.push(direct);
+        childrenByParent.set(referrerId, list);
+      } else {
+        // Slot taken — spill to bottom of that side's extreme outer spine
+        const sideRoot = refChildren.find((k) => k.position === targetSide)!;
+        const parentId = findExtremeLeafSync(sideRoot.id, targetSide);
+        // Keep original position (do NOT overwrite)
+        const list = childrenByParent.get(parentId) || [];
+        list.push(direct);
+        childrenByParent.set(parentId, list);
+      }
     }
   }
 

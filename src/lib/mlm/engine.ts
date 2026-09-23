@@ -74,34 +74,35 @@ export async function autoPlace(
   const hasLeft = leftChild.length > 0;
   const hasRight = rightChild.length > 0;
 
-  // Both empty — first join
-  if (!hasLeft && !hasRight) {
-    const leg = preferredLeg ?? "left";
-    await placeInTree(newUserId, referrerId, leg);
-    return leg;
-  }
-  // One side empty — fill it regardless of preference
-  if (!hasLeft) {
-    await placeInTree(newUserId, referrerId, "left");
-    return "left";
-  }
-  if (!hasRight) {
-    await placeInTree(newUserId, referrerId, "right");
-    return "right";
-  }
-
-  // Both legs occupied — spill to extreme outer bottom
+  // Determine target side — preserve actual chosen position, never overwrite
   let targetLeg: "left" | "right";
   if (preferredLeg) {
     targetLeg = preferredLeg;
+  } else if (!hasLeft && !hasRight) {
+    targetLeg = "left";
+  } else if (!hasLeft) {
+    // Only left empty — if no preference, fill left; if preference is right, respect it (will spill)
+    targetLeg = "left";
+  } else if (!hasRight) {
+    targetLeg = "right";
   } else {
-    // Alternate: count existing directs to balance 20 → 10 left / 10 right
+    // Both occupied — alternate to balance, but still per stored intent
     const directs = await db
       .select({ id: users.id })
       .from(users)
       .where(eq(users.referredBy, referrerId));
-    // directs.length is 2 before 3rd insertion → even → left, then right, etc.
     targetLeg = directs.length % 2 === 0 ? "left" : "right";
+    // If user explicitly chose a leg, respect it even when both occupied
+    if (preferredLeg) targetLeg = preferredLeg;
+  }
+
+  // If caller explicitly asked for a side, respect it even if opposite side is empty
+  if (preferredLeg) targetLeg = preferredLeg;
+
+  const hasTargetSlot = targetLeg === "left" ? !hasLeft : !hasRight;
+  if (hasTargetSlot) {
+    await placeInTree(newUserId, referrerId, targetLeg);
+    return targetLeg;
   }
 
   const sideRootId = targetLeg === "left" ? leftChild[0]!.id : rightChild[0]!.id;

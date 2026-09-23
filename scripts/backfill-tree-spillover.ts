@@ -94,22 +94,20 @@ async function main() {
       continue;
     }
 
-    // Determine slot using extreme outer-leg rule:
-    // 1st direct -> left under referrer, 2nd -> right, rest -> alternate extreme bottom
+    // Preserve actual stored position (left/right) — never overwrite what was chosen at signup.
+    // First direct on a side goes directly under referrer; later directs spill to outer extreme bottom.
     const count = directCountMap.get(referrerId) ?? 0;
     let slot: Slot;
     try {
-      if (count === 0) {
-        slot = { parentId: referrerId, position: "left" };
-      } else if (count === 1) {
-        slot = { parentId: referrerId, position: "right" };
+      const storedPos = user.position as "left" | "right" | null;
+      const targetSide: "left" | "right" =
+        storedPos === "left" || storedPos === "right" ? storedPos : count % 2 === 0 ? "left" : "right";
+      const refSlots = childrenMap.get(referrerId);
+      const hasSlot = refSlots ? (targetSide === "left" ? refSlots.left : refSlots.right) != null : false;
+      if (!hasSlot) {
+        slot = { parentId: referrerId, position: targetSide };
       } else {
-        const storedPos = user.position as "left" | "right" | null;
-        const targetSide: "left" | "right" =
-          storedPos === "left" || storedPos === "right" ? storedPos : count % 2 === 0 ? "left" : "right";
-        const refSlots = childrenMap.get(referrerId);
-        const sideRootId = targetSide === "left" ? refSlots?.left : refSlots?.right;
-        if (!sideRootId) throw new Error(`Referrer ${referrerId} missing ${targetSide} leg for extreme spill`);
+        const sideRootId = targetSide === "left" ? refSlots!.left! : refSlots!.right!;
         slot = findExtremeSlotSync(sideRootId, targetSide, childrenMap);
       }
     } catch (e: any) {
