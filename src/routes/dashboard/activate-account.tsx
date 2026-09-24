@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { activateWithPin } from "../../functions/user/activate-with-pin";
-import { getMyPins, getPinsHistory, activateAccountWithPin } from "../../functions/user/pins";
+import { getMyPins, getPinsHistory, activateAccountWithPin, searchUserForActivation } from "../../functions/user/pins";
 import { getDashboard } from "../../functions/user/dashboard";
 
 export const Route = createFileRoute("/dashboard/activate-account")({
@@ -28,6 +28,8 @@ function ActivateAccount() {
   const [targetCode, setTargetCode] = useState("");
   const [targetActivating, setTargetActivating] = useState<string | null>(null);
   const [copiedPin, setCopiedPin] = useState<string | null>(null);
+  const [searchedUser, setSearchedUser] = useState<any>(null);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     getDashboard().then(setUser).catch(console.error).finally(() => setLoading(false));
@@ -79,6 +81,17 @@ function ActivateAccount() {
     navigator.clipboard.writeText(p);
     setCopiedPin(p);
     setTimeout(() => setCopiedPin(null), 1500);
+  };
+
+  const handleSearchUser = async () => {
+    if (!targetCode.trim()) { alert("Enter code to search"); return; }
+    setSearching(true);
+    try {
+      const res = await searchUserForActivation({ data: { query: targetCode } });
+      if (!res.user) { alert("Account not found"); setSearchedUser(null); }
+      else setSearchedUser(res.user);
+    } catch (e:any) { alert(e.message || "Search failed"); }
+    finally { setSearching(false); }
   };
 
   if (loading) return <div className="flex min-h-screen items-center justify-center bg-background"><div className="text-sm uppercase tracking-widest text-emerald/70">Loading...</div></div>;
@@ -139,7 +152,17 @@ function ActivateAccount() {
             <p className="mt-1 text-[10px] text-emerald/60">Search inactive account by referral code / ID / email, then use a PIN from below.</p>
             <div className="mt-3 flex gap-2">
               <input value={targetCode} onChange={(e)=>setTargetCode(e.target.value)} placeholder="Enter referral code e.g. PR1234 or ID" className="flex-1 rounded border border-gold/20 px-3 py-2 text-sm outline-none focus:border-gold/40" />
+              <button onClick={handleSearchUser} disabled={searching} className="rounded bg-emerald px-4 py-2 text-xs font-bold text-white hover:bg-emerald/90 disabled:opacity-40">
+                {searching ? "..." : "Search"}
+              </button>
             </div>
+            {searchedUser && (
+              <div className="mt-3 rounded border border-emerald/20 bg-emerald/5 p-3 text-xs">
+                <p className="font-semibold">{searchedUser.name} ({searchedUser.referralCode})</p>
+                <p className="text-[11px] text-emerald/60">{searchedUser.email} · {searchedUser.isActive ? "Active" : "Inactive"}</p>
+                {searchedUser.isActive && <p className="text-[10px] text-red-500">Already active — cannot activate</p>}
+              </div>
+            )}
           </div>
           {pinsLoading ? <div className="text-center text-xs text-emerald/60 py-8">Loading...</div> : myPins.length===0 ? <div className="rounded border border-gold/10 bg-card p-12 text-center text-xs text-emerald/60">No PINs in your inbox. Ask admin or another user to send you one.</div> : (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -81,6 +81,36 @@ export const getPinsHistory = createServerFn({ method: "GET" }).handler(async ()
   return { pins: enriched };
 });
 
+// ── Search user for activation (by code / ID / email)
+export const searchUserForActivation = createServerFn({ method: "GET" })
+  .validator((data: { query: string }) => data)
+  .handler(async ({ data }) => {
+    await getAuthUserId();
+    const q = data.query?.trim().toUpperCase();
+    if (!q) return { user: null };
+    let found: any = null;
+    const byCode = await db.select({ id: users.id, name: users.name, referralCode: users.referralCode, isActive: users.isActive, email: users.email }).from(users).where(eq(users.referralCode, q));
+    if (byCode.length) found = byCode[0];
+    else {
+      const byEmail = await db.select({ id: users.id, name: users.name, referralCode: users.referralCode, isActive: users.isActive, email: users.email }).from(users).where(eq(users.email, q));
+      if (byEmail.length) found = byEmail[0];
+      else {
+        const numId = Number(q.replace(/^#/, ""));
+        if (!isNaN(numId)) {
+          const byId = await db.select({ id: users.id, name: users.name, referralCode: users.referralCode, isActive: users.isActive, email: users.email }).from(users).where(eq(users.id, numId));
+          if (byId.length) found = byId[0];
+        }
+      }
+    }
+    if (!found) {
+      // fallback ILIKE search for partial
+      const like = `%${q}%`;
+      const byLike = await db.select({ id: users.id, name: users.name, referralCode: users.referralCode, isActive: users.isActive, email: users.email }).from(users).where(sql`${users.referralCode} ILIKE ${like} OR ${users.email} ILIKE ${like}`);
+      if (byLike.length) found = byLike[0];
+    }
+    return { user: found };
+  });
+
 // ── Activate any account (by searching) using a PIN I own
 export const activateAccountWithPin = createServerFn({ method: "POST" })
   .validator((data: { pin: string; targetCode: string }) => data)
