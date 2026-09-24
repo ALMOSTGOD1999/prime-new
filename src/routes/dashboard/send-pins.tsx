@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getMyPins, sendPin } from "../../functions/user/pins";
+import { getMyPins, sendPin, searchUserForActivation } from "../../functions/user/pins";
 
 export const Route = createFileRoute("/dashboard/send-pins")({
   component: DashboardSendPins,
@@ -11,6 +11,8 @@ function DashboardSendPins() {
   const [loading, setLoading] = useState(true);
   const [toCode, setToCode] = useState("");
   const [sendingPin, setSendingPin] = useState<string | null>(null);
+  const [searchedUser, setSearchedUser] = useState<any>(null);
+  const [searching, setSearching] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -22,6 +24,17 @@ function DashboardSendPins() {
   };
   useEffect(() => { load(); }, []);
 
+  const handleSearch = async () => {
+    if (!toCode.trim()) { alert("Enter code to search"); return; }
+    setSearching(true);
+    try {
+      const res = await searchUserForActivation({ data: { query: toCode } });
+      if (!res.user) { alert("User not found"); setSearchedUser(null); }
+      else setSearchedUser(res.user);
+    } catch (err: any) { alert(err.message || "Search failed"); }
+    finally { setSearching(false); }
+  };
+
   const handleSend = async (pinStr: string) => {
     if (!toCode.trim()) { alert("Enter recipient code / ID"); return; }
     setSendingPin(pinStr);
@@ -29,6 +42,7 @@ function DashboardSendPins() {
       await sendPin({ data: { pin: pinStr, toCode } });
       alert(`PIN ${pinStr} sent to ${toCode}`);
       setToCode("");
+      setSearchedUser(null);
       load();
     } catch (err: any) { alert(err.message || "Failed"); }
     finally { setSendingPin(null); }
@@ -45,8 +59,17 @@ function DashboardSendPins() {
         <label className="text-[10px] font-semibold uppercase tracking-widest text-gold">Recipient</label>
         <div className="mt-2 flex gap-2">
           <input value={toCode} onChange={(e)=>setToCode(e.target.value)} placeholder="Referral code / Email / ID e.g. PR1234" className="flex-1 rounded border border-gold/20 px-3 py-2 text-sm outline-none focus:border-gold/40" />
+          <button onClick={handleSearch} disabled={searching} className="rounded bg-emerald px-4 py-2 text-xs font-bold text-white hover:bg-emerald/90 disabled:opacity-40">
+            {searching ? "..." : "Search"}
+          </button>
         </div>
-        <p className="mt-1 text-[10px] text-emerald/50">Enter recipient, then click Send next to a PIN below. Each PIN can be used only once.</p>
+        {searchedUser && (
+          <div className="mt-3 rounded border border-emerald/20 bg-emerald/5 p-3 text-xs">
+            <p className="font-semibold">{searchedUser.name} ({searchedUser.referralCode})</p>
+            <p className="text-[11px] text-emerald/60">{searchedUser.email} · {searchedUser.isActive ? "Active" : "Inactive"}</p>
+          </div>
+        )}
+        <p className="mt-1 text-[10px] text-emerald/50">Search the user, then click Send next to a PIN below. Each PIN can be used only once.</p>
       </div>
 
       {loading ? <div className="py-12 text-center text-xs text-emerald/60">Loading...</div> : pins.length===0 ? <div className="rounded border border-gold/10 bg-card p-12 text-center text-xs text-emerald/60">No PINs to send. Request from admin.</div> : (
