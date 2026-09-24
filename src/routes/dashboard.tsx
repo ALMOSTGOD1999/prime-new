@@ -141,6 +141,7 @@ function DashboardLayout() {
   const navLinks: (NavLeaf | NavParent)[] = [
     // ── Primary nav ──
     { to: "/dashboard", label: "Dashboard", icon: "◈" },
+    { to: "/dashboard/add-user", label: "Add User", icon: "➕" },
     {
       label: "My Profile", icon: "👤",
       children: [
@@ -165,7 +166,6 @@ function DashboardLayout() {
     { to: "/dashboard/reports", label: "Report", icon: "📊" },
     { to: "/dashboard/kyc", label: "KYC Update", icon: "📋" },
     // ── Secondary nav ──
-    { to: "/dashboard/add-user", label: "Add User", icon: "➕" },
     {
       label: "Activate Account", icon: "🔑",
       children: [
@@ -202,64 +202,65 @@ function DashboardLayout() {
 
           <nav className="flex-1 space-y-1 overflow-y-auto p-4">
             {navLinks.map((link, idx) => {
-              // Separator between primary and secondary nav
-              if (idx === 7) {
-                return (
-                  <div key="separator" className="my-3 border-t border-gold/10" />
-                );
-              }
+              const sep = idx === 8 ? <div key={`sep-${idx}`} className="my-3 border-t border-gold/10" /> : null;
               if ("children" in link) {
                 const isOpen = expandedMenu === link.label;
                 return (
-                  <div key={link.label}>
-                    <button
-                      onClick={() => setExpandedMenu(isOpen ? null : link.label)}
-                      className="flex w-full items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-emerald/70 transition-colors hover:bg-gold/5 hover:text-emerald"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <span>{link.icon}</span>
-                        <span>{link.label}</span>
-                      </div>
-                      <span className={`text-[10px] transition-transform ${isOpen ? "rotate-90" : ""}`}>▶</span>
-                    </button>
-                    {isOpen && (
-                      <div className="ml-5 mt-1 space-y-0.5 border-l border-gold/10 pl-3">
-                        {link.children.map((child) => (
-                          <Link
-                            key={child.label}
-                            to={child.to}
-                            search={child.search}
-                            activeProps={{ className: "bg-gold/10 text-gold" }}
-                            className="block rounded px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-emerald/50 transition-colors hover:bg-gold/5 hover:text-emerald"
-                            onClick={() => setSidebarOpen(false)}
-                          >
-                            {child.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <>
+                    {sep}
+                    <div key={link.label}>
+                      <button
+                        onClick={() => setExpandedMenu(isOpen ? null : link.label)}
+                        className="flex w-full items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-emerald/70 transition-colors hover:bg-gold/5 hover:text-emerald"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <span>{link.icon}</span>
+                          <span>{link.label}</span>
+                        </div>
+                        <span className={`text-[10px] transition-transform ${isOpen ? "rotate-90" : ""}`}>▶</span>
+                      </button>
+                      {isOpen && (
+                        <div className="ml-5 mt-1 space-y-0.5 border-l border-gold/10 pl-3">
+                          {link.children.map((child) => (
+                            <Link
+                              key={child.label}
+                              to={child.to}
+                              search={child.search}
+                              activeProps={{ className: "bg-gold/10 text-gold" }}
+                              className="block rounded px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-emerald/50 transition-colors hover:bg-gold/5 hover:text-emerald"
+                              onClick={() => setSidebarOpen(false)}
+                            >
+                              {child.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </>
                 );
               }
               return (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  activeOptions={{ exact: link.to === "/dashboard" }}
-                  activeProps={{ className: "bg-gold/10 text-gold" }}
-                  className="flex items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-emerald/70 transition-colors hover:bg-gold/5 hover:text-emerald"
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <div className="flex items-center space-x-3">
-                    <span>{link.icon}</span>
-                    <span>{link.label}</span>
-                  </div>
-                  {"badge" in link && (link.badge ?? 0) > 0 && (
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-cream">
-                      {link.badge! > 99 ? "99+" : link.badge}
-                    </span>
-                  )}
-                </Link>
+                <>
+                  {sep}
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    activeOptions={{ exact: link.to === "/dashboard" }}
+                    activeProps={{ className: "bg-gold/10 text-gold" }}
+                    className="flex items-center justify-between rounded px-4 py-3 text-xs font-semibold uppercase tracking-widest text-emerald/70 transition-colors hover:bg-gold/5 hover:text-emerald"
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <span>{link.icon}</span>
+                      <span>{link.label}</span>
+                    </div>
+                    {"badge" in link && (link.badge ?? 0) > 0 && (
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-cream">
+                        {link.badge! > 99 ? "99+" : link.badge}
+                      </span>
+                    )}
+                  </Link>
+                </>
               );
             })}
           </nav>
