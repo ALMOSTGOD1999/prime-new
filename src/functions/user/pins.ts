@@ -53,6 +53,49 @@ export const sendPin = createServerFn({ method: "POST" })
     return { success: true, message: `PIN ${pinStr} sent to user #${toUser.id}` };
   });
 
+// ── Bulk send: send many PINs at once with checkboxes
+export const sendPinsBulk = createServerFn({ method: "POST" })
+  .validator((data: { pins: string[]; toCode: string }) => data)
+  .handler(async ({ data }) => {
+    const fromUserId = await getAuthUserId();
+    const { pins, toCode: rawTo } = data;
+    const toCode = rawTo?.trim().toUpperCase();
+    if (!pins?.length) throw new Error("Select at least one PIN");
+    if (!toCode) throw new Error("Recipient code is required");
+
+    // Find recipient
+    let toUser: any = null;
+    const byCode = await db.select({ id: users.id }).from(users).where(eq(users.referralCode, toCode));
+    if (byCode.length) toUser = byCode[0];
+    else {
+      const byEmail = await db.select({ id: users.id }).from(users).where(eq(users.email, toCode));
+      if (byEmail.length) toUser = byEmail[0];
+      else {
+        const numId = Number(toCode.replace(/^#/, ""));
+        if (!isNaN(numId)) {
+          const byId = await db.select({ id: users.id }).from(users).where(eq(users.id, numId));
+          if (byId.length) toUser = byId[0];
+        }
+      }
+    }
+    if (!toUser) throw new Error("Recipient not found");
+    if (toUser.id === fromUserId) throw new Error("Cannot send to yourself");
+
+    let sent = 0;
+    const errors: string[] = [];
+    for (const pinStr of pins) {
+      const pinRows = await db.select().from(activationPins).where(and(eq(activationPins.pin, pinStr), eq(activationPins.isUsed, false)));
+      if (!pinRows.length) { errors.push(`${pinStr}: not found/used`); continue; }
+      const pin = pinRows[0]!;
+      if (pin.ownerId !== fromUserId) { errors.push(`${pinStr}: not owned`); continue; }
+      await db.update(activationPins).set({ ownerId: toUser.id }).where(eq(activationPins.id, pin.id));
+      await db.insert(pinTransfers).values({ pinId: pin.id, fromUserId, toUserId: toUser.id });
+      sent++;
+    }
+    if (sent === 0) throw new Error(errors.join("; ") || "No PINs sent");
+    return { success: true, sent, errors, message: `${sent} PIN(s) sent to ${toCode}${errors.length ? `; ${errors.length} failed` : ""}` };
+  });
+
 // ── Get My Pins (inbox: owned, unused)
 export const getMyPins = createServerFn({ method: "GET" }).handler(async () => {
   const userId = await getAuthUserId();
