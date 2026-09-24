@@ -30,6 +30,8 @@ function ActivateAccount() {
   const [copiedPin, setCopiedPin] = useState<string | null>(null);
   const [searchedUser, setSearchedUser] = useState<any>(null);
   const [searching, setSearching] = useState(false);
+  const [selectedPins, setSelectedPins] = useState<Set<string>>(new Set());
+  const [bulkActivating, setBulkActivating] = useState(false);
 
   useEffect(() => {
     getDashboard().then(setUser).catch(console.error).finally(() => setLoading(false));
@@ -92,6 +94,38 @@ function ActivateAccount() {
       else setSearchedUser(res.user);
     } catch (e:any) { alert(e.message || "Search failed"); }
     finally { setSearching(false); }
+  };
+
+  const togglePinSelect = (pinStr: string) => {
+    setSelectedPins((prev) => {
+      const n = new Set(prev);
+      if (n.has(pinStr)) n.delete(pinStr);
+      else n.add(pinStr);
+      return n;
+    });
+  };
+  const selectAllPins = () => {
+    if (selectedPins.size === myPins.length) setSelectedPins(new Set());
+    else setSelectedPins(new Set(myPins.map((p: any) => p.pin)));
+  };
+  const handleBulkActivate = async () => {
+    if (selectedPins.size === 0) { alert("Select at least one PIN"); return; }
+    if (!targetCode.trim()) { alert("Enter target code and Search first"); return; }
+    if (!searchedUser) { alert("Search the account first"); return; }
+    if (searchedUser.isActive) { alert("Target already active"); return; }
+    setBulkActivating(true);
+    let ok = 0, fail = 0;
+    for (const pinStr of Array.from(selectedPins)) {
+      try {
+        await activateAccountWithPin({ data: { pin: pinStr, targetCode } });
+        ok++;
+        break; // target becomes active after first, so stop
+      } catch { fail++; }
+    }
+    alert(`${ok} PIN(s) used to activate ${targetCode}`);
+    setSelectedPins(new Set());
+    loadPins();
+    setBulkActivating(false);
   };
 
   if (loading) return <div className="flex min-h-screen items-center justify-center bg-background"><div className="text-sm uppercase tracking-widest text-emerald/70">Loading...</div></div>;
@@ -165,20 +199,34 @@ function ActivateAccount() {
             )}
           </div>
           {pinsLoading ? <div className="text-center text-xs text-emerald/60 py-8">Loading...</div> : myPins.length===0 ? <div className="rounded border border-gold/10 bg-card p-12 text-center text-xs text-emerald/60">No PINs in your inbox. Ask admin or another user to send you one.</div> : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {myPins.map((p:any)=> (
-                <div key={p.id} className="rounded border border-emerald/20 bg-card p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-lg font-bold text-emerald tracking-widest">{p.pin}</span>
-                    <button onClick={()=>copyPin(p.pin)} className="rounded border border-emerald/20 px-2 py-1 text-[10px] font-semibold uppercase text-emerald hover:bg-emerald/5">{copiedPin===p.pin?"Copied!":"Copy"}</button>
+            <>
+              <div className="flex flex-wrap items-center justify-between gap-2 rounded border border-gold/10 bg-card px-4 py-3">
+                <label className="flex items-center gap-2 text-xs font-semibold text-emerald">
+                  <input type="checkbox" checked={selectedPins.size===myPins.length && myPins.length>0} onChange={selectAllPins} className="h-3 w-3 rounded border-gold/30" />
+                  Select All ({selectedPins.size}/{myPins.length})
+                </label>
+                <button onClick={handleBulkActivate} disabled={bulkActivating || selectedPins.size===0} className="rounded bg-gold px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-cream hover:bg-emerald disabled:opacity-40">
+                  {bulkActivating ? "Activating..." : `Use Selected (${selectedPins.size})`}
+                </button>
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {myPins.map((p:any)=> (
+                  <div key={p.id} className={`rounded border bg-card p-4 ${selectedPins.has(p.pin) ? "border-gold ring-1 ring-gold/20" : "border-emerald/20"}`}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-lg font-bold text-emerald tracking-widest">{p.pin}</span>
+                      <div className="flex items-center gap-1">
+                        <input type="checkbox" checked={selectedPins.has(p.pin)} onChange={()=>togglePinSelect(p.pin)} className="h-4 w-4 rounded border-gold/30" />
+                        <button onClick={()=>copyPin(p.pin)} className="rounded border border-emerald/20 px-2 py-1 text-[10px] font-semibold uppercase text-emerald hover:bg-emerald/5">{copiedPin===p.pin?"Copied!":"Copy"}</button>
+                      </div>
+                    </div>
+                    <p className="mt-1 text-[10px] text-emerald/50">From: {p.generatedBy ? `User #${p.generatedBy}` : "Admin"} · {new Date(p.createdAt).toLocaleDateString("en-IN")}</p>
+                    <button onClick={()=>handleActivateTarget(p.pin)} disabled={!!targetActivating} className="mt-3 w-full rounded bg-gold px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream hover:bg-emerald disabled:opacity-40">
+                      {targetActivating===p.pin ? "Activating..." : "Use to Activate"}
+                    </button>
                   </div>
-                  <p className="mt-1 text-[10px] text-emerald/50">From: {p.generatedBy ? `User #${p.generatedBy}` : "Admin"} · {new Date(p.createdAt).toLocaleDateString("en-IN")}</p>
-                  <button onClick={()=>handleActivateTarget(p.pin)} disabled={!!targetActivating} className="mt-3 w-full rounded bg-gold px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-cream hover:bg-emerald disabled:opacity-40">
-                    {targetActivating===p.pin ? "Activating..." : "Use to Activate"}
-                  </button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       )}
