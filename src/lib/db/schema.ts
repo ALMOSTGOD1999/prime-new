@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, boolean, timestamp, uniqueIndex, real } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, boolean, timestamp, uniqueIndex, real, bigint } from "drizzle-orm/pg-core";
 
 // ── Users ──────────────────────────────────────────────
 export const users = pgTable("users", {
@@ -35,7 +35,7 @@ export const pairs = pgTable("pairs", {
 export const income = pgTable("income", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  type: text("type", { enum: ["direct", "matching", "award", "cashback", "daily_activation", "referral"] }).notNull(),
+  type: text("type", { enum: ["direct", "matching", "award", "cashback", "daily_activation", "referral", "performance_incentive"] }).notNull(),
   amount: integer("amount").notNull(),
   pairId: integer("pair_id").references(() => pairs.id),
   description: text("description").notNull(),
@@ -46,7 +46,7 @@ export const income = pgTable("income", {
 // workingBalance  = gross income (user sees ALL income, no deductions)
 // incomeBalance   = net income after 20% repurchase + 10% admin = 70% (withdrawable)
 // repurchaseBalance = 20% of every income (spendable on products)
-// cashbackBalance = monthly cashback = 30% of self business (spendable on products)
+// cashbackBalance = gold purchase cashback (2%–3%/month per approved purchase, capped at 60% of purchase value)
 export const wallet = pgTable("wallet", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull().unique(),
@@ -246,3 +246,51 @@ export const investments = pgTable("investments", {
   stoppedAt: timestamp("stopped_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// ── Gold Purchase Cashback ledger ──────────────────────
+// One row per approved purchase (>= minimum billing). Monthly payout at the
+// tier rate until totalPaid reaches capAmount (60% of purchase value).
+export const cashbackLedger = pgTable(
+  "cashback_ledger",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id).notNull(),
+    purchaseId: integer("purchase_id").references(() => purchases.id).notNull().unique(),
+    purchaseValue: integer("purchase_value").notNull(),
+    ratePct: real("rate_pct").notNull(),
+    monthlyAmount: integer("monthly_amount").notNull(),
+    capAmount: integer("cap_amount").notNull(),
+    totalPaid: integer("total_paid").default(0).notNull(),
+    paidCount: integer("paid_count").default(0).notNull(),
+    status: text("status", { enum: ["active", "completed"] }).default("active").notNull(),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    lastPaidAt: timestamp("last_paid_at"),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("cashback_ledger_purchase_idx").on(t.purchaseId)],
+);
+
+// ── Performance Incentive milestones ───────────────────
+// A row is created when the user's accumulated business first meets a rank
+// target. Bonus pays only if business grows >=30% above businessAtReach
+// within 3 months (growthDeadline) — else the milestone expires.
+export const performanceIncentives = pgTable(
+  "performance_incentives",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id).notNull(),
+    rankName: text("rank_name").notNull(),
+    targetBusiness: bigint("target_business", { mode: "number" }).notNull(),
+    bonusAmount: integer("bonus_amount").notNull(),
+    businessAtReach: bigint("business_at_reach", { mode: "number" }).notNull(),
+    reachedAt: timestamp("reached_at").defaultNow().notNull(),
+    growthDeadline: timestamp("growth_deadline").notNull(),
+    status: text("status", { enum: ["pending_growth", "eligible", "paid", "expired"] })
+      .default("pending_growth")
+      .notNull(),
+    paidAt: timestamp("paid_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("performance_incentives_user_rank_idx").on(t.userId, t.rankName)],
+);

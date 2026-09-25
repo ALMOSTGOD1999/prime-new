@@ -1,4 +1,4 @@
-import { eq, and, sql, gte } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { db } from "../db";
 import { users, pairs, income, wallet, matchingAwards, dailyPairs, dailyActivations } from "../db/schema";
 
@@ -417,63 +417,9 @@ export async function getIncomeSummary(userId: number) {
   };
 }
 
-// ── Monthly cashback: credit 30% of self business ──────
-// Called by admin button. Credits cashbackBalance for all active users.
-const CASHBACK_PCT = 30;
-
-export async function creditMonthlyCashback() {
-  // Get all active users with a package (self business = packageAmount)
-  const activeUsers = await db
-    .select()
-    .from(users)
-    .where(and(eq(users.isActive, true), gte(users.packageAmount, 1)));
-
-  const credited: { userId: number; name: string; selfBusiness: number; cashback: number }[] = [];
-
-  for (const user of activeUsers) {
-    const selfBusiness = user.packageAmount;
-    const cashback = Math.round((selfBusiness * CASHBACK_PCT) / 100);
-
-    if (cashback <= 0) continue;
-
-    // Credit cashback wallet
-    const existing = await db.select().from(wallet).where(eq(wallet.userId, user.id));
-    if (existing.length > 0) {
-      await db
-        .update(wallet)
-        .set({
-          cashbackBalance: existing[0].cashbackBalance + cashback,
-        })
-        .where(eq(wallet.userId, user.id));
-    } else {
-      await db.insert(wallet).values({
-        userId: user.id,
-        workingBalance: 0,
-        incomeBalance: 0,
-        repurchaseBalance: 0,
-        cashbackBalance: cashback,
-        totalEarned: 0,
-      });
-    }
-
-    // Record as income (type: "cashback")
-    await db.insert(income).values({
-      userId: user.id,
-      type: "cashback",
-      amount: cashback,
-      description: `Monthly cashback — 30% of self business ₹${selfBusiness.toLocaleString("en-IN")}`,
-    });
-
-    credited.push({
-      userId: user.id,
-      name: user.name,
-      selfBusiness,
-      cashback,
-    });
-  }
-
-  return { totalUsers: credited.length, credited };
-}
+// ── Monthly cashback ───────────────────────────────────
+// Gold Purchase Cashback (tiered 2%–3% per approved purchase, capped at 60%
+// of purchase value) lives in ./gold-cashback.ts — runGoldPurchaseCashbackPayout().
 
 // ── Daily ID activation reward ────────────────────────
 // Users can activate their ID once daily between 12PM-12AM

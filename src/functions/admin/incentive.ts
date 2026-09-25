@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { runGoldPurchaseCashbackPayout } from "../../lib/mlm/gold-cashback";
+import { runPerformanceIncentivePayout } from "../../lib/mlm/performance-incentive";
 import { getCookie } from "@tanstack/react-start/server";
 
 async function requireAdmin() {
@@ -16,10 +16,12 @@ async function requireAdmin() {
   return payload.userId;
 }
 
-// ── Monthly Gold Purchase Cashback payout (admin button) ─
-export const monthlyCashbackPayout = createServerFn({ method: "POST" })
+// ── Performance Incentive payout (admin button) ────────
+// Records newly reached rank targets, pays bonuses whose 30% growth window
+// is satisfied, and expires milestones that missed their 3-month deadline.
+export const performanceIncentivePayout = createServerFn({ method: "POST" })
   .handler(async () => {
     await requireAdmin();
-    const result = await runGoldPurchaseCashbackPayout();
+    const result = await runPerformanceIncentivePayout();
     return result;
   });

@@ -40,6 +40,7 @@ import { Route as DashboardActivateAccountRouteImport } from './routes/dashboard
 import { Route as DashboardAddUserRouteImport } from './routes/dashboard/add-user'
 import { Route as DashboardBadgesRouteImport } from './routes/dashboard/badges'
 import { Route as DashboardCalculatorRouteImport } from './routes/dashboard/calculator'
+import { Route as DashboardCashbackRouteImport } from './routes/dashboard/cashback'
 import { Route as DashboardGoldRouteImport } from './routes/dashboard/gold'
 import { Route as DashboardIncomeRouteImport } from './routes/dashboard/income'
 import { Route as DashboardKycRouteImport } from './routes/dashboard/kyc'
@@ -47,6 +48,7 @@ import { Route as DashboardLeaderboardRouteImport } from './routes/dashboard/lea
 import { Route as DashboardManagePositionsRouteImport } from './routes/dashboard/manage-positions'
 import { Route as DashboardNetworkRouteImport } from './routes/dashboard/network'
 import { Route as DashboardNotificationsRouteImport } from './routes/dashboard/notifications'
+import { Route as DashboardPerformanceIncentiveRouteImport } from './routes/dashboard/performance-incentive'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
 import { Route as DashboardPurchaseRouteImport } from './routes/dashboard/purchase'
 import { Route as DashboardReportsRouteImport } from './routes/dashboard/reports'
@@ -211,6 +213,11 @@ const DashboardCalculatorRoute = DashboardCalculatorRouteImport.update({
   path: '/calculator',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardCashbackRoute = DashboardCashbackRouteImport.update({
+  id: '/cashback',
+  path: '/cashback',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardGoldRoute = DashboardGoldRouteImport.update({
   id: '/gold',
   path: '/gold',
@@ -247,6 +254,12 @@ const DashboardNotificationsRoute = DashboardNotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPerformanceIncentiveRoute =
+  DashboardPerformanceIncentiveRouteImport.update({
+    id: '/performance-incentive',
+    path: '/performance-incentive',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -313,6 +326,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
+  '/dashboard/cashback': typeof DashboardCashbackRoute
   '/dashboard/gold': typeof DashboardGoldRoute
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
@@ -320,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/manage-positions': typeof DashboardManagePositionsRoute
   '/dashboard/network': typeof DashboardNetworkRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/performance-incentive': typeof DashboardPerformanceIncentiveRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/purchase': typeof DashboardPurchaseRoute
   '/dashboard/reports': typeof DashboardReportsRoute
@@ -358,6 +373,7 @@ export interface FileRoutesByTo {
   '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
+  '/dashboard/cashback': typeof DashboardCashbackRoute
   '/dashboard/gold': typeof DashboardGoldRoute
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
@@ -365,6 +381,7 @@ export interface FileRoutesByTo {
   '/dashboard/manage-positions': typeof DashboardManagePositionsRoute
   '/dashboard/network': typeof DashboardNetworkRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/performance-incentive': typeof DashboardPerformanceIncentiveRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/purchase': typeof DashboardPurchaseRoute
   '/dashboard/reports': typeof DashboardReportsRoute
@@ -406,6 +423,7 @@ export interface FileRoutesById {
   '/dashboard/add-user': typeof DashboardAddUserRoute
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
+  '/dashboard/cashback': typeof DashboardCashbackRoute
   '/dashboard/gold': typeof DashboardGoldRoute
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
@@ -413,6 +431,7 @@ export interface FileRoutesById {
   '/dashboard/manage-positions': typeof DashboardManagePositionsRoute
   '/dashboard/network': typeof DashboardNetworkRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/performance-incentive': typeof DashboardPerformanceIncentiveRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/purchase': typeof DashboardPurchaseRoute
   '/dashboard/reports': typeof DashboardReportsRoute
@@ -455,6 +474,7 @@ export interface FileRouteTypes {
     | '/dashboard/add-user'
     | '/dashboard/badges'
     | '/dashboard/calculator'
+    | '/dashboard/cashback'
     | '/dashboard/gold'
     | '/dashboard/income'
     | '/dashboard/kyc'
@@ -462,6 +482,7 @@ export interface FileRouteTypes {
     | '/dashboard/manage-positions'
     | '/dashboard/network'
     | '/dashboard/notifications'
+    | '/dashboard/performance-incentive'
     | '/dashboard/profile'
     | '/dashboard/purchase'
     | '/dashboard/reports'
@@ -500,6 +521,7 @@ export interface FileRouteTypes {
     | '/dashboard/add-user'
     | '/dashboard/badges'
     | '/dashboard/calculator'
+    | '/dashboard/cashback'
     | '/dashboard/gold'
     | '/dashboard/income'
     | '/dashboard/kyc'
@@ -507,6 +529,7 @@ export interface FileRouteTypes {
     | '/dashboard/manage-positions'
     | '/dashboard/network'
     | '/dashboard/notifications'
+    | '/dashboard/performance-incentive'
     | '/dashboard/profile'
     | '/dashboard/purchase'
     | '/dashboard/reports'
@@ -547,6 +570,7 @@ export interface FileRouteTypes {
     | '/dashboard/add-user'
     | '/dashboard/badges'
     | '/dashboard/calculator'
+    | '/dashboard/cashback'
     | '/dashboard/gold'
     | '/dashboard/income'
     | '/dashboard/kyc'
@@ -554,6 +578,7 @@ export interface FileRouteTypes {
     | '/dashboard/manage-positions'
     | '/dashboard/network'
     | '/dashboard/notifications'
+    | '/dashboard/performance-incentive'
     | '/dashboard/profile'
     | '/dashboard/purchase'
     | '/dashboard/reports'
@@ -795,6 +820,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCalculatorRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/cashback': {
+      id: '/dashboard/cashback'
+      path: '/cashback'
+      fullPath: '/dashboard/cashback'
+      preLoaderRoute: typeof DashboardCashbackRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/gold': {
       id: '/dashboard/gold'
       path: '/gold'
@@ -842,6 +874,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/dashboard/notifications'
       preLoaderRoute: typeof DashboardNotificationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/performance-incentive': {
+      id: '/dashboard/performance-incentive'
+      path: '/performance-incentive'
+      fullPath: '/dashboard/performance-incentive'
+      preLoaderRoute: typeof DashboardPerformanceIncentiveRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/profile': {
@@ -945,6 +984,7 @@ interface DashboardRouteChildren {
   DashboardAddUserRoute: typeof DashboardAddUserRoute
   DashboardBadgesRoute: typeof DashboardBadgesRoute
   DashboardCalculatorRoute: typeof DashboardCalculatorRoute
+  DashboardCashbackRoute: typeof DashboardCashbackRoute
   DashboardGoldRoute: typeof DashboardGoldRoute
   DashboardIncomeRoute: typeof DashboardIncomeRoute
   DashboardKycRoute: typeof DashboardKycRoute
@@ -952,6 +992,7 @@ interface DashboardRouteChildren {
   DashboardManagePositionsRoute: typeof DashboardManagePositionsRoute
   DashboardNetworkRoute: typeof DashboardNetworkRoute
   DashboardNotificationsRoute: typeof DashboardNotificationsRoute
+  DashboardPerformanceIncentiveRoute: typeof DashboardPerformanceIncentiveRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardPurchaseRoute: typeof DashboardPurchaseRoute
   DashboardReportsRoute: typeof DashboardReportsRoute
@@ -967,6 +1008,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAddUserRoute: DashboardAddUserRoute,
   DashboardBadgesRoute: DashboardBadgesRoute,
   DashboardCalculatorRoute: DashboardCalculatorRoute,
+  DashboardCashbackRoute: DashboardCashbackRoute,
   DashboardGoldRoute: DashboardGoldRoute,
   DashboardIncomeRoute: DashboardIncomeRoute,
   DashboardKycRoute: DashboardKycRoute,
@@ -974,6 +1016,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardManagePositionsRoute: DashboardManagePositionsRoute,
   DashboardNetworkRoute: DashboardNetworkRoute,
   DashboardNotificationsRoute: DashboardNotificationsRoute,
+  DashboardPerformanceIncentiveRoute: DashboardPerformanceIncentiveRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardPurchaseRoute: DashboardPurchaseRoute,
   DashboardReportsRoute: DashboardReportsRoute,

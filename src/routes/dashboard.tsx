@@ -163,6 +163,8 @@ function DashboardLayout() {
     },
     { to: "/dashboard/purchase", label: "Gold Purchase", icon: "🛒" },
     { to: "/dashboard/income", label: "Wallet", icon: "💰" },
+    { to: "/dashboard/performance-incentive", label: "Performance Incentive", icon: "📈" },
+    { to: "/dashboard/cashback", label: "Cashback", icon: "💵" },
     { to: "/dashboard/reports", label: "Report", icon: "📊" },
     { to: "/dashboard/kyc", label: "KYC Update", icon: "📋" },
     // ── Secondary nav ──
@@ -202,7 +204,7 @@ function DashboardLayout() {
 
           <nav className="flex-1 space-y-1 overflow-y-auto p-4">
             {navLinks.map((link, idx) => {
-              const sep = idx === 8 ? <div key={`sep-${idx}`} className="my-3 border-t border-gold/10" /> : null;
+              const sep = idx === 10 ? <div key={`sep-${idx}`} className="my-3 border-t border-gold/10" /> : null;
               if ("children" in link) {
                 const isOpen = expandedMenu === link.label;
                 return (

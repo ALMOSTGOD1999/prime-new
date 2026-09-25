@@ -110,7 +110,7 @@ function IncomePage() {
       )}
 
       <div className="flex gap-2">
-        {["all", "direct", "matching", "award"].map((f) => (
+        {["all", "direct", "matching", "award", "cashback", "performance_incentive"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -120,7 +120,7 @@ function IncomePage() {
                 : "border border-gold/20 text-emerald/70 hover:border-gold/40"
             }`}
           >
-            {f}
+            {f.replace(/_/g, " ")}
           </button>
         ))}
       </div>

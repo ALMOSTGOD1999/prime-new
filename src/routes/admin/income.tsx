@@ -38,6 +38,8 @@ function AdminIncome() {
     { key: "direct", label: "Direct", color: "emerald" },
     { key: "matching", label: "Matching", color: "gold" },
     { key: "award", label: "Awards", color: "gold" },
+    { key: "cashback", label: "Cashback", color: "gold" },
+    { key: "performance_incentive", label: "Performance", color: "emerald" },
   ];
 
   return (
