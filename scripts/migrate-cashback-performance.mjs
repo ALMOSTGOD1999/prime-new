@@ -24,6 +24,9 @@ await sql`
 `;
 await sql`CREATE INDEX IF NOT EXISTS cashback_ledger_purchase_idx ON cashback_ledger(purchase_id)`;
 
+// NOTE: performance_incentives was later migrated to the monthly-schedule
+// shape by scripts/migrate-performance-schedule.mjs — kept in sync here so a
+// fresh database gets the current shape.
 console.log("Creating performance_incentives if not exists...");
 await sql`
   CREATE TABLE IF NOT EXISTS performance_incentives (
@@ -32,11 +35,11 @@ await sql`
     rank_name TEXT NOT NULL,
     target_business BIGINT NOT NULL,
     bonus_amount INTEGER NOT NULL,
-    business_at_reach BIGINT NOT NULL,
-    reached_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    growth_deadline TIMESTAMP NOT NULL,
-    status TEXT NOT NULL DEFAULT 'pending_growth',
-    paid_at TIMESTAMP,
+    monthly_amount INTEGER NOT NULL,
+    business_last_month BIGINT NOT NULL,
+    paid_count INTEGER NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'active',
+    last_paid_at TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
   )
 `;
