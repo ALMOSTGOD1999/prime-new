@@ -165,22 +165,30 @@ function DashboardIndex() {
               <p>Total right: ₹{(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}</p>
             </>} />
             <DashCard title="Cashback" value={`₹${(income.cashbackBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="💰" details={<>
-              <p>30% of self business as monthly cashback</p>
-              <p>Spendable on products only</p>
+              <p>Gold purchase cashback credited monthly</p>
+              <p>2%–3% based on purchase value</p>
             </>} />
-            <DashCard title="Referral Income" value={`₹${(income.referral ?? 0).toLocaleString("en-IN")}`} gradient={gradients.pink} icon="🔗" details={<>
+            <DashCard title="Referral Income" value={`₹${(income.direct ?? 0).toLocaleString("en-IN")}`} gradient={gradients.pink} icon="🔗" details={<>
               <p>Earn for every direct referral</p>
-              <p>Commission on referral purchases</p>
+              <p>5% one-time direct commission</p>
             </>} />
           </div>
 
-          {/* Row 3: Awards */}
-          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
+          {/* Row 3: Awards + Joining Wallets */}
+          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
             <DashCard title="Joining Awards" value={income.awards?.length ?? 0} gradient={gradients.blue} icon="🏆" details={<>
               <p>Milestone rewards for pair matching</p>
               <p>Bag at 100 pairs · Phone at 500</p>
               <p>Laptop at 1000 · Scooty at 2000</p>
               <p>Car at 10000 pairs</p>
+            </>} />
+            <DashCard title="Joining Wallet" value={`₹${((income.direct ?? 0) + (income.matching ?? 0)).toLocaleString("en-IN")}`} gradient={gradients.green} icon="👛" details={<>
+              <p>Referral + Matching income credited</p>
+              <p>Referral: ₹{(income.direct ?? 0).toLocaleString("en-IN")} · Matching: ₹{(income.matching ?? 0).toLocaleString("en-IN")}</p>
+            </>} />
+            <DashCard title="Joining Withdraw Wallet" value={`₹${Math.round(((income.direct ?? 0) + (income.matching ?? 0)) * 0.9).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="🏦" details={<>
+              <p>After 10% system admin charge</p>
+              <p>Gross: ₹{((income.direct ?? 0) + (income.matching ?? 0)).toLocaleString("en-IN")} · Admin charge: ₹{Math.round(((income.direct ?? 0) + (income.matching ?? 0)) * 0.1).toLocaleString("en-IN")}</p>
             </>} />
           </div>
 
