@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export function DashCard({
   title,
+  subtitle,
   value,
   gradient,
   icon,
@@ -9,6 +10,7 @@ export function DashCard({
   onMoreInfo,
 }: {
   title: string;
+  subtitle?: React.ReactNode;
   value: string | number;
   gradient: string;
   icon?: string;
@@ -25,6 +27,11 @@ export function DashCard({
       <div className="flex flex-col items-center justify-center px-5 py-8 text-center">
         <p className="text-3xl font-bold leading-tight">{value}</p>
         <p className="mt-1 text-sm font-semibold">{title}</p>
+        {subtitle && (
+          <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-white/85">
+            {subtitle}
+          </p>
+        )}
       </div>
 
       {/* More info button — opens a member modal (onMoreInfo) or expands inline details */}

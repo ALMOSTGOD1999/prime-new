@@ -413,6 +413,14 @@ export async function getIncomeSummary(userId: number) {
     .reduce((sum, i) => sum + i.amount, 0);
   const workingWithdraw = Math.round((workingGross * 70) / 100);
 
+  // Per-type totals for the Total Wallet card (performance incentive + level income only)
+  const performanceTotal = allIncome
+    .filter((i) => i.type === "performance_incentive")
+    .reduce((sum, i) => sum + i.amount, 0);
+  const levelTotal = allIncome
+    .filter((i) => i.type === "level")
+    .reduce((sum, i) => sum + i.amount, 0);
+
   const walletRow = await db.select().from(wallet).where(eq(wallet.userId, userId));
 
   return {
@@ -422,6 +430,8 @@ export async function getIncomeSummary(userId: number) {
     totalIncome: direct + matching + referral,
     workingGross,                                              // gross working income (cashback+level+performance)
     workingWithdraw,                                           // 70% of working income (withdrawable)
+    performanceTotal,                                          // gross performance-incentive credits
+    levelTotal,                                                // gross level-income credits
     workingBalance: walletRow[0]?.workingBalance ?? 0,   // Gross income (no deductions)
     incomeBalance: walletRow[0]?.incomeBalance ?? 0,      // Net income (after 20%+10% deductions)
     repurchaseBalance: walletRow[0]?.repurchaseBalance ?? 0, // 20% (spendable on products)

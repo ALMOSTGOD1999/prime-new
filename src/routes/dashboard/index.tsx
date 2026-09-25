@@ -195,7 +195,7 @@ function DashboardIndex() {
             </>} />
           </div>
 
-          {/* Row 3: Awards + Joining Wallets */}
+          {/* Row 3: Awards, Joining Wallet, Matching Income (top-7 positions) */}
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
             <DashCard title="Joining Awards" value={income.awards?.length ?? 0} gradient={gradients.blue} icon="🏆" details={<>
               <p>Milestone rewards for pair matching</p>
@@ -207,29 +207,37 @@ function DashboardIndex() {
               <p>Referral + Matching income credited</p>
               <p>Referral: ₹{(income.direct ?? 0).toLocaleString("en-IN")} · Matching: ₹{(income.matching ?? 0).toLocaleString("en-IN")}</p>
             </>} />
-            <DashCard title="Joining Withdraw Wallet" value={`₹${Math.round(((income.direct ?? 0) + (income.matching ?? 0)) * 0.9).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="🏦" details={<>
-              <p>After 10% system admin charge</p>
-              <p>Gross: ₹{((income.direct ?? 0) + (income.matching ?? 0)).toLocaleString("en-IN")} · Admin charge: ₹{Math.round(((income.direct ?? 0) + (income.matching ?? 0)) * 0.1).toLocaleString("en-IN")}</p>
+            <DashCard title="Matching Income" value={`₹${(income.matching ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="💎" details={<>
+              <p>20% of each qualifying pair match</p>
+              <p>Direct: ₹{(income.direct ?? 0).toLocaleString("en-IN")}</p>
+              <p>Total earned: ₹{(income.totalEarned ?? 0).toLocaleString("en-IN")}</p>
             </>} />
           </div>
 
-          {/* Row 3b: Wallet balances */}
+          {/* Row 3b: Wallet balances — Working Withdraw sits just above Total Wallet */}
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
-            <DashCard title="Total Wallet" value={`₹${((income.incomeBalance ?? 0) + (income.repurchaseBalance ?? 0)).toLocaleString("en-IN")}`} gradient={gradients.blue} icon="💳" details={<>
-              <p>Withdrawable: ₹{(income.incomeBalance ?? 0).toLocaleString("en-IN")}</p>
-              <p>Repurchase: ₹{(income.repurchaseBalance ?? 0).toLocaleString("en-IN")}</p>
-            </>} />
             <DashCard title="Working Withdraw Wallet" value={`₹${(income.workingWithdraw ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="💼" details={<>
               <p>70% of working income — cashback + level + performance</p>
               <p>Gross working income: ₹{(income.workingGross ?? 0).toLocaleString("en-IN")}</p>
             </>} />
+            <DashCard
+              title="Total Wallet"
+              subtitle="Performance Incentive and Level Income"
+              value={`₹${((income.performanceTotal ?? 0) + (income.levelTotal ?? 0)).toLocaleString("en-IN")}`}
+              gradient={gradients.blue}
+              icon="💳"
+              details={<>
+                <p>Performance Incentive: ₹{(income.performanceTotal ?? 0).toLocaleString("en-IN")}</p>
+                <p>Level Income: ₹{(income.levelTotal ?? 0).toLocaleString("en-IN")}</p>
+              </>}
+            />
             <DashCard title="Repurchase Wallet" value={`₹${(income.repurchaseBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="🔁" details={<>
               <p>20% of every income credit</p>
               <p>Spendable on products</p>
             </>} />
           </div>
 
-          {/* Row 4: Ratio, Rank, Matching */}
+          {/* Row 4: Ratio, Rank */}
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
             <DashCard title="60:40 Ratio" value="Business Split" gradient={gradients.red} icon="⚖️" details={<>
               <p>Left: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}</p>
@@ -239,11 +247,6 @@ function DashboardIndex() {
             <DashCard title="Rank & Reward" value={rankInfo?.currentRankLabel ?? "Bronze"} gradient={gradients.blue} icon="🎖" details={<>
               <p>Team size: {rankInfo?.teamSize ?? 0} members</p>
               {rankInfo?.nextRank && <p>Next: {rankInfo.nextRankLabel} ({rankInfo.progress}%)</p>}
-            </>} />
-            <DashCard title="Matching Income" value={`₹${(income.matching ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="💎" details={<>
-              <p>20% of each qualifying pair match</p>
-              <p>Direct: ₹{(income.direct ?? 0).toLocaleString("en-IN")}</p>
-              <p>Total earned: ₹{(income.totalEarned ?? 0).toLocaleString("en-IN")}</p>
             </>} />
           </div>
         </>
