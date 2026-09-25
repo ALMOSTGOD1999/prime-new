@@ -213,6 +213,22 @@ function DashboardIndex() {
             </>} />
           </div>
 
+          {/* Row 3b: Wallet balances */}
+          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
+            <DashCard title="Total Wallet" value={`₹${((income.incomeBalance ?? 0) + (income.repurchaseBalance ?? 0)).toLocaleString("en-IN")}`} gradient={gradients.blue} icon="💳" details={<>
+              <p>Withdrawable: ₹{(income.incomeBalance ?? 0).toLocaleString("en-IN")}</p>
+              <p>Repurchase: ₹{(income.repurchaseBalance ?? 0).toLocaleString("en-IN")}</p>
+            </>} />
+            <DashCard title="Working Withdraw Wallet" value={`₹${(income.workingWithdraw ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="💼" details={<>
+              <p>70% of working income — cashback + level + performance</p>
+              <p>Gross working income: ₹{(income.workingGross ?? 0).toLocaleString("en-IN")}</p>
+            </>} />
+            <DashCard title="Repurchase Wallet" value={`₹${(income.repurchaseBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="🔁" details={<>
+              <p>20% of every income credit</p>
+              <p>Spendable on products</p>
+            </>} />
+          </div>
+
           {/* Row 4: Ratio, Rank, Matching */}
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
             <DashCard title="60:40 Ratio" value="Business Split" gradient={gradients.red} icon="⚖️" details={<>
@@ -267,9 +283,21 @@ function DashboardIndex() {
               From Income Wallet. Available 12:00 AM — 12:00 PM IST daily. Missed days carry over.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-emerald/60">Income Wallet:</span>
-            <span className="font-display text-lg text-emerald">₹{income.incomeBalance.toLocaleString("en-IN")}</span>
+          <div className="text-right">
+            <div className="flex flex-wrap justify-end gap-x-4 gap-y-0.5 text-xs">
+              <span className="text-emerald/70">
+                Joining Withdraw Wallet:{" "}
+                <span className="font-semibold text-gold">₹{Math.round(((income.direct ?? 0) + (income.matching ?? 0)) * 0.9).toLocaleString("en-IN")}</span>
+              </span>
+              <span className="text-emerald/70">
+                Working Withdraw Wallet:{" "}
+                <span className="font-semibold text-gold">₹{(income.workingWithdraw ?? 0).toLocaleString("en-IN")}</span>
+              </span>
+            </div>
+            <div className="mt-1 flex items-center justify-end gap-2">
+              <span className="text-xs text-emerald/60">Available to withdraw:</span>
+              <span className="font-display text-lg text-emerald">₹{income.incomeBalance.toLocaleString("en-IN")}</span>
+            </div>
           </div>
         </div>
 
