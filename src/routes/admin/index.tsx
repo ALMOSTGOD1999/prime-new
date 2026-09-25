@@ -56,12 +56,12 @@ function AdminDashboard() {
   };
 
   const handleIncentivePayout = async () => {
-    if (!confirm("Run Performance Incentive payout? Enrolls ranks reached on last-month team business and pays this month's bonus installment (up to 6 months per rank).")) return;
+    if (!confirm("Run Performance Incentive payout? Enrolls ranks reached on last-month team business and pays this month's full bonus (6 monthly payments per rank).")) return;
     setIncentiveLoading(true);
     try {
       const result = await performanceIncentivePayout();
       setIncentiveResult(result);
-      alert(`Paid ${result.paidCount} bonus installments totaling ₹${(result.totalCredited ?? 0).toLocaleString("en-IN")}! ${result.enrolled ?? 0} newly enrolled rank schedules, ${result.completedCount ?? 0} completed.`);
+      alert(`Paid ${result.paidCount} monthly bonus payments totaling ₹${(result.totalCredited ?? 0).toLocaleString("en-IN")}! ${result.enrolled ?? 0} newly enrolled rank schedules, ${result.completedCount ?? 0} completed.`);
     } catch (err: any) {
       alert(err.message || "Performance Incentive payout failed");
     } finally {
@@ -293,7 +293,7 @@ function AdminDashboard() {
         {incentiveResult && (
           <div className="px-6 py-3 bg-emerald/5 border-b border-emerald/10">
             <p className="text-xs text-emerald">
-              Paid <span className="font-semibold">{incentiveResult.paidCount}</span> installments totaling <span className="font-semibold">₹{(incentiveResult.totalCredited ?? 0).toLocaleString("en-IN")}</span> · {incentiveResult.enrolled ?? 0} newly enrolled · {incentiveResult.completedCount ?? 0} schedules completed.
+              Paid <span className="font-semibold">{incentiveResult.paidCount}</span> monthly bonus payments totaling <span className="font-semibold">₹{(incentiveResult.totalCredited ?? 0).toLocaleString("en-IN")}</span> · {incentiveResult.enrolled ?? 0} newly enrolled · {incentiveResult.completedCount ?? 0} schedules completed.
             </p>
           </div>
         )}

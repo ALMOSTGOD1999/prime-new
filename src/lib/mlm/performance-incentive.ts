@@ -3,23 +3,15 @@ import { db } from "../db";
 import { income, performanceIncentives, purchases, users } from "../db/schema";
 import { distributeIncome } from "./engine";
 
-// ── Performance Incentive rules (user-confirmed) ───────
+// ── Performance Incentive rules (user-confirmed 2026-09-25) ──
 // Qualifying business = total team business (left + right legs, excludes
 // self) accumulated over the LAST MONTH ONLY — approved purchases in the
 // trailing 30 days. (The spec's "60:40" caption refers to the matching-income
 // leg split, not to this logic.)
-// The rank bonus then pays monthly for up to 6 months.
-//
-// PAYOUT MODE — pending user confirmation:
-//   "installment" (default, money-conservative)
-//       bonus is split into 6 equal monthly installments (pays 1× total).
-//       Once enrolled, installments continue regardless of the current
-//       month's business.
-//   "monthly"
-//       full bonus pays each month the last-month business still meets the
-//       target, up to 6 months (up to 6× total).
-// Switch = change PERFORMANCE_PAYOUT_MODE below.
-export const PERFORMANCE_PAYOUT_MODE: "installment" | "monthly" = "installment";
+// PAYOUT: once a rank is reached, the FULL bonus pays every month for 6
+// months (e.g. STARTER ₹5L → ₹1,999 × 6). Payments are unconditional once
+// enrolled — a later month's business only matters for reaching HIGHER ranks.
+export const PERFORMANCE_PAYOUT_MODE: "installment" | "monthly" = "monthly";
 export const PERFORMANCE_MONTHS = 6;
 
 export const PERFORMANCE_RANKS: { name: string; target: number; bonus: number }[] = [
@@ -98,9 +90,8 @@ export async function computeLastMonthBusiness(): Promise<Map<number, LegBusines
 // ── Payout (admin button) ──────────────────────────────
 // 1) Enroll: for each rank whose target the user's last-month team business
 //    meets, create a schedule row (once per user+rank).
-// 2) Pay: each active row with paidCount < 6 gets this month's payment —
-//    installment mode always pays; monthly mode pays only while last-month
-//    business still meets the row's target. Credit goes through
+// 2) Pay: each active row with paidCount < 6 gets this month's full bonus
+//    payment (unconditional once enrolled). Credit goes through
 //    distributeIncome (70/20/10) + an income ledger entry.
 export async function runPerformanceIncentivePayout() {
   const businessMap = await computeLastMonthBusiness();
@@ -150,10 +141,9 @@ export async function runPerformanceIncentivePayout() {
       }
     }
 
-    // 2) Pay this month's installment for every schedule row
+    // 2) Pay this month's bonus for every schedule row (full bonus, unconditional)
     for (const row of existing) {
       if (row.status !== "active" || row.paidCount >= PERFORMANCE_MONTHS) continue;
-      if (PERFORMANCE_PAYOUT_MODE === "monthly" && business < row.targetBusiness) continue;
 
       const amount = row.monthlyAmount;
       if (amount <= 0) continue;

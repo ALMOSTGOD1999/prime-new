@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getDashboard } from "../../functions/user/dashboard";
 import { requestWithdrawal, getWithdrawals, getWithdrawalInfo } from "../../functions/user/withdraw";
 import { getRankInfo } from "../../functions/user/rank";
-import { getTeamStats } from "../../functions/user/tree";
+import { getTeamStats, getDownlineUsers, getDirectUsers } from "../../functions/user/tree";
 import { DashCard } from "../../components/DashCard";
 
 export const Route = createFileRoute("/dashboard/")({
@@ -20,6 +20,26 @@ function DashboardIndex() {
   const [withdrawInfo, setWithdrawInfo] = useState<any>(null);
   const [rankInfo, setRankInfo] = useState<any>(null);
   const [teamStats, setTeamStats] = useState<any>(null);
+  const [memberModal, setMemberModal] = useState<null | "downline" | "direct">(null);
+  const [memberList, setMemberList] = useState<any[] | null>(null);
+  const [memberLoading, setMemberLoading] = useState(false);
+  const [memberSearch, setMemberSearch] = useState("");
+
+  const openMemberModal = async (kind: "downline" | "direct") => {
+    setMemberModal(kind);
+    setMemberList(null);
+    setMemberSearch("");
+    setMemberLoading(true);
+    try {
+      const list = kind === "downline" ? await getDownlineUsers() : await getDirectUsers();
+      setMemberList(list);
+    } catch (err) {
+      console.error(err);
+      setMemberList([]);
+    } finally {
+      setMemberLoading(false);
+    }
+  };
 
   useEffect(() => {
     getDashboard()
@@ -93,12 +113,20 @@ function DashboardIndex() {
     red: "from-red-400 via-rose-400 to-pink-300",
   };
 
+  const memberQuery = memberSearch.trim().toLowerCase();
+  const filteredMembers = (memberList ?? []).filter((m: any) =>
+    !memberQuery ||
+    (m.name ?? "").toLowerCase().includes(memberQuery) ||
+    (m.referralCode ?? "").toLowerCase().includes(memberQuery),
+  );
+
   return (
     <div className="space-y-6 overflow-hidden">
       <div className="flex flex-col gap-3">
         <div>
           <h1 className="font-display text-xl sm:text-3xl">
-            Welcome, <span className="italic text-gold">{user.name}</span>
+            Welcome, <span className="italic text-gold">{user.name}</span>{" "}
+            <span className="text-base sm:text-2xl text-gold/70">( {user.referralCode} )</span>
           </h1>
           <p className="mt-1 text-[10px] uppercase tracking-widest text-emerald/70">
             Member since {new Date(user.createdAt).toLocaleDateString("en-IN")}
@@ -133,15 +161,8 @@ function DashboardIndex() {
         <>
           {/* Row 1: Team counts */}
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
-            <DashCard title="Total Downline" value={teamStats.totalTeam ?? 0} gradient={gradients.pink} icon="🛍" details={<>
-              <p>Active: {teamStats.activeTeam ?? 0}</p>
-              <p>Inactive: {(teamStats.totalTeam ?? 0) - (teamStats.activeTeam ?? 0)}</p>
-              <p>Left: {teamStats.teamLeft ?? 0} · Right: {teamStats.teamRight ?? 0}</p>
-            </>} />
-            <DashCard title="Total Direct" value={teamStats.directTeam ?? 0} gradient={gradients.green} icon="📊" details={<>
-              <p>Left referrals: {teamStats.leftCount ?? 0}</p>
-              <p>Right referrals: {teamStats.rightCount ?? 0}</p>
-            </>} />
+            <DashCard title="Total Downline" value={teamStats.totalTeam ?? 0} gradient={gradients.pink} icon="🛍" onMoreInfo={() => openMemberModal("downline")} />
+            <DashCard title="Total Direct" value={teamStats.directTeam ?? 0} gradient={gradients.green} icon="📊" onMoreInfo={() => openMemberModal("direct")} />
             <DashCard title={`Left Team: ${teamStats.teamLeft ?? 0}`} value={`${teamStats.teamLeftActive ?? 0} Active`} gradient={gradients.blue} icon="👤" details={<>
               <p>Total: {teamStats.teamLeft ?? 0}</p>
               <p>Active: {teamStats.teamLeftActive ?? 0}</p>
@@ -326,6 +347,74 @@ function DashboardIndex() {
           <p className="text-xs font-semibold uppercase tracking-widest text-gold">Admin Panel</p>
           <p className="mt-1 text-xs text-emerald/60">Manage users, purchases and more</p>
         </Link>
+      )}
+
+      {/* Member list modal — More info opens all downlines / direct referrals */}
+      {memberModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setMemberModal(null)}
+        >
+          <div
+            className="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-gold/30 bg-background shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-gold/20 px-5 py-4">
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">
+                  {memberModal === "downline" ? "All Downlines" : "All Direct Referrals"}
+                </h3>
+                {memberList && (
+                  <p className="mt-0.5 text-[10px] uppercase tracking-widest text-emerald/60">
+                    {memberList.length} members · {memberList.filter((m: any) => m.isActive).length} active
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => setMemberModal(null)}
+                className="text-lg leading-none text-emerald/60 transition-colors hover:text-gold"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="border-b border-gold/10 px-5 py-3">
+              <input
+                autoFocus
+                value={memberSearch}
+                onChange={(e) => setMemberSearch(e.target.value)}
+                placeholder="Search name or PR code…"
+                className="w-full border-b border-gold/30 bg-transparent py-1.5 text-xs outline-none placeholder:text-emerald/50 focus:border-gold"
+              />
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              {memberLoading ? (
+                <p className="px-5 py-6 text-center text-xs text-emerald/60">Loading members…</p>
+              ) : filteredMembers.length === 0 ? (
+                <p className="px-5 py-6 text-center text-xs text-emerald/60">No members found.</p>
+              ) : (
+                <ul className="divide-y divide-gold/10">
+                  {filteredMembers.map((m: any) => (
+                    <li key={m.id} className="flex items-center justify-between gap-3 px-5 py-2.5 text-xs">
+                      <span className="text-emerald">
+                        {m.name} <span className="text-gold/80">( {m.referralCode} )</span>
+                      </span>
+                      <span
+                        className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                          m.isActive ? "bg-emerald/10 text-emerald" : "bg-red-500/10 text-red-400"
+                        }`}
+                      >
+                        {m.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

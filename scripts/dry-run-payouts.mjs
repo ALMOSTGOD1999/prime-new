@@ -11,7 +11,7 @@ const TIERS = [
 ];
 const rateFor = (v) => (TIERS.find((t) => v >= t.min) ?? TIERS[2]).rate;
 
-// ── Performance: 12 ranks, installment mode ────────────
+// ── Performance: 12 ranks, full bonus × 6 monthly ──────
 const RANKS = [
   ["STARTER", 500000, 1999], ["STARTER ELITE", 1000000, 3499], ["BRONZE", 2500000, 9999],
   ["SILVER", 5000000, 19499], ["GOLD", 10000000, 39999], ["PLATINUM", 30000000, 79999],
@@ -74,7 +74,7 @@ for (const s of sales) {
   }
 }
 
-console.log(`\n=== PERFORMANCE DRY RUN (last-30-day business, installment mode) ===`);
+console.log(`\n=== PERFORMANCE DRY RUN (last-30-day business, full bonus × 6 months) ===`);
 console.log(`Buyers with approved purchases in last 30 days: ${sales.length} of ${users.length} users`);
 let enrollments = 0;
 let run1Payout = 0;
@@ -85,14 +85,14 @@ for (const [id, b] of biz) {
   if (hits.length === 0) continue;
   for (const [name, target, bonus] of hits) {
     enrollments++;
-    const monthly = Math.round(bonus / MONTHS);
+    const monthly = bonus; // full bonus pays each of the 6 months
     run1Payout += monthly;
     rows.push({ id, name: nameOf.get(id), total, bonus, monthly });
   }
 }
 rows.sort((a, b) => b.total - a.total);
 for (const r of rows.slice(0, 20)) {
-  console.log(`  ${r.name} (id ${r.id}): last-month business ₹${r.total.toLocaleString("en-IN")} → ${r.bonus} over ${MONTHS} mo = ₹${r.monthly.toLocaleString("en-IN")}/mo`);
+  console.log(`  ${r.name} (id ${r.id}): last-month business ₹${r.total.toLocaleString("en-IN")} → ₹${r.monthly.toLocaleString("en-IN")}/mo × ${MONTHS} months (₹${(r.monthly * MONTHS).toLocaleString("en-IN")} total)`);
 }
 if (rows.length > 20) console.log(`  ... +${rows.length - 20} more`);
 console.log(`Enrollments on first run: ${enrollments}`);

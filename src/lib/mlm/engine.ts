@@ -210,42 +210,51 @@ export async function calculateMatchingIncome(newUserId: number) {
   if (newUser.length === 0) return [];
 
   const events: { userId: number; amount: number; pairId: number }[] = [];
-  let currentUserId = newUser[0].parentId;
 
-  // Walk up the tree, checking each ancestor for pair matches
-  while (currentUserId) {
-    const ancestor = await db.select().from(users).where(eq(users.id, currentUserId));
-    if (ancestor.length === 0) break;
+  // ── Leg truth = parent_id + position (never the rendered tree) ──
+  // Load the placement graph once and count ACTIVE MEMBERS per leg subtree:
+  // a direct child contributes its whole active subtree to its own side.
+  const all = await db
+    .select({ id: users.id, parentId: users.parentId, position: users.position, isActive: users.isActive })
+    .from(users);
+  const parentOf = new Map(all.map((u) => [u.id, u.parentId]));
+  const activeById = new Map(all.map((u) => [u.id, u.isActive]));
+  const childrenByParent = new Map<number, { id: number; position: string | null }[]>();
+  for (const u of all) {
+    if (u.parentId == null) continue;
+    const list = childrenByParent.get(u.parentId) ?? [];
+    list.push({ id: u.id, position: u.position });
+    childrenByParent.set(u.parentId, list);
+  }
 
-    // Count left and right active legs under this ancestor
-    const leftActive = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(users)
-      .where(
-        and(
-          sql` EXISTS (
-            SELECT 1 FROM ${users} AS child
-            WHERE child.parent_id = ${currentUserId} AND child.position = 'left'
-            AND child.is_active = true
-          ) `,
-        ),
-      );
+  // Memoized active-member count of a subtree (cycle-safe).
+  const sizeMemo = new Map<number, number>();
+  const onPath = new Set<number>();
+  const activeSizeOf = (id: number): number => {
+    const cached = sizeMemo.get(id);
+    if (cached != null) return cached;
+    if (onPath.has(id)) return 0;
+    onPath.add(id);
+    let sum = activeById.get(id) ? 1 : 0;
+    for (const c of childrenByParent.get(id) ?? []) sum += activeSizeOf(c.id);
+    onPath.delete(id);
+    sizeMemo.set(id, sum);
+    return sum;
+  };
 
-    const rightActive = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(users)
-      .where(
-        and(
-          sql` EXISTS (
-            SELECT 1 FROM ${users} AS child
-            WHERE child.parent_id = ${currentUserId} AND child.position = 'right'
-            AND child.is_active = true
-          ) `,
-        ),
-      );
+  // Walk up the placement chain, checking each ancestor for pair matches
+  let currentUserId: number | null = newUser[0]?.parentId ?? null;
+  const seenAncestors = new Set<number>();
+  while (currentUserId != null && !seenAncestors.has(currentUserId)) {
+    seenAncestors.add(currentUserId);
 
-    const leftLeg = leftActive[0]?.count ?? 0;
-    const rightLeg = rightActive[0]?.count ?? 0;
+    let leftLeg = 0;
+    let rightLeg = 0;
+    for (const child of childrenByParent.get(currentUserId) ?? []) {
+      const size = activeSizeOf(child.id);
+      if (child.position === "left") leftLeg += size;
+      else if (child.position === "right") rightLeg += size;
+    }
     const possiblePairs = Math.min(leftLeg, rightLeg);
     const totalPairs = await getTotalPairs(currentUserId);
     const todayPairsCount = await getTodayPairs(currentUserId);
@@ -318,7 +327,7 @@ export async function calculateMatchingIncome(newUserId: number) {
       }
     }
 
-    currentUserId = ancestor[0].parentId;
+    currentUserId = parentOf.get(currentUserId) ?? null;
   }
 
   return events;

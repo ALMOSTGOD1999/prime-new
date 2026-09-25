@@ -6,12 +6,14 @@ export function DashCard({
   gradient,
   icon,
   details,
+  onMoreInfo,
 }: {
   title: string;
   value: string | number;
   gradient: string;
   icon?: string;
   details?: React.ReactNode;
+  onMoreInfo?: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -25,20 +27,20 @@ export function DashCard({
         <p className="mt-1 text-sm font-semibold">{title}</p>
       </div>
 
-      {/* More info button */}
-      {details && (
+      {/* More info button — opens a member modal (onMoreInfo) or expands inline details */}
+      {(details || onMoreInfo) && (
         <div
           className="cursor-pointer border-t-2 border-white/30 bg-black/10 px-5 py-3 text-center transition-colors hover:bg-black/15"
-          onClick={() => setExpanded(!expanded)}
+          onClick={() => (onMoreInfo ? onMoreInfo() : setExpanded(!expanded))}
         >
           <p className="text-xs font-bold tracking-wide">
-            {expanded ? "Less ↑" : "More info ⊕"}
+            {!onMoreInfo && expanded ? "Less ↑" : "More info ⊕"}
           </p>
         </div>
       )}
 
       {/* Expanded details */}
-      {expanded && details && (
+      {!onMoreInfo && expanded && details && (
         <div className="border-t border-white/20 px-5 py-3 text-xs leading-relaxed">
           {details}
         </div>

@@ -59,7 +59,7 @@ function PerformanceIncentivePage() {
   if (error) return <div className="rounded border border-gold/20 bg-background p-6 text-sm text-red-500">{error}</div>;
   if (!data) return null;
 
-  const { business, ranks, schedule, months, payoutMode } = data;
+  const { business, ranks, schedule, months } = data;
   const leftRanks = ranks.slice(0, 6);
   const rightRanks = ranks.slice(6);
   const nextRank = ranks.find((r: any) => !r.reached);
@@ -145,8 +145,8 @@ function PerformanceIncentivePage() {
         <div className="border-b border-gold/10 px-5 py-4">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">My Payout Schedule</h3>
           <p className="mt-0.5 text-[11px] text-emerald/60">
-            When last-month team business meets a rank target, the bonus pays monthly for up to {months} months
-            {payoutMode === "installment" ? " as equal monthly installments." : " while the target keeps being met."}
+            When last-month team business meets a rank target, the full bonus pays every month for {months} months
+            (e.g. STARTER → ₹1,999 × 6), then the schedule completes.
           </p>
         </div>
         {schedule.length === 0 ? (
