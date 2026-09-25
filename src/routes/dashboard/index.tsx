@@ -166,7 +166,7 @@ function DashboardIndex() {
             </>} />
             <DashCard title="Cashback" value={`₹${(income.cashbackBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="💰" details={<>
               <p>Gold purchase cashback credited monthly</p>
-              <p>2%–3% based on purchase value</p>
+              <p>3% / 3.5% / 4% based on purchase value</p>
             </>} />
             <DashCard title="Referral Income" value={`₹${(income.direct ?? 0).toLocaleString("en-IN")}`} gradient={gradients.pink} icon="🔗" details={<>
               <p>Earn for every direct referral</p>

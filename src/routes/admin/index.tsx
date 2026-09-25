@@ -25,7 +25,7 @@ function AdminDashboard() {
   const [businessData, setBusinessData] = useState<any>(null);
 
   const handleCashbackPayout = async () => {
-    if (!confirm("Credit this month's Gold Purchase Cashback (2%–3% per approved purchase, capped at 60% of purchase value) to all eligible users?")) return;
+    if (!confirm("Credit this month's Gold Purchase Cashback (3%–4% per approved purchase, capped at 60% of purchase value) to all eligible users?")) return;
     setCashbackLoading(true);
     try {
       const result = await monthlyCashbackPayout();
@@ -39,12 +39,12 @@ function AdminDashboard() {
   };
 
   const handleIncentivePayout = async () => {
-    if (!confirm("Run Performance Incentive payout? Records newly reached rank targets, pays bonuses with 30% growth achieved within 3 months, expires overdue milestones.")) return;
+    if (!confirm("Run Performance Incentive payout? Enrolls ranks reached on last-month team business and pays this month's bonus installment (up to 6 months per rank).")) return;
     setIncentiveLoading(true);
     try {
       const result = await performanceIncentivePayout();
       setIncentiveResult(result);
-      alert(`Paid ${result.paidCount} bonuses totaling ₹${(result.totalCredited ?? 0).toLocaleString("en-IN")}! ${result.created?.length ?? 0} new milestones recorded, ${result.expired?.length ?? 0} expired.`);
+      alert(`Paid ${result.paidCount} bonus installments totaling ₹${(result.totalCredited ?? 0).toLocaleString("en-IN")}! ${result.enrolled ?? 0} newly enrolled rank schedules, ${result.completedCount ?? 0} completed.`);
     } catch (err: any) {
       alert(err.message || "Performance Incentive payout failed");
     } finally {
@@ -213,7 +213,7 @@ function AdminDashboard() {
                 </div>
                 <div>
                   <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-gold">Gold Purchase Cashback Payout</h3>
-                  <p className="mt-0.5 text-[11px] sm:text-xs text-emerald/60">Credits monthly cashback (2%–3% per approved purchase ≥ ₹10,000, capped at 60% of purchase value) to eligible users</p>
+                  <p className="mt-0.5 text-[11px] sm:text-xs text-emerald/60">Credits monthly cashback (3% up to ₹1,99,999 · 3.5% ₹2–5L · 4% ₹5L+ per approved purchase ≥ ₹10,000, capped at 60% of purchase value) to eligible users</p>
             </div>
           </div>
           <button
@@ -252,7 +252,7 @@ function AdminDashboard() {
             </div>
             <div>
               <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-gold">Performance Incentive Payout</h3>
-              <p className="mt-0.5 text-[11px] sm:text-xs text-emerald/60">Records rank targets (STARTER→CROWN), pays bonuses after 30% growth within 3 months, expires overdue milestones</p>
+              <p className="mt-0.5 text-[11px] sm:text-xs text-emerald/60">Enrolls ranks (STARTER→CROWN) reached on last-month team business, then pays the bonus monthly for up to 6 months (70/20/10 split)</p>
             </div>
           </div>
           <button
@@ -276,7 +276,7 @@ function AdminDashboard() {
         {incentiveResult && (
           <div className="px-6 py-3 bg-emerald/5 border-b border-emerald/10">
             <p className="text-xs text-emerald">
-              Paid <span className="font-semibold">{incentiveResult.paidCount}</span> bonuses totaling <span className="font-semibold">₹{(incentiveResult.totalCredited ?? 0).toLocaleString("en-IN")}</span> · {incentiveResult.created?.length ?? 0} new milestones · {incentiveResult.expired?.length ?? 0} expired.
+              Paid <span className="font-semibold">{incentiveResult.paidCount}</span> installments totaling <span className="font-semibold">₹{(incentiveResult.totalCredited ?? 0).toLocaleString("en-IN")}</span> · {incentiveResult.enrolled ?? 0} newly enrolled · {incentiveResult.completedCount ?? 0} schedules completed.
             </p>
           </div>
         )}

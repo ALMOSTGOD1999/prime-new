@@ -46,7 +46,9 @@ export const income = pgTable("income", {
 // workingBalance  = gross income (user sees ALL income, no deductions)
 // incomeBalance   = net income after 20% repurchase + 10% admin = 70% (withdrawable)
 // repurchaseBalance = 20% of every income (spendable on products)
-// cashbackBalance = gold purchase cashback (2%–3%/month per approved purchase, capped at 60% of purchase value)
+// cashbackBalance = gold purchase cashback gross (3%–4%/month per approved purchase, capped at 60% of purchase value)
+// Working Income (dashboard section) = cashback + level income + performance incentive (gross),
+// split 70/20/10 at credit time: 70% → incomeBalance, 20% → repurchaseBalance, 10% admin (wiped)
 export const wallet = pgTable("wallet", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull().unique(),
@@ -271,10 +273,11 @@ export const cashbackLedger = pgTable(
   (t) => [uniqueIndex("cashback_ledger_purchase_idx").on(t.purchaseId)],
 );
 
-// ── Performance Incentive milestones ───────────────────
-// A row is created when the user's accumulated business first meets a rank
-// target. Bonus pays only if business grows >=30% above businessAtReach
-// within 3 months (growthDeadline) — else the milestone expires.
+// ── Performance Incentive schedule ─────────────────────
+// One row per (user, rank). Enrolled when last-month team business (approved
+// purchases in the trailing 30 days, both legs, excludes self) meets the rank
+// target. The bonus then pays monthly for up to 6 months (see
+// PERFORMANCE_PAYOUT_MODE in lib/mlm/performance-incentive.ts).
 export const performanceIncentives = pgTable(
   "performance_incentives",
   {
@@ -283,13 +286,13 @@ export const performanceIncentives = pgTable(
     rankName: text("rank_name").notNull(),
     targetBusiness: bigint("target_business", { mode: "number" }).notNull(),
     bonusAmount: integer("bonus_amount").notNull(),
-    businessAtReach: bigint("business_at_reach", { mode: "number" }).notNull(),
-    reachedAt: timestamp("reached_at").defaultNow().notNull(),
-    growthDeadline: timestamp("growth_deadline").notNull(),
-    status: text("status", { enum: ["pending_growth", "eligible", "paid", "expired"] })
-      .default("pending_growth")
+    monthlyAmount: integer("monthly_amount").notNull(),
+    businessLastMonth: bigint("business_last_month", { mode: "number" }).notNull(),
+    paidCount: integer("paid_count").default(0).notNull(),
+    status: text("status", { enum: ["active", "completed"] })
+      .default("active")
       .notNull(),
-    paidAt: timestamp("paid_at"),
+    lastPaidAt: timestamp("last_paid_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (t) => [uniqueIndex("performance_incentives_user_rank_idx").on(t.userId, t.rankName)],

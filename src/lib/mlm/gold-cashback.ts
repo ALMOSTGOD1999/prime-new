@@ -1,26 +1,31 @@
-import { and, eq, gte } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 import { db } from "../db";
 import { cashbackLedger, income, purchases, users, wallet } from "../db/schema";
+import { distributeIncome } from "./engine";
 
 // ── Gold Purchase Cashback rules ───────────────────────
-// Spec: minimum billing Rs 10,000; @2% / @2.5% / @3% per month by purchase
-// value tier; "for up to 60% purchase value" = lifetime cashback on a
-// purchase is capped at 60% of its value; generated monthly (admin payout).
+// Spec (user-confirmed): minimum billing Rs 10,000; @3% / @3.5% / @4% per
+// month by purchase value tier; "for up to 60% purchase value" = lifetime
+// cashback on a purchase is capped at 60% of its value (3% → 20 months,
+// 3.5% → 17 partial months, 4% → 15 months); generated monthly (admin payout).
+// Cashback is part of Working Income: each credit is split 70/20/10 via
+// distributeIncome (70% → withdrawable, 20% → repurchase, 10% admin wiped);
+// cashbackBalance tracks the gross cashback earned for the Cashback section.
 export const CASHBACK_MIN_BILLING = 10000;
 export const CASHBACK_CAP_PCT = 60;
 
-// Highest tier whose minimum the purchase value meets wins.
+// Highest tier whose minimum the purchase value wins.
 const CASHBACK_TIERS: { min: number; rate: number }[] = [
-  { min: 500000, rate: 3 },     // Rs 5,00,000 and above
-  { min: 200000, rate: 2.5 },   // Rs 2,00,000 – Rs 4,99,999
-  { min: 0, rate: 2 },          // up to Rs 1,99,999
+  { min: 500000, rate: 4 },     // Rs 5,00,000 and above
+  { min: 200000, rate: 3.5 },   // Rs 2,00,000 – Rs 4,99,999
+  { min: 0, rate: 3 },          // up to Rs 1,99,999
 ];
 
 export function cashbackRateFor(value: number): number {
   for (const tier of CASHBACK_TIERS) {
     if (value >= tier.min) return tier.rate;
   }
-  return 2;
+  return 3;
 }
 
 export function cashbackMonthlyFor(value: number): { rate: number; monthly: number; cap: number } {
@@ -33,7 +38,8 @@ export function cashbackMonthlyFor(value: number): { rate: number; monthly: numb
 // ── Monthly payout (admin button) ──────────────────────
 // 1) Enroll every approved purchase >= minimum billing that has no ledger row
 // 2) Credit one month of cashback for each active ledger row (clipped at the
-//    60%-of-purchase cap), into the cashback wallet + income ledger
+//    60%-of-purchase cap): gross → working/70%/20% via distributeIncome, plus
+//    cashbackBalance gross tracker + income ledger entry
 export async function runGoldPurchaseCashbackPayout() {
   const eligible = await db
     .select()
@@ -94,23 +100,12 @@ export async function runGoldPurchaseCashbackPayout() {
       continue;
     }
 
-    // Credit cashback wallet
-    const w = await db.select().from(wallet).where(eq(wallet.userId, l.userId));
-    if (w.length > 0) {
-      await db
-        .update(wallet)
-        .set({ cashbackBalance: (w[0]?.cashbackBalance ?? 0) + amount })
-        .where(eq(wallet.userId, l.userId));
-    } else {
-      await db.insert(wallet).values({
-        userId: l.userId,
-        workingBalance: 0,
-        incomeBalance: 0,
-        repurchaseBalance: 0,
-        cashbackBalance: amount,
-        totalEarned: 0,
-      });
-    }
+    // Credit wallets: 70/20/10 split (Working Income) + gross cashback tracker
+    await distributeIncome(l.userId, amount);
+    await db
+      .update(wallet)
+      .set({ cashbackBalance: sql`${wallet.cashbackBalance} + ${amount}` })
+      .where(eq(wallet.userId, l.userId));
 
     // Income ledger entry
     await db.insert(income).values({

@@ -56,6 +56,7 @@ import { Route as DashboardRewardsRouteImport } from './routes/dashboard/rewards
 import { Route as DashboardSendPinsRouteImport } from './routes/dashboard/send-pins'
 import { Route as DashboardTeamRouteImport } from './routes/dashboard/team'
 import { Route as DashboardTreeRouteImport } from './routes/dashboard/tree'
+import { Route as DashboardWorkingIncomeRouteImport } from './routes/dashboard/working-income'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -295,6 +296,11 @@ const DashboardTreeRoute = DashboardTreeRouteImport.update({
   path: '/tree',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardWorkingIncomeRoute = DashboardWorkingIncomeRouteImport.update({
+  id: '/working-income',
+  path: '/working-income',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -342,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/send-pins': typeof DashboardSendPinsRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/dashboard/tree': typeof DashboardTreeRoute
+  '/dashboard/working-income': typeof DashboardWorkingIncomeRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
@@ -389,6 +396,7 @@ export interface FileRoutesByTo {
   '/dashboard/send-pins': typeof DashboardSendPinsRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/dashboard/tree': typeof DashboardTreeRoute
+  '/dashboard/working-income': typeof DashboardWorkingIncomeRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
 }
@@ -439,6 +447,7 @@ export interface FileRoutesById {
   '/dashboard/send-pins': typeof DashboardSendPinsRoute
   '/dashboard/team': typeof DashboardTeamRoute
   '/dashboard/tree': typeof DashboardTreeRoute
+  '/dashboard/working-income': typeof DashboardWorkingIncomeRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
@@ -490,6 +499,7 @@ export interface FileRouteTypes {
     | '/dashboard/send-pins'
     | '/dashboard/team'
     | '/dashboard/tree'
+    | '/dashboard/working-income'
     | '/admin/'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
@@ -537,6 +547,7 @@ export interface FileRouteTypes {
     | '/dashboard/send-pins'
     | '/dashboard/team'
     | '/dashboard/tree'
+    | '/dashboard/working-income'
     | '/admin'
     | '/dashboard'
   id:
@@ -586,6 +597,7 @@ export interface FileRouteTypes {
     | '/dashboard/send-pins'
     | '/dashboard/team'
     | '/dashboard/tree'
+    | '/dashboard/working-income'
     | '/admin/'
     | '/dashboard/'
   fileRoutesById: FileRoutesById
@@ -932,6 +944,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTreeRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/working-income': {
+      id: '/dashboard/working-income'
+      path: '/working-income'
+      fullPath: '/dashboard/working-income'
+      preLoaderRoute: typeof DashboardWorkingIncomeRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
@@ -1000,6 +1019,7 @@ interface DashboardRouteChildren {
   DashboardSendPinsRoute: typeof DashboardSendPinsRoute
   DashboardTeamRoute: typeof DashboardTeamRoute
   DashboardTreeRoute: typeof DashboardTreeRoute
+  DashboardWorkingIncomeRoute: typeof DashboardWorkingIncomeRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
@@ -1024,6 +1044,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardSendPinsRoute: DashboardSendPinsRoute,
   DashboardTeamRoute: DashboardTeamRoute,
   DashboardTreeRoute: DashboardTreeRoute,
+  DashboardWorkingIncomeRoute: DashboardWorkingIncomeRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 

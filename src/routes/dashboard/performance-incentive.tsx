@@ -20,16 +20,12 @@ function fmtBiz(n: number): string {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    pending_growth: "bg-gold/10 text-gold",
-    eligible: "bg-emerald/10 text-emerald",
-    paid: "bg-emerald/10 text-emerald",
-    expired: "bg-red-500/10 text-red-500",
+    active: "bg-gold/10 text-gold",
+    completed: "bg-emerald/10 text-emerald",
   };
   const labels: Record<string, string> = {
-    pending_growth: "Awaiting 30% growth",
-    eligible: "Eligible — awaiting payout",
-    paid: "Paid",
-    expired: "Expired",
+    active: "Paying monthly",
+    completed: "Completed",
   };
   return (
     <span className={`inline-block rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${styles[status] ?? "bg-emerald/10 text-emerald/70"}`}>
@@ -63,7 +59,7 @@ function PerformanceIncentivePage() {
   if (error) return <div className="rounded border border-gold/20 bg-background p-6 text-sm text-red-500">{error}</div>;
   if (!data) return null;
 
-  const { business, ranks, milestones, growthPct, growthMonths } = data;
+  const { business, ranks, schedule, months, payoutMode } = data;
   const leftRanks = ranks.slice(0, 6);
   const rightRanks = ranks.slice(6);
   const nextRank = ranks.find((r: any) => !r.reached);
@@ -76,6 +72,7 @@ function PerformanceIncentivePage() {
             <th className="px-4 py-3">Rank</th>
             <th className="px-4 py-3 text-right">Business</th>
             <th className="px-4 py-3 text-right">Bonus</th>
+            <th className="px-4 py-3 text-right">Paid</th>
           </tr>
         </thead>
         <tbody>
@@ -90,6 +87,7 @@ function PerformanceIncentivePage() {
               </td>
               <td className="px-4 py-2.5 text-right text-xs font-semibold text-gold">{fmtBiz(r.target)}</td>
               <td className="px-4 py-2.5 text-right text-xs font-semibold text-emerald">Rs {r.bonus.toLocaleString("en-IN")}/-</td>
+              <td className="px-4 py-2.5 text-right text-xs text-emerald/70">{r.paidCount}/{months}</td>
             </tr>
           ))}
         </tbody>
@@ -106,25 +104,27 @@ function PerformanceIncentivePage() {
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight text-gold sm:text-4xl">
             Performance Incentive
           </h1>
-          <p className="mt-2 text-sm italic text-emerald/60">60:40 ratio accumulation basis — up to 6 months</p>
+          <p className="mt-2 text-sm italic text-emerald/60">
+            Based on total team business (left + right) accumulated in the last month
+          </p>
           <p className="mt-1 text-xs italic text-emerald/50">
-            {growthPct}% Increase must be in next {growthMonths} month, to receive payment
+            Rank bonus pays monthly for up to {months} months
           </p>
         </div>
       </div>
 
-      {/* My business */}
+      {/* My last-month business */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-lg border border-emerald/20 bg-background p-5">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/60">Left Business</p>
+          <p className="text-[10px] uppercase tracking-widest text-emerald/60">Left Business (Last Month)</p>
           <p className="mt-1 font-display text-2xl text-emerald">₹{(business.left ?? 0).toLocaleString("en-IN")}</p>
         </div>
         <div className="rounded-lg border border-gold/20 bg-background p-5">
-          <p className="text-[10px] uppercase tracking-widest text-gold/70">Right Business</p>
+          <p className="text-[10px] uppercase tracking-widest text-gold/70">Right Business (Last Month)</p>
           <p className="mt-1 font-display text-2xl text-gold">₹{(business.right ?? 0).toLocaleString("en-IN")}</p>
         </div>
         <div className="rounded-lg border border-gold/30 bg-gold/5 p-5">
-          <p className="text-[10px] uppercase tracking-widest text-gold">Total Accumulated Business</p>
+          <p className="text-[10px] uppercase tracking-widest text-gold">Total Team Business (Last Month)</p>
           <p className="mt-1 font-display text-2xl text-gold">₹{(business.total ?? 0).toLocaleString("en-IN")}</p>
           {nextRank && (
             <p className="mt-1 text-[11px] text-emerald/60">
@@ -140,17 +140,18 @@ function PerformanceIncentivePage() {
         <RankTable rows={rightRanks} />
       </div>
 
-      {/* Milestones */}
+      {/* My payout schedule */}
       <div className="rounded-lg border border-gold/15 bg-background">
         <div className="border-b border-gold/10 px-5 py-4">
-          <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">My Incentive Milestones</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">My Payout Schedule</h3>
           <p className="mt-0.5 text-[11px] text-emerald/60">
-            A milestone starts when your business first hits the rank target. Bonus pays once your business grows {growthPct}%+ above that level within {growthMonths} months.
+            When last-month team business meets a rank target, the bonus pays monthly for up to {months} months
+            {payoutMode === "installment" ? " as equal monthly installments." : " while the target keeps being met."}
           </p>
         </div>
-        {milestones.length === 0 ? (
+        {schedule.length === 0 ? (
           <p className="px-5 py-6 text-sm text-emerald/60">
-            No rank targets reached yet. Keep accumulating team business — your first milestone unlocks at {fmtBiz(ranks[0].target)} (STARTER).
+            No rank targets reached on last-month business yet. Your first schedule unlocks at {fmtBiz(ranks[0].target)} (STARTER).
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -159,22 +160,26 @@ function PerformanceIncentivePage() {
                 <tr className="border-b border-gold/10 text-left text-[10px] uppercase tracking-widest text-emerald/70">
                   <th className="px-5 py-3">Rank</th>
                   <th className="px-5 py-3">Target</th>
-                  <th className="px-5 py-3">Business at Reach</th>
-                  <th className="px-5 py-3">Reached On</th>
-                  <th className="px-5 py-3">Growth Deadline</th>
                   <th className="px-5 py-3 text-right">Bonus</th>
+                  <th className="px-5 py-3 text-right">Monthly</th>
+                  <th className="px-5 py-3 text-right">Paid</th>
+                  <th className="px-5 py-3">Business at Enroll</th>
+                  <th className="px-5 py-3">Last Paid</th>
                   <th className="px-5 py-3">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {milestones.map((m: any) => (
+                {schedule.map((m: any) => (
                   <tr key={m.id} className="border-b border-gold/5 last:border-0">
                     <td className="px-5 py-3 text-xs font-semibold uppercase text-emerald">{m.rankName}</td>
                     <td className="px-5 py-3 text-xs text-gold">{fmtBiz(m.targetBusiness)}</td>
-                    <td className="px-5 py-3 text-xs text-emerald">₹{Number(m.businessAtReach).toLocaleString("en-IN")}</td>
-                    <td className="px-5 py-3 text-xs text-emerald/70">{new Date(m.reachedAt).toLocaleDateString("en-IN")}</td>
-                    <td className="px-5 py-3 text-xs text-emerald/70">{new Date(m.growthDeadline).toLocaleDateString("en-IN")}</td>
                     <td className="px-5 py-3 text-right text-xs font-semibold text-gold">₹{m.bonusAmount.toLocaleString("en-IN")}</td>
+                    <td className="px-5 py-3 text-right text-xs text-emerald">₹{m.monthlyAmount.toLocaleString("en-IN")}</td>
+                    <td className="px-5 py-3 text-right text-xs text-emerald/70">{m.paidCount}/{months}</td>
+                    <td className="px-5 py-3 text-xs text-emerald/70">₹{Number(m.businessLastMonth).toLocaleString("en-IN")}</td>
+                    <td className="px-5 py-3 text-xs text-emerald/70">
+                      {m.lastPaidAt ? new Date(m.lastPaidAt).toLocaleDateString("en-IN") : "—"}
+                    </td>
                     <td className="px-5 py-3"><StatusBadge status={m.status} /></td>
                   </tr>
                 ))}

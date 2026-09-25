@@ -7,9 +7,9 @@ export const Route = createFileRoute("/dashboard/cashback")({
 });
 
 const RATE_CARDS = [
-  { rate: "@2% per month", detail: "on purchase value up to Rs 1,99,999/-", cap: "for up to 60% Purchase value" },
-  { rate: "@2.5% per month", detail: "on purchase value of Rs 2,00,000/- to Rs 4,99,999/-", cap: "for up to 60% Purchase value" },
-  { rate: "@3% per month", detail: "on purchase value of Rs 5,00,000/- and above", cap: "for up to 60% Purchase value" },
+  { rate: "@3% per month", detail: "on purchase value up to Rs 1,99,999/-", cap: "for up to 60% Purchase value" },
+  { rate: "@3.5% per month", detail: "on purchase value of Rs 2,00,000/- to Rs 4,99,999/-", cap: "for up to 60% Purchase value" },
+  { rate: "@4% per month", detail: "on purchase value of Rs 5,00,000/- and above", cap: "for up to 60% Purchase value" },
 ];
 
 function CashbackPage() {
@@ -76,7 +76,7 @@ function CashbackPage() {
         <div className="rounded-lg border border-gold/30 bg-gold/5 p-5">
           <p className="text-[10px] uppercase tracking-widest text-gold">Cashback Balance</p>
           <p className="mt-1 font-display text-2xl text-gold">₹{(balance ?? 0).toLocaleString("en-IN")}</p>
-          <p className="mt-1 text-[11px] text-emerald/60">Spendable on products</p>
+          <p className="mt-1 text-[11px] text-emerald/60">Gross cashback — split 70/20/10 into Working Income</p>
         </div>
         <div className="rounded-lg border border-emerald/20 bg-background p-5">
           <p className="text-[10px] uppercase tracking-widest text-emerald/60">Minimum Billing</p>
