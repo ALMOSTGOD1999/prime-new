@@ -45,6 +45,7 @@ import { Route as DashboardGoldRouteImport } from './routes/dashboard/gold'
 import { Route as DashboardIncomeRouteImport } from './routes/dashboard/income'
 import { Route as DashboardKycRouteImport } from './routes/dashboard/kyc'
 import { Route as DashboardLeaderboardRouteImport } from './routes/dashboard/leaderboard'
+import { Route as DashboardLevelIncomeRouteImport } from './routes/dashboard/level-income'
 import { Route as DashboardManagePositionsRouteImport } from './routes/dashboard/manage-positions'
 import { Route as DashboardNetworkRouteImport } from './routes/dashboard/network'
 import { Route as DashboardNotificationsRouteImport } from './routes/dashboard/notifications'
@@ -239,6 +240,11 @@ const DashboardLeaderboardRoute = DashboardLeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardLevelIncomeRoute = DashboardLevelIncomeRouteImport.update({
+  id: '/level-income',
+  path: '/level-income',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardManagePositionsRoute =
   DashboardManagePositionsRouteImport.update({
     id: '/manage-positions',
@@ -337,6 +343,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
+  '/dashboard/level-income': typeof DashboardLevelIncomeRoute
   '/dashboard/manage-positions': typeof DashboardManagePositionsRoute
   '/dashboard/network': typeof DashboardNetworkRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
@@ -385,6 +392,7 @@ export interface FileRoutesByTo {
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
+  '/dashboard/level-income': typeof DashboardLevelIncomeRoute
   '/dashboard/manage-positions': typeof DashboardManagePositionsRoute
   '/dashboard/network': typeof DashboardNetworkRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
@@ -436,6 +444,7 @@ export interface FileRoutesById {
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
+  '/dashboard/level-income': typeof DashboardLevelIncomeRoute
   '/dashboard/manage-positions': typeof DashboardManagePositionsRoute
   '/dashboard/network': typeof DashboardNetworkRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
@@ -488,6 +497,7 @@ export interface FileRouteTypes {
     | '/dashboard/income'
     | '/dashboard/kyc'
     | '/dashboard/leaderboard'
+    | '/dashboard/level-income'
     | '/dashboard/manage-positions'
     | '/dashboard/network'
     | '/dashboard/notifications'
@@ -536,6 +546,7 @@ export interface FileRouteTypes {
     | '/dashboard/income'
     | '/dashboard/kyc'
     | '/dashboard/leaderboard'
+    | '/dashboard/level-income'
     | '/dashboard/manage-positions'
     | '/dashboard/network'
     | '/dashboard/notifications'
@@ -586,6 +597,7 @@ export interface FileRouteTypes {
     | '/dashboard/income'
     | '/dashboard/kyc'
     | '/dashboard/leaderboard'
+    | '/dashboard/level-income'
     | '/dashboard/manage-positions'
     | '/dashboard/network'
     | '/dashboard/notifications'
@@ -867,6 +879,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLeaderboardRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/level-income': {
+      id: '/dashboard/level-income'
+      path: '/level-income'
+      fullPath: '/dashboard/level-income'
+      preLoaderRoute: typeof DashboardLevelIncomeRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/manage-positions': {
       id: '/dashboard/manage-positions'
       path: '/manage-positions'
@@ -1008,6 +1027,7 @@ interface DashboardRouteChildren {
   DashboardIncomeRoute: typeof DashboardIncomeRoute
   DashboardKycRoute: typeof DashboardKycRoute
   DashboardLeaderboardRoute: typeof DashboardLeaderboardRoute
+  DashboardLevelIncomeRoute: typeof DashboardLevelIncomeRoute
   DashboardManagePositionsRoute: typeof DashboardManagePositionsRoute
   DashboardNetworkRoute: typeof DashboardNetworkRoute
   DashboardNotificationsRoute: typeof DashboardNotificationsRoute
@@ -1033,6 +1053,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIncomeRoute: DashboardIncomeRoute,
   DashboardKycRoute: DashboardKycRoute,
   DashboardLeaderboardRoute: DashboardLeaderboardRoute,
+  DashboardLevelIncomeRoute: DashboardLevelIncomeRoute,
   DashboardManagePositionsRoute: DashboardManagePositionsRoute,
   DashboardNetworkRoute: DashboardNetworkRoute,
   DashboardNotificationsRoute: DashboardNotificationsRoute,

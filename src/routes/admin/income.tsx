@@ -39,6 +39,7 @@ function AdminIncome() {
     { key: "matching", label: "Matching", color: "gold" },
     { key: "award", label: "Awards", color: "gold" },
     { key: "cashback", label: "Cashback", color: "gold" },
+    { key: "level", label: "Level", color: "gold" },
     { key: "performance_incentive", label: "Performance", color: "emerald" },
   ];
 

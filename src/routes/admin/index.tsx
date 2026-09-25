@@ -4,6 +4,7 @@ import { getAdminUsers } from "../../functions/admin/users";
 import { getAdminIncome } from "../../functions/admin/income";
 import { monthlyCashbackPayout } from "../../functions/admin/cashback";
 import { performanceIncentivePayout } from "../../functions/admin/incentive";
+import { levelIncomePayout } from "../../functions/admin/level-income";
 import { processMonthlyReturns } from "../../functions/admin/investment";
 import { getTotalBusiness } from "../../functions/admin/business";
 import { DashCard } from "../../components/DashCard";
@@ -20,9 +21,25 @@ function AdminDashboard() {
   const [cashbackResult, setCashbackResult] = useState<any>(null);
   const [incentiveLoading, setIncentiveLoading] = useState(false);
   const [incentiveResult, setIncentiveResult] = useState<any>(null);
+  const [levelLoading, setLevelLoading] = useState(false);
+  const [levelResult, setLevelResult] = useState<any>(null);
   const [returnsLoading, setReturnsLoading] = useState(false);
   const [returnsResult, setReturnsResult] = useState<any>(null);
   const [businessData, setBusinessData] = useState<any>(null);
+
+  const handleLevelPayout = async () => {
+    if (!confirm("Run Level Income payout? Pays rate% × last-month business at each unlocked level (1st–24th), once per user per calendar month (70/20/10 split).")) return;
+    setLevelLoading(true);
+    try {
+      const result = await levelIncomePayout();
+      setLevelResult(result);
+      alert(`Credited ₹${(result.totalCredited ?? 0).toLocaleString("en-IN")} level income to ${result.totalUsers} users!`);
+    } catch (err: any) {
+      alert(err.message || "Level Income payout failed");
+    } finally {
+      setLevelLoading(false);
+    }
+  };
 
   const handleCashbackPayout = async () => {
     if (!confirm("Credit this month's Gold Purchase Cashback (3%–4% per approved purchase, capped at 60% of purchase value) to all eligible users?")) return;
@@ -277,6 +294,45 @@ function AdminDashboard() {
           <div className="px-6 py-3 bg-emerald/5 border-b border-emerald/10">
             <p className="text-xs text-emerald">
               Paid <span className="font-semibold">{incentiveResult.paidCount}</span> installments totaling <span className="font-semibold">₹{(incentiveResult.totalCredited ?? 0).toLocaleString("en-IN")}</span> · {incentiveResult.enrolled ?? 0} newly enrolled · {incentiveResult.completedCount ?? 0} schedules completed.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Monthly Level Income Payout */}
+      <div className="overflow-hidden rounded-xl border border-gold/10 bg-background shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-gold/10 px-4 sm:px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-gold/10 p-2">
+              <svg className="h-4 w-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" stroke-linejoin="round" strokeWidth={1.5} d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" /></svg>
+            </div>
+            <div>
+              <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-gold">Level Income Payout</h3>
+              <p className="mt-0.5 text-[11px] sm:text-xs text-emerald/60">Pays 1% / 0.5% / 0.2% / 0.15% / 0.1% / 0.05% / 0.02% of last-month business at levels 1–24, gated by direct count + team business (once per user per month, 70/20/10 split)</p>
+            </div>
+          </div>
+          <button
+            onClick={handleLevelPayout}
+            disabled={levelLoading}
+            className="inline-flex items-center gap-2 rounded-lg bg-gold px-4 sm:px-5 py-2.5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-cream shadow-sm shadow-gold/20 transition-all duration-200 hover:bg-gold/90 hover:shadow-md hover:shadow-gold/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {levelLoading ? (
+              <>
+                <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                Processing...
+              </>
+            ) : (
+              <>
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" stroke-linejoin="round" strokeWidth={2} d="M12 6v12m-3-2.818.879.659 1.171-1.671.48-.642A3 3 0 0 1 15.96 12H18a3 3 0 0 1 3 3v.342M3 9.342A3 3 0 0 1 5.96 6H8.04c.734 0 1.413.468 1.658 1.165l.637 1.787M3 9.342V15a3 3 0 0 0 3 3h.64M12 6V3" /></svg>
+                Credit Level Income
+              </>
+            )}
+          </button>
+        </div>
+        {levelResult && (
+          <div className="px-6 py-3 bg-emerald/5 border-b border-emerald/10">
+            <p className="text-xs text-emerald">
+              Credited <span className="font-semibold">₹{(levelResult.totalCredited ?? 0).toLocaleString("en-IN")}</span> level income to <span className="font-semibold">{levelResult.totalUsers}</span> users.
             </p>
           </div>
         )}

@@ -70,7 +70,7 @@ function WorkingIncomePage() {
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {breakdownEntries.length === 0 ? (
               <p className="text-xs text-emerald/60 sm:col-span-3">
-                No working income yet. Cashback and Performance Incentive credits appear here once the admin runs the monthly payouts.
+                No working income yet. Cashback, Level Income and Performance Incentive credits appear here once the admin runs the monthly payouts.
               </p>
             ) : (
               breakdownEntries.map(([type, amt]) => (

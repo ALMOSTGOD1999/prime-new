@@ -52,7 +52,7 @@ const sales = await sql`
   WHERE status = 'approved' AND created_at >= ${since}
   GROUP BY user_id
 `;
-const users = await sql`SELECT id, parent_id, position, name FROM users`;
+const users = await sql`SELECT id, parent_id, position, name, referred_by, package_amount, created_at FROM users`;
 const parentOf = new Map(users.map((u) => [u.id, u.parent_id]));
 const positionOf = new Map(users.map((u) => [u.id, u.position]));
 const nameOf = new Map(users.map((u) => [u.id, u.name]));
@@ -97,4 +97,88 @@ for (const r of rows.slice(0, 20)) {
 if (rows.length > 20) console.log(`  ... +${rows.length - 20} more`);
 console.log(`Enrollments on first run: ${enrollments}`);
 console.log(`First-run performance payout: ₹${run1Payout.toLocaleString("en-IN")} gross → 70/20/10 = ₹${Math.round(run1Payout * 0.7).toLocaleString("en-IN")} withdraw / ₹${Math.round(run1Payout * 0.2).toLocaleString("en-IN")} repurchase / ₹${Math.round(run1Payout * 0.1).toLocaleString("en-IN")} admin`);
+
+// ── Level Income: rates, unlocks, last-month depth earnings ──
+const RATE_TABLE = [
+  { from: 1, to: 1, rate: 1 }, { from: 2, to: 2, rate: 0.5 }, { from: 3, to: 3, rate: 0.2 },
+  { from: 4, to: 7, rate: 0.15 }, { from: 8, to: 11, rate: 0.1 },
+  { from: 12, to: 19, rate: 0.05 }, { from: 20, to: 24, rate: 0.02 },
+];
+const UNLOCKS = [
+  { directs: 1, biz: 0, open: 2 }, { directs: 2, biz: 200000, open: 4 },
+  { directs: 3, biz: 500000, open: 8 }, { directs: 4, biz: 1000000, open: 12 },
+  { directs: 5, biz: 1500000, open: 16 }, { directs: 6, biz: 2500000, open: 24 },
+];
+const rateForDepth = (d) => RATE_TABLE.find((r) => d >= r.from && d <= r.to)?.rate ?? 0;
+const openLevelsFor = (d, b) => UNLOCKS.reduce((acc, t) => (d >= t.directs && b >= t.biz ? t.open : acc), 0);
+
+// sponsorship children (referred_by) + placement team business (package_amount)
+const sponsorKids = new Map();
+const teamChildren = new Map();
+const pkgOf = new Map();
+for (const u of users) {
+  pkgOf.set(u.id, u.package_amount ?? 0);
+  if (u.referred_by != null) {
+    if (!sponsorKids.has(u.referred_by)) sponsorKids.set(u.referred_by, []);
+    sponsorKids.get(u.referred_by).push(u.id);
+  }
+  if (u.parent_id != null) {
+    if (!teamChildren.has(u.parent_id)) teamChildren.set(u.parent_id, []);
+    teamChildren.get(u.parent_id).push(u.id);
+  }
+}
+const tmemo = new Map();
+const teamSubtree = (id) => {
+  if (tmemo.has(id)) return tmemo.get(id);
+  tmemo.set(id, 0);
+  let s = 0;
+  for (const c of teamChildren.get(id) ?? []) { s += pkgOf.get(c) ?? 0; s += teamSubtree(c); }
+  tmemo.set(id, s);
+  return s;
+};
+const salesByBuyer = new Map(sales.map((s) => [s.user_id, Math.round(Number(s.amt))]));
+const windowStart = new Date(Date.now() - 10 * 30 * 24 * 60 * 60 * 1000);
+const createdAtOf = new Map(users.map((u) => [u.id, new Date(u.created_at)]));
+
+let levelPayoutTotal = 0;
+let levelUsers = 0;
+const levelSamples = [];
+for (const u of users) {
+  const directs = (sponsorKids.get(u.id) ?? []).length;
+  const teamBiz = teamSubtree(u.id);
+  const open = openLevelsFor(directs, teamBiz);
+  if (open <= 0) continue;
+  // depth business (trailing 30d, members within 10-month window)
+  let frontier = [u.id];
+  const seen = new Set([u.id]);
+  let earning = 0;
+  for (let depth = 1; depth <= 24 && frontier.length > 0; depth++) {
+    const next = [];
+    for (const id of frontier) {
+      for (const child of sponsorKids.get(id) ?? []) {
+        if (seen.has(child)) continue;
+        seen.add(child);
+        next.push(child);
+        if ((createdAtOf.get(child) ?? new Date(0)) >= windowStart && depth <= open) {
+          const vol = salesByBuyer.get(child) ?? 0;
+          earning += Math.round((vol * rateForDepth(depth)) / 100);
+        }
+      }
+    }
+    frontier = next;
+  }
+  if (earning > 0) {
+    levelUsers++;
+    levelPayoutTotal += earning;
+    levelSamples.push({ name: u.name, directs, teamBiz, open, earning });
+  }
+}
+console.log(`\n=== LEVEL INCOME DRY RUN (last-month depth volume, 10-month window) ===`);
+console.log(`Users with level income this run: ${levelUsers}`);
+levelSamples.sort((a, b) => b.earning - a.earning);
+for (const s of levelSamples.slice(0, 10)) {
+  console.log(`  ${s.name}: ${s.directs} directs, team ₹${s.teamBiz.toLocaleString("en-IN")} → ${s.open} levels open → ₹${s.earning.toLocaleString("en-IN")}`);
+}
+if (levelSamples.length > 10) console.log(`  ... +${levelSamples.length - 10} more`);
+console.log(`First-run level income: ₹${levelPayoutTotal.toLocaleString("en-IN")} gross → 70/20/10 = ₹${Math.round(levelPayoutTotal * 0.7).toLocaleString("en-IN")} withdraw / ₹${Math.round(levelPayoutTotal * 0.2).toLocaleString("en-IN")} repurchase / ₹${Math.round(levelPayoutTotal * 0.1).toLocaleString("en-IN")} admin`);
 console.log(`\nDRY RUN COMPLETE — no data was written.`);

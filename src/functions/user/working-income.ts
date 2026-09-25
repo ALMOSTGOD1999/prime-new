@@ -14,8 +14,7 @@ async function getAuthUserId(): Promise<number> {
 }
 
 // Income types that make up Working Income.
-// (level income type not defined yet — add "level" here once it exists)
-export const WORKING_INCOME_TYPES = ["cashback", "performance_incentive"] as const;
+export const WORKING_INCOME_TYPES = ["cashback", "level", "performance_incentive"] as const;
 
 // ── Working Income section data ────────────────────────
 // Working Income   = gross of cashback + level income + performance incentive
