@@ -83,7 +83,7 @@
   --secondary: oklch(0.955 0.02 100);
   --secondary-foreground: var(--emerald);
   --muted: oklch(0.955 0.02 100);
-  --muted-foreground: oklch(0.55 0.03 165);
+  --muted-foreground: oklch(0.45 0.03 165);
   --accent: var(--gold);
   --accent-foreground: var(--emerald);
   --destructive: oklch(0.577 0.245 27.325);
@@ -119,7 +119,7 @@
   --secondary: oklch(0.955 0.02 100);
   --secondary-foreground: var(--emerald);
   --muted: oklch(0.955 0.02 100);
-  --muted-foreground: oklch(0.55 0.03 165);
+  --muted-foreground: oklch(0.45 0.03 165);
   --accent: var(--gold);
   --accent-foreground: var(--emerald);
   --destructive: oklch(0.577 0.245 27.325);
@@ -317,4 +317,88 @@
 }
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Readability pass — darker colors, heavier weight, larger sizes for
+   small/light text. Unlayered on purpose: beats Tailwind's layered
+   utilities regardless of source order.
+   ═════════════════════════════════════════════════════════════════ */
+
+/* Muted emerald text → solid dark tones + semibold */
+.text-emerald\/25,
+.text-emerald\/30,
+.text-emerald\/40,
+.text-emerald\/50,
+.text-emerald\/60 {
+  color: oklch(0.42 0.072 165.5);
+  font-weight: 600;
+}
+.text-emerald\/70,
+.text-emerald\/75,
+.text-emerald\/80 {
+  color: oklch(0.36 0.075 165.5);
+  font-weight: 600;
+}
+
+/* Gold text → dark antique gold on light surfaces … */
+.text-gold,
+.text-gold\/40,
+.text-gold\/50,
+.text-gold\/60,
+.text-gold\/70,
+.text-gold\/80 {
+  color: oklch(0.55 0.11 88.5);
+  font-weight: 600;
+}
+/* … but keep bright brand gold on dark emerald surfaces */
+.bg-emerald .text-gold,
+.bg-emerald .text-gold\/40,
+.bg-emerald .text-gold\/50,
+.bg-emerald .text-gold\/60,
+.bg-emerald .text-gold\/70,
+.bg-emerald .text-gold\/80 {
+  color: var(--gold);
+}
+
+/* Slate muted text → darker + semibold */
+.text-slate-400 {
+  color: #475569;
+  font-weight: 600;
+}
+.text-slate-500 {
+  color: #334155;
+  font-weight: 600;
+}
+.text-slate-600 {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* Small text sizes → one step larger */
+.text-\[6px\] {
+  font-size: 8px;
+}
+.text-\[7px\] {
+  font-size: 9px;
+}
+.text-\[8px\] {
+  font-size: 10px;
+}
+.text-\[9px\] {
+  font-size: 11px;
+}
+.text-\[10px\] {
+  font-size: 12px;
+}
+.text-\[11px\] {
+  font-size: 12.5px;
+}
+
+/* Tree card name widths keep pace with the larger type */
+.max-w-\[110px\] {
+  max-width: 136px;
+}
+.max-w-\[120px\] {
+  max-width: 150px;
 }
