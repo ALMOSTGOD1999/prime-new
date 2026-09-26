@@ -15,8 +15,13 @@ type Props = {
   node: TreeNodeData | null;
   isRoot?: boolean;
   collapsed: Set<number>;
-  toggleCollapse: (id: number) => void;
-  searchQuery?: string;
+  /** Toggle/expand handler — depth lets the parent page forward on bottom-level expands */
+  onToggle: (node: TreeNodeData, depth: number) => void;
+  searchQuery?: string | undefined;
+  /** Current depth of this node in the full hierarchy (0 = root) */
+  depth: number;
+  /** Top depth of the two-level viewing window (window = depth viewDepth … viewDepth+1) */
+  viewDepth: number;
 };
 
 /* ── Person SVG Avatar ── */
@@ -47,9 +52,14 @@ function countTeam(n: TreeNodeData | null): number {
   return 1 + countTeam(n.left) + countTeam(n.right);
 }
 
-export function NetTreeNode({ node, isRoot, collapsed, toggleCollapse, searchQuery }: Props) {
+export function NetTreeNode({ node, isRoot, collapsed, onToggle, searchQuery, depth, viewDepth }: Props) {
+  // Window cap: never render deeper than the two visible levels.
+  // Pruned here so huge trees only cost O(visible nodes).
+  if (depth > viewDepth + 1) return null;
+
   // Empty slot
   if (!node) {
+    if (depth < viewDepth) return null; // hidden top section — no placeholders there
     return (
       <div className="flex flex-col items-center">
         <EmptyAvatar size={56} />
@@ -58,10 +68,27 @@ export function NetTreeNode({ node, isRoot, collapsed, toggleCollapse, searchQue
     );
   }
 
+  const isCollapsed = collapsed.has(node.id);
+
+  // Hidden top section: skip our own card but keep walking down the expanded
+  // chain so window roots (depth === viewDepth) still render at the top.
+  if (depth < viewDepth) {
+    if (isCollapsed) return null;
+    return (
+      <div className="flex gap-6 sm:gap-10">
+        <div className="relative flex flex-1 flex-col items-center">
+          <NetTreeNode node={node.left} collapsed={collapsed} onToggle={onToggle} searchQuery={searchQuery} depth={depth + 1} viewDepth={viewDepth} />
+        </div>
+        <div className="relative flex flex-1 flex-col items-center">
+          <NetTreeNode node={node.right} collapsed={collapsed} onToggle={onToggle} searchQuery={searchQuery} depth={depth + 1} viewDepth={viewDepth} />
+        </div>
+      </div>
+    );
+  }
+
   const hasLeft = node.left != null;
   const hasRight = node.right != null;
   const hasChildren = hasLeft || hasRight;
-  const isCollapsed = collapsed.has(node.id);
 
   const leftCount = hasLeft ? countTeam(node.left) - 1 : 0;
   const rightCount = hasRight ? countTeam(node.right) - 1 : 0;
@@ -76,6 +103,10 @@ export function NetTreeNode({ node, isRoot, collapsed, toggleCollapse, searchQue
     String(node.id).includes(searchQuery)
   );
 
+  // Bottom of the window: children only become visible after paging forward
+  const isBottom = depth === viewDepth + 1;
+  const showChildren = hasChildren && !isCollapsed && !isBottom;
+
   return (
     <div className="flex flex-col items-center">
       {/* Node card */}
@@ -87,8 +118,8 @@ export function NetTreeNode({ node, isRoot, collapsed, toggleCollapse, searchQue
         <p className="text-[9px] font-semibold text-slate-600">(L:{leftCount},R:{rightCount})</p>
       </div>
 
-      {/* Children with connecting lines */}
-      {hasChildren && !isCollapsed && (
+      {/* Children with connecting lines — only when this node is the top of the window */}
+      {showChildren && (
         <div className="relative mt-0">
           <div className="absolute left-1/2 top-0 h-4 w-px bg-slate-300" />
           {(hasLeft || hasRight) && (
@@ -98,23 +129,23 @@ export function NetTreeNode({ node, isRoot, collapsed, toggleCollapse, searchQue
           <div className="flex gap-6 pt-4 sm:gap-10">
             <div className="relative flex flex-1 flex-col items-center">
               <div className="absolute h-4 w-px bg-slate-300" style={{ left: "50%" }} />
-              <NetTreeNode node={node.left} collapsed={collapsed} toggleCollapse={toggleCollapse} searchQuery={searchQuery} />
+              <NetTreeNode node={node.left} collapsed={collapsed} onToggle={onToggle} searchQuery={searchQuery} depth={depth + 1} viewDepth={viewDepth} />
             </div>
             <div className="relative flex flex-1 flex-col items-center">
               <div className="absolute h-4 w-px bg-slate-300" style={{ left: "50%" }} />
-              <NetTreeNode node={node.right} collapsed={collapsed} toggleCollapse={toggleCollapse} searchQuery={searchQuery} />
+              <NetTreeNode node={node.right} collapsed={collapsed} onToggle={onToggle} searchQuery={searchQuery} depth={depth + 1} viewDepth={viewDepth} />
             </div>
           </div>
         </div>
       )}
 
-      {/* Expand/collapse */}
+      {/* Expand/collapse — at the bottom of the window this pages one level deeper */}
       {hasChildren && (
         <button
-          onClick={() => toggleCollapse(node.id)}
+          onClick={() => onToggle(node, depth)}
           className="mt-2 text-[10px] font-bold text-emerald underline hover:text-emerald/80"
         >
-          {isCollapsed ? "+ expand" : "− collapse"}
+          {isBottom ? "+ expand" : isCollapsed ? "+ expand" : "− collapse"}
         </button>
       )}
     </div>

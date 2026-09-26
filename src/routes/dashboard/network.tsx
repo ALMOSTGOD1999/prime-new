@@ -116,6 +116,10 @@ function TreeViewTab() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [collapsed, setCollapsed] = useState<Set<number>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
+  // Two-level viewing window: only depths viewDepth … viewDepth+1 are rendered.
+  // Expanding at the bottom of the window pages one level deeper (previous top
+  // section leaves the view); "Up a level" pages back toward the root.
+  const [viewDepth, setViewDepth] = useState(0);
 
   useEffect(() => {
     Promise.all([getTreeVisualization(), getLevelTree(), getTeamStats()])
@@ -139,6 +143,29 @@ function TreeViewTab() {
 
   const toggleCollapse = (id: number) => {
     setCollapsed((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });
+  };
+
+  // Expand handler: bottom-of-window expands page one level deeper and bring
+  // the newly expanded section into view (pan resets to origin with the
+  // container's existing smooth transform transition).
+  const handleToggle = (node: any, depth: number) => {
+    if (depth === viewDepth + 1) {
+      if (collapsed.has(node.id)) toggleCollapse(node.id);
+      setViewDepth(depth);
+      setPan({ x: 0, y: 0 });
+    } else {
+      toggleCollapse(node.id);
+    }
+  };
+
+  const goUpLevel = () => {
+    setViewDepth((v) => Math.max(0, v - 1));
+    setPan({ x: 0, y: 0 });
+  };
+
+  const goTopLevel = () => {
+    setViewDepth(0);
+    setPan({ x: 0, y: 0 });
   };
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
@@ -210,10 +237,33 @@ function TreeViewTab() {
           </button>
         </div>
       )}
+      {/* Two-level pagination bar — visible whenever we are not at the top */}
+      {viewMode === "binary" && viewDepth > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gold/20 bg-emerald/5 px-3 py-2">
+          <p className="text-[11px] text-emerald/70">
+            Showing levels <span className="font-bold text-emerald">{viewDepth}</span>
+            <span className="font-bold text-emerald">–{viewDepth + 1}</span> · 2 levels at a time
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={goUpLevel}
+              className="rounded border border-gold/30 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald transition-colors hover:bg-emerald/5"
+            >
+              ⬆ Up a level
+            </button>
+            <button
+              onClick={goTopLevel}
+              className="rounded border border-gold/30 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald transition-colors hover:bg-emerald/5"
+            >
+              ⌂ Top
+            </button>
+          </div>
+        </div>
+      )}
       {viewMode === "binary" && (tree ? (
         <div ref={containerRef} className="overflow-hidden rounded-lg border border-gold/15 bg-card shadow-sm" style={{ cursor: dragging ? "grabbing" : "grab", minHeight: "500px" }} onWheel={handleWheel} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove}>
           <div className="origin-top-left p-4 sm:p-6" style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`, transition: dragging ? "none" : "transform 0.15s ease-out", transformOrigin: "0 0" }}>
-            <NetTreeNode node={tree} isRoot={true} collapsed={collapsed} toggleCollapse={toggleCollapse} searchQuery={searchQuery} />
+            <NetTreeNode node={tree} isRoot={true} collapsed={collapsed} onToggle={handleToggle} searchQuery={searchQuery} depth={0} viewDepth={viewDepth} />
           </div>
         </div>
       ) : (<div className="rounded-lg border border-gold/15 bg-card p-12 text-center"><p className="text-4xl">{"\uD83C\uDF33"}</p><p className="mt-3 text-xs text-emerald/60">No team data yet. Share your referral code to start building!</p></div>))}
