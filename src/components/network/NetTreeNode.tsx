@@ -14,14 +14,11 @@ type TreeNodeData = {
 type Props = {
   node: TreeNodeData | null;
   isRoot?: boolean;
-  collapsed: Set<number>;
-  /** Toggle/expand handler — depth lets the parent page forward on bottom-level expands */
-  onToggle: (node: TreeNodeData, depth: number) => void;
+  /** Re-anchor handler — the fixed window slides to this user's downline */
+  onToggle: (node: TreeNodeData) => void;
   searchQuery?: string | undefined;
-  /** Current depth of this node in the full hierarchy (0 = root) */
-  depth: number;
-  /** Top depth of the two-level viewing window (window = depth viewDepth … viewDepth+1) */
-  viewDepth: number;
+  /** true = bottom-row slot card (tap re-anchors the window when it has a downline) */
+  isChild?: boolean;
 };
 
 /* ── Person SVG Avatar ── */
@@ -52,36 +49,14 @@ function countTeam(n: TreeNodeData | null): number {
   return 1 + countTeam(n.left) + countTeam(n.right);
 }
 
-export function NetTreeNode({ node, isRoot, collapsed, onToggle, searchQuery, depth, viewDepth }: Props) {
-  // Window cap: never render deeper than the two visible levels.
-  // Pruned here so huge trees only cost O(visible nodes).
-  if (depth > viewDepth + 1) return null;
-
-  // Empty slot
+export function NetTreeNode({ node, isRoot, onToggle, searchQuery, isChild }: Props) {
+  // Fixed empty slot (bottom row only)
   if (!node) {
-    if (depth < viewDepth) return null; // hidden top section — no placeholders there
+    if (!isChild) return null;
     return (
       <div className="flex flex-col items-center">
         <EmptyAvatar size={56} />
         <p className="mt-1 text-[11px] font-semibold text-blue-500">Join Now</p>
-      </div>
-    );
-  }
-
-  const isCollapsed = collapsed.has(node.id);
-
-  // Hidden top section: skip our own card but keep walking down the expanded
-  // chain so window roots (depth === viewDepth) still render at the top.
-  if (depth < viewDepth) {
-    if (isCollapsed) return null;
-    return (
-      <div className="flex gap-6 sm:gap-10">
-        <div className="relative flex flex-1 flex-col items-center">
-          <NetTreeNode node={node.left} collapsed={collapsed} onToggle={onToggle} searchQuery={searchQuery} depth={depth + 1} viewDepth={viewDepth} />
-        </div>
-        <div className="relative flex flex-1 flex-col items-center">
-          <NetTreeNode node={node.right} collapsed={collapsed} onToggle={onToggle} searchQuery={searchQuery} depth={depth + 1} viewDepth={viewDepth} />
-        </div>
       </div>
     );
   }
@@ -103,51 +78,59 @@ export function NetTreeNode({ node, isRoot, collapsed, onToggle, searchQuery, de
     String(node.id).includes(searchQuery)
   );
 
-  // Bottom of the window: children only become visible after paging forward
-  const isBottom = depth === viewDepth + 1;
-  const showChildren = hasChildren && !isCollapsed && !isBottom;
+  // Bottom-row boxes with a downline are tappable; leaves are inert.
+  const tappable = !!isChild && hasChildren;
 
+  const card = (
+    <div
+      className={`flex flex-col items-center rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all${tappable ? " cursor-pointer hover:-translate-y-0.5 hover:border-emerald/40 hover:shadow-md hover:ring-2 hover:ring-emerald/30 active:scale-95" : ""}${isRoot ? " ring-2 ring-gold/30" : ""}${isHighlighted ? " scale-110 shadow-lg ring-2 ring-gold" : ""}`}
+      onClick={tappable ? () => onToggle(node) : undefined}
+      onKeyDown={
+        tappable
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onToggle(node);
+              }
+            }
+          : undefined
+      }
+      role={tappable ? "button" : undefined}
+      tabIndex={tappable ? 0 : undefined}
+      title={tappable ? `Show downline of ${node.name || node.referralCode}` : undefined}
+    >
+      <PersonAvatar size={56} isActive={node.isActive} />
+      <p className="mt-1.5 text-[11px] font-mono font-bold text-slate-800">{node.referralCode}</p>
+      <p className="max-w-[110px] truncate text-center text-[10px] text-slate-500">{node.name}</p>
+      <p className="text-[9px] text-slate-400">({joinDate})</p>
+      <p className="text-[9px] font-semibold text-slate-600">(L:{leftCount},R:{rightCount})</p>
+    </div>
+  );
+
+  // Bottom-row leaf card — nothing below it to show.
+  if (isChild) return card;
+
+  // Anchor (top row): card + fixed two-slot downline row with connecting lines.
+  // The skeleton never changes — tapping a slot slides the whole window to
+  // that user's family, so mobile always shows exactly one level pair.
   return (
     <div className="flex flex-col items-center">
-      {/* Node card */}
-      <div className={`flex flex-col items-center rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all ${isRoot ? "ring-2 ring-gold/30" : ""} ${isHighlighted ? "scale-110 shadow-lg ring-2 ring-gold" : ""}`}>
-        <PersonAvatar size={56} isActive={node.isActive} />
-        <p className="mt-1.5 text-[11px] font-mono font-bold text-slate-800">{node.referralCode}</p>
-        <p className="max-w-[110px] truncate text-center text-[10px] text-slate-500">{node.name}</p>
-        <p className="text-[9px] text-slate-400">({joinDate})</p>
-        <p className="text-[9px] font-semibold text-slate-600">(L:{leftCount},R:{rightCount})</p>
-      </div>
+      {card}
+      <div className="relative mt-0">
+        <div className="absolute left-1/2 top-0 h-4 w-px bg-slate-300" />
+        <div className="absolute top-4 h-px bg-slate-300" style={{ left: "25%", right: "25%" }} />
 
-      {/* Children with connecting lines — only when this node is the top of the window */}
-      {showChildren && (
-        <div className="relative mt-0">
-          <div className="absolute left-1/2 top-0 h-4 w-px bg-slate-300" />
-          {(hasLeft || hasRight) && (
-            <div className="absolute top-4 h-px bg-slate-300" style={{ left: hasLeft ? "25%" : "50%", right: hasRight ? "25%" : "50%" }} />
-          )}
-
-          <div className="flex gap-6 pt-4 sm:gap-10">
-            <div className="relative flex flex-1 flex-col items-center">
-              <div className="absolute h-4 w-px bg-slate-300" style={{ left: "50%" }} />
-              <NetTreeNode node={node.left} collapsed={collapsed} onToggle={onToggle} searchQuery={searchQuery} depth={depth + 1} viewDepth={viewDepth} />
-            </div>
-            <div className="relative flex flex-1 flex-col items-center">
-              <div className="absolute h-4 w-px bg-slate-300" style={{ left: "50%" }} />
-              <NetTreeNode node={node.right} collapsed={collapsed} onToggle={onToggle} searchQuery={searchQuery} depth={depth + 1} viewDepth={viewDepth} />
-            </div>
+        <div className="flex gap-6 pt-4 sm:gap-10">
+          <div className="relative flex flex-1 flex-col items-center">
+            <div className="absolute h-4 w-px bg-slate-300" style={{ left: "50%" }} />
+            <NetTreeNode node={node.left} onToggle={onToggle} searchQuery={searchQuery} isChild />
+          </div>
+          <div className="relative flex flex-1 flex-col items-center">
+            <div className="absolute h-4 w-px bg-slate-300" style={{ left: "50%" }} />
+            <NetTreeNode node={node.right} onToggle={onToggle} searchQuery={searchQuery} isChild />
           </div>
         </div>
-      )}
-
-      {/* Expand/collapse — at the bottom of the window this pages one level deeper */}
-      {hasChildren && (
-        <button
-          onClick={() => onToggle(node, depth)}
-          className="mt-2 text-[10px] font-bold text-emerald underline hover:text-emerald/80"
-        >
-          {isBottom ? "+ expand" : isCollapsed ? "+ expand" : "− collapse"}
-        </button>
-      )}
+      </div>
     </div>
   );
 }
