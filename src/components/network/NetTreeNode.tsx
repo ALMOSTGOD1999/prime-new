@@ -11,14 +11,19 @@ type TreeNodeData = {
   right: TreeNodeData | null;
 };
 
+/** Fixed window size: anchor + this many tiers below (always the same skeleton). */
+export const WINDOW_LEVELS = 4;
+
 type Props = {
   node: TreeNodeData | null;
   isRoot?: boolean;
   /** Re-anchor handler — the fixed window slides to this user's downline */
   onToggle: (node: TreeNodeData) => void;
   searchQuery?: string | undefined;
-  /** true = bottom-row slot card (tap re-anchors the window when it has a downline) */
-  isChild?: boolean;
+  /** Tier inside the window: 0 = anchor … WINDOW_LEVELS-1 = deepest visible row */
+  level?: number;
+  /** Deepest renderable tier (window size - 1) */
+  maxLevel?: number;
 };
 
 /* ── Person SVG Avatar ── */
@@ -49,10 +54,11 @@ function countTeam(n: TreeNodeData | null): number {
   return 1 + countTeam(n.left) + countTeam(n.right);
 }
 
-export function NetTreeNode({ node, isRoot, onToggle, searchQuery, isChild }: Props) {
-  // Fixed empty slot (bottom row only)
+export function NetTreeNode({ node, isRoot, onToggle, searchQuery, level = 0, maxLevel = WINDOW_LEVELS - 1 }: Props) {
+  // Empty fixed slot — terminal (nothing below an unfilled position).
+  // Root-empty is handled by the route's own empty state.
   if (!node) {
-    if (!isChild) return null;
+    if (level === 0) return null;
     return (
       <div className="flex flex-col items-center">
         <EmptyAvatar size={56} />
@@ -78,8 +84,9 @@ export function NetTreeNode({ node, isRoot, onToggle, searchQuery, isChild }: Pr
     String(node.id).includes(searchQuery)
   );
 
-  // Bottom-row boxes with a downline are tappable; leaves are inert.
-  const tappable = !!isChild && hasChildren;
+  // Every box below the anchor with a downline is tappable: tapping it slides
+  // the fixed window so that user becomes the new anchor. Leaves are inert.
+  const tappable = level > 0 && hasChildren;
 
   const card = (
     <div
@@ -107,12 +114,11 @@ export function NetTreeNode({ node, isRoot, onToggle, searchQuery, isChild }: Pr
     </div>
   );
 
-  // Bottom-row leaf card — nothing below it to show.
-  if (isChild) return card;
+  // Deepest visible tier: card only — the skeleton never grows past the window.
+  if (level >= maxLevel) return card;
 
-  // Anchor (top row): card + fixed two-slot downline row with connecting lines.
-  // The skeleton never changes — tapping a slot slides the whole window to
-  // that user's family, so mobile always shows exactly one level pair.
+  // Card + fixed two-slot downline row with connecting lines. The skeleton is
+  // identical at every tier, so tapping a box only swaps the users in it.
   return (
     <div className="flex flex-col items-center">
       {card}
@@ -123,11 +129,11 @@ export function NetTreeNode({ node, isRoot, onToggle, searchQuery, isChild }: Pr
         <div className="flex gap-6 pt-4 sm:gap-10">
           <div className="relative flex flex-1 flex-col items-center">
             <div className="absolute h-4 w-px bg-slate-300" style={{ left: "50%" }} />
-            <NetTreeNode node={node.left} onToggle={onToggle} searchQuery={searchQuery} isChild />
+            <NetTreeNode node={node.left} onToggle={onToggle} searchQuery={searchQuery} level={level + 1} maxLevel={maxLevel} />
           </div>
           <div className="relative flex flex-1 flex-col items-center">
             <div className="absolute h-4 w-px bg-slate-300" style={{ left: "50%" }} />
-            <NetTreeNode node={node.right} onToggle={onToggle} searchQuery={searchQuery} isChild />
+            <NetTreeNode node={node.right} onToggle={onToggle} searchQuery={searchQuery} level={level + 1} maxLevel={maxLevel} />
           </div>
         </div>
       </div>

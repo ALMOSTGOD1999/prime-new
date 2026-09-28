@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { getTreeVisualization, getLevelTree, getTeamStats, getDownlineUsers, getDirectUsers } from "../../functions/user/tree";
 import { LevelTreeView } from "../../components/LevelTreeView";
-import { NetTreeNode } from "../../components/network/NetTreeNode";
+import { NetTreeNode, WINDOW_LEVELS } from "../../components/network/NetTreeNode";
 
 export const Route = createFileRoute("/dashboard/network")({
   component: NetworkPage,
@@ -115,10 +115,10 @@ function TreeViewTab() {
   const lastPos = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  // Fixed two-slot window: the anchor user's card sits on top with exactly
-  // two downline slots below. Tapping a slot that has a downline re-anchors
-  // the window to that user — the skeleton stays identical, only the users
-  // change — so a full expanded tree is never needed on mobile.
+  // Fixed four-level window: the anchor user's card sits on top with exactly
+  // three tiers of two downline slots below. Tapping a box that has a downline
+  // re-anchors the window to that user — the skeleton stays identical, only
+  // the users change — so a full expanded tree is never needed on mobile.
   const [anchorId, setAnchorId] = useState<number | null>(null);
   // Drag-vs-tap guard: pan gestures must not trigger a box re-anchor.
   const dragMovedRef = useRef(false);
@@ -244,7 +244,7 @@ function TreeViewTab() {
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gold/20 bg-emerald/5 px-3 py-2">
           <p className="text-[11px] text-emerald/70">
             Showing levels <span className="font-bold text-emerald">{anchor.depth}</span>
-            <span className="font-bold text-emerald">–{anchor.depth + 1}</span> · 2 levels at a time
+            <span className="font-bold text-emerald">–{anchor.depth + WINDOW_LEVELS - 1}</span> · {WINDOW_LEVELS} levels at a time
           </p>
           <div className="flex gap-2">
             <button
