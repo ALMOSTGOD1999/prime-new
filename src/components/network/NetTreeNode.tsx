@@ -12,7 +12,7 @@ type TreeNodeData = {
 };
 
 /** Fixed window size: anchor + this many tiers below (always the same skeleton). */
-export const WINDOW_LEVELS = 4;
+export const WINDOW_LEVELS = 3;
 
 type Props = {
   node: TreeNodeData | null;

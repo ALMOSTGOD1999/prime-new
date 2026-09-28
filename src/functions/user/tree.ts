@@ -184,103 +184,34 @@ async function fetchAllUsersInTree(rootId: number): Promise<FlatUser[]> {
 }
 
 // ── Build tree from flat user list (zero DB queries) ──
-// Display fix: EVERY user's direct referrals (referredBy) are forced to
-// ONLY the extreme outer spines per stored `position`, never middle.
-// For each referrer: 1st → left, 2nd → right, rest → vertical stack on extreme leg matching position.
+// Placement truth: every node renders under its stored `parentId` on its
+// stored `position` side — the SAME structure for every viewer.
+// (The old sponsor-based re-insertion dropped auto-placed/spilled members
+// from the placement parent's own tree while the sponsor could see them.)
 function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | null {
   const userMap = new Map<number, FlatUser>();
   for (const u of descendants) userMap.set(u.id, u);
 
-  // Group all directs by referrer (referredBy), sorted by id
-  const directsByReferrer = new Map<number, FlatUser[]>();
-  for (const u of descendants) {
-    if (u.referredBy != null) {
-      const list = directsByReferrer.get(u.referredBy) || [];
-      list.push(u);
-      directsByReferrer.set(u.referredBy, list);
-    }
-  }
-  for (const [, list] of directsByReferrer) list.sort((a, b) => a.id - b.id);
-  const allDirectIds = new Set<number>();
-  for (const list of directsByReferrer.values()) for (const d of list) allDirectIds.add(d.id);
-
-  // Build parent→children map for any non-direct nodes (normally only root + orphans)
+  // parent → children per stored placement (root is the entry, never a child)
   const childrenByParent = new Map<number, FlatUser[]>();
   for (const u of descendants) {
-    if (u.id === rootId) continue;
-    if (allDirectIds.has(u.id)) continue; // will be re-inserted respecting position
-    if (u.parentId) {
-      const list = childrenByParent.get(u.parentId) || [];
-      list.push(u);
-      childrenByParent.set(u.parentId, list);
-    }
+    if (u.id === rootId || u.parentId == null) continue;
+    const list = childrenByParent.get(u.parentId) || [];
+    list.push(u);
+    childrenByParent.set(u.parentId, list);
   }
-
-  // Helper: find bottommost leaf on outer spine (always follow same side)
-  function findExtremeLeafSync(sideRootId: number, side: "left" | "right"): number {
-    let cur = sideRootId;
-    while (true) {
-      const kids = childrenByParent.get(cur) || [];
-      const sideChild = kids.find((k) => k.position === side);
-      if (!sideChild) return cur;
-      cur = sideChild.id;
-    }
-  }
-
-  // Re-insert directs for EVERY referrer in id order (parents before children)
-  // so deeper extremes see already-placed ancestors.
-  const referrersSorted = [...directsByReferrer.keys()].sort((a, b) => a - b);
-  for (const referrerId of referrersSorted) {
-    if (!userMap.has(referrerId)) continue;
-    const directs = directsByReferrer.get(referrerId)!;
-    if (directs.length === 0) continue;
-
-    // Preserve original position — never overwrite left/right choice made at signup.
-    // Place each direct on its stored side's extreme outer spine, vertical stack.
-    for (const direct of directs) {
-      const storedPos = direct.position as "left" | "right" | null;
-      // If position is null/invalid, fall back to alternating to avoid crash
-      let targetSide: "left" | "right";
-      if (storedPos === "left" || storedPos === "right") targetSide = storedPos;
-      else {
-        // Fallback: count already placed on left vs right for this referrer
-        const placed = childrenByParent.get(referrerId) || [];
-        const leftCnt = placed.filter((k) => k.position === "left").length;
-        const rightCnt = placed.filter((k) => k.position === "right").length;
-        targetSide = leftCnt <= rightCnt ? "left" : "right";
-      }
-
-      const refChildren = childrenByParent.get(referrerId) || [];
-      const hasSlot = refChildren.some((k) => k.position === targetSide);
-      if (!hasSlot) {
-        // Direct slot empty — place directly under referrer, keep original position
-        const list = childrenByParent.get(referrerId) || [];
-        list.push(direct);
-        childrenByParent.set(referrerId, list);
-      } else {
-        // Slot taken — spill to bottom of that side's extreme outer spine
-        const sideRoot = refChildren.find((k) => k.position === targetSide)!;
-        const parentId = findExtremeLeafSync(sideRoot.id, targetSide);
-        // Keep original position (do NOT overwrite)
-        const list = childrenByParent.get(parentId) || [];
-        list.push(direct);
-        childrenByParent.set(parentId, list);
-      }
-    }
-  }
+  for (const [, list] of childrenByParent) list.sort((a, b) => a.id - b.id);
 
   function buildNode(id: number): TreeNode | null {
     const user = userMap.get(id);
     if (!user) return null;
 
     const children = childrenByParent.get(id) || [];
-    
-    // Separate by position
-    const leftChildren = children.filter((c) => c.position === "left").sort((a, b) => a.id - b.id);
-    const rightChildren = children.filter((c) => c.position === "right").sort((a, b) => a.id - b.id);
-    const unpositioned = children
-      .filter((c) => c.position !== "left" && c.position !== "right")
-      .sort((a, b) => a.id - b.id);
+
+    // Separate by stored position
+    const leftChildren = children.filter((c) => c.position === "left");
+    const rightChildren = children.filter((c) => c.position === "right");
+    const unpositioned = children.filter((c) => c.position !== "left" && c.position !== "right");
 
     let finalLeft: FlatUser[];
     let finalRight: FlatUser[];
@@ -299,7 +230,9 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       finalRight = unpositioned.filter((_, i) => i % 2 === 1);
     }
 
-    // Build left subtree: first child in left slot, extras chain to EXTREME LEFT (always left)
+    // Left slot: first child sits in the slot. If data ever holds multiple
+    // same-side children (rare admin-move anomaly), chain the extras down the
+    // extreme left spine so nobody is hidden.
     let leftNode: TreeNode | null = null;
     if (finalLeft.length > 0) {
       leftNode = buildNode(finalLeft[0]!.id);
@@ -307,15 +240,14 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       for (let i = 1; i < finalLeft.length; i++) {
         const childNode = buildNode(finalLeft[i]!.id);
         if (childNode && current) {
-          // Chain to extreme left — always fill left side
-          if (!current.left) current.left = childNode;
-          else if (!current.right) current.right = childNode;
+          while (current.left) current = current.left;
+          current.left = childNode;
           current = childNode;
         }
       }
     }
 
-    // Build right subtree: first child in right slot, extras chain to EXTREME RIGHT (always right)
+    // Right slot: mirror of left — extras chain down the extreme right spine
     let rightNode: TreeNode | null = null;
     if (finalRight.length > 0) {
       rightNode = buildNode(finalRight[0]!.id);
@@ -323,9 +255,8 @@ function buildTreeFromFlat(rootId: number, descendants: FlatUser[]): TreeNode | 
       for (let i = 1; i < finalRight.length; i++) {
         const childNode = buildNode(finalRight[i]!.id);
         if (childNode && current) {
-          // Chain to extreme right — always fill right side
-          if (!current.right) current.right = childNode;
-          else if (!current.left) current.left = childNode;
+          while (current.right) current = current.right;
+          current.right = childNode;
           current = childNode;
         }
       }
