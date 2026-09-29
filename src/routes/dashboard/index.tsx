@@ -4,6 +4,7 @@ import { getDashboard } from "../../functions/user/dashboard";
 import { requestWithdrawal, getWithdrawals, getWithdrawalInfo } from "../../functions/user/withdraw";
 import { getRankInfo } from "../../functions/user/rank";
 import { getTeamStats, getDownlineUsers, getDirectUsers } from "../../functions/user/tree";
+import { getMyPerformanceIncentive } from "../../functions/user/incentive";
 import { DashCard } from "../../components/DashCard";
 
 export const Route = createFileRoute("/dashboard/")({
@@ -20,6 +21,8 @@ function DashboardIndex() {
   const [withdrawInfo, setWithdrawInfo] = useState<any>(null);
   const [rankInfo, setRankInfo] = useState<any>(null);
   const [teamStats, setTeamStats] = useState<any>(null);
+  // Last-month team business (same source as the Performance Incentive page)
+  const [perfBusiness, setPerfBusiness] = useState<{ left: number; right: number; total: number } | null>(null);
   const [memberModal, setMemberModal] = useState<null | "downline" | "direct">(null);
   const [memberList, setMemberList] = useState<any[] | null>(null);
   const [memberLoading, setMemberLoading] = useState(false);
@@ -57,6 +60,9 @@ function DashboardIndex() {
       .catch(() => {});
     getTeamStats()
       .then(setTeamStats)
+      .catch(() => {});
+    getMyPerformanceIncentive()
+      .then((d) => setPerfBusiness(d.business ?? null))
       .catch(() => {});
   }, []);
 
@@ -175,15 +181,17 @@ function DashboardIndex() {
             </>} />
           </div>
 
-          {/* Row 2: Business + income + awards */}
+          {/* Row 2: Last-month leg business + income + awards */}
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
-            <DashCard title="Left Gold Business" value={`₹${(teamStats.teamBusinessLeftGold ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" details={<>
-              <p>Gold/Platinum purchase volume</p>
-              <p>Total left: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}</p>
+            <DashCard title="Left Business" subtitle="Last month" value={`₹${(perfBusiness?.left ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" details={<>
+              <p>Trailing 30-day team purchases — left leg</p>
+              <p>Gold/Platinum volume: ₹{(teamStats.teamBusinessLeftGold ?? 0).toLocaleString("en-IN")}</p>
+              <p>All-time left team business: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}</p>
             </>} />
-            <DashCard title="Right Gold Business" value={`₹${(teamStats.teamBusinessRightGold ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="📊" details={<>
-              <p>Gold/Platinum purchase volume</p>
-              <p>Total right: ₹{(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}</p>
+            <DashCard title="Right Business" subtitle="Last month" value={`₹${(perfBusiness?.right ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="📊" details={<>
+              <p>Trailing 30-day team purchases — right leg</p>
+              <p>Gold/Platinum volume: ₹{(teamStats.teamBusinessRightGold ?? 0).toLocaleString("en-IN")}</p>
+              <p>All-time right team business: ₹{(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}</p>
             </>} />
             <DashCard title="Cashback" value={`₹${(income.cashbackBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="💰" details={<>
               <p>Gold purchase cashback credited monthly</p>
@@ -195,22 +203,27 @@ function DashboardIndex() {
             </>} />
           </div>
 
-          {/* Row 3: Awards, Joining Wallet, Matching Income (top-7 positions) */}
-          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
+          {/* Row 3: Matching right after Referral, then Performance + Level, then Joining Awards */}
+          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
+            <DashCard title="Matching Income" value={`₹${(income.matching ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="💎" details={<>
+              <p>20% of each qualifying pair match</p>
+              <p>Direct: ₹{(income.direct ?? 0).toLocaleString("en-IN")}</p>
+              <p>Total earned: ₹{(income.totalEarned ?? 0).toLocaleString("en-IN")}</p>
+            </>} />
+            <DashCard title="Performance Incentive" value={`₹${(income.performanceTotal ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="📈" details={<>
+              <p>Rank bonus from last-month team business</p>
+              <p>Pays monthly for up to 6 months once reached</p>
+              <p>Last month (L+R): ₹{(perfBusiness?.total ?? 0).toLocaleString("en-IN")}</p>
+            </>} />
+            <DashCard title="Level Income" value={`₹${(income.levelTotal ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="🎚" details={<>
+              <p>% of team business at each open level</p>
+              <p>Working income — credited via 70/20/10 split</p>
+            </>} />
             <DashCard title="Joining Awards" value={income.awards?.length ?? 0} gradient={gradients.blue} icon="🏆" details={<>
               <p>Milestone rewards for pair matching</p>
               <p>Bag at 100 pairs · Phone at 500</p>
               <p>Laptop at 1000 · Scooty at 2000</p>
               <p>Car at 10000 pairs</p>
-            </>} />
-            <DashCard title="Joining Wallet" value={`₹${((income.direct ?? 0) + (income.matching ?? 0)).toLocaleString("en-IN")}`} gradient={gradients.green} icon="👛" details={<>
-              <p>Referral + Matching income credited</p>
-              <p>Referral: ₹{(income.direct ?? 0).toLocaleString("en-IN")} · Matching: ₹{(income.matching ?? 0).toLocaleString("en-IN")}</p>
-            </>} />
-            <DashCard title="Matching Income" value={`₹${(income.matching ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="💎" details={<>
-              <p>20% of each qualifying pair match</p>
-              <p>Direct: ₹{(income.direct ?? 0).toLocaleString("en-IN")}</p>
-              <p>Total earned: ₹{(income.totalEarned ?? 0).toLocaleString("en-IN")}</p>
             </>} />
           </div>
 
@@ -237,7 +250,7 @@ function DashboardIndex() {
             </>} />
           </div>
 
-          {/* Row 4: Ratio, Rank */}
+          {/* Row 4: Ratio, Rank, Joining Wallet (joining income = last tile) */}
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
             <DashCard title="60:40 Ratio" value="Business Split" gradient={gradients.red} icon="⚖️" details={<>
               <p>Left: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}</p>
@@ -247,6 +260,10 @@ function DashboardIndex() {
             <DashCard title="Rank & Reward" value={rankInfo?.currentRankLabel ?? "Bronze"} gradient={gradients.blue} icon="🎖" details={<>
               <p>Team size: {rankInfo?.teamSize ?? 0} members</p>
               {rankInfo?.nextRank && <p>Next: {rankInfo.nextRankLabel} ({rankInfo.progress}%)</p>}
+            </>} />
+            <DashCard title="Joining Wallet" value={`₹${((income.direct ?? 0) + (income.matching ?? 0)).toLocaleString("en-IN")}`} gradient={gradients.green} icon="👛" details={<>
+              <p>Referral + Matching income credited</p>
+              <p>Referral: ₹{(income.direct ?? 0).toLocaleString("en-IN")} · Matching: ₹{(income.matching ?? 0).toLocaleString("en-IN")}</p>
             </>} />
           </div>
         </>

@@ -204,9 +204,9 @@ export async function generatePurchaseBill(data: PurchaseBillData): Promise<void
   if (data.weight) rows.push([`Weight`, `${data.weight}g`]);
   if (data.goldRatePerGram) rows.push([`Gold Rate per Gram`, formatINR(data.goldRatePerGram)]);
   if (data.goldValue) rows.push([`Gold Value`, formatINR(data.goldValue)]);
-  if (data.makingCharges) rows.push([`Making Charges (${8}%)`, formatINR(data.makingCharges)]);
-  if (data.cgst) rows.push([`CGST (${9}%)`, formatINR(data.cgst)]);
-  if (data.sgst) rows.push([`SGST (${9}%)`, formatINR(data.sgst)]);
+  if (data.makingCharges) rows.push([`Making Charges`, formatINR(data.makingCharges)]);
+  if (data.cgst) rows.push([`CGST`, formatINR(data.cgst)]);
+  if (data.sgst) rows.push([`SGST`, formatINR(data.sgst)]);
   if (data.hallmarkCharges) rows.push([`Hallmark Charges`, formatINR(data.hallmarkCharges)]);
   if (data.additionalCharges && data.additionalCharges > 0) rows.push([`Additional Charges`, formatINR(data.additionalCharges)]);
 
@@ -260,8 +260,8 @@ export async function generatePurchaseBill(data: PurchaseBillData): Promise<void
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7);
     doc.setTextColor(...GRAY);
-    if (data.cgst) doc.text(`CGST @9%: ${formatINR(data.cgst)}`, margin + 8, y + 11);
-    if (data.sgst) doc.text(`SGST @9%: ${formatINR(data.sgst)}`, pageW / 2, y + 11);
+    if (data.cgst) doc.text(`CGST: ${formatINR(data.cgst)}`, margin + 8, y + 11);
+    if (data.sgst) doc.text(`SGST: ${formatINR(data.sgst)}`, pageW / 2, y + 11);
     y += 18;
   }
 

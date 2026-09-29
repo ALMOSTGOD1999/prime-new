@@ -372,23 +372,42 @@ export const getTeamStats = createServerFn({ method: "GET" })
     const userId = await getAuthUserId();
     const descendants = await fetchAllUsersInTree(userId);
 
-    // Split descendants into left and right legs
-    // Walk the tree from root to classify each user's leg
+    // Split descendants into left/right legs by ROOT-LEG SUBTREE: a member's
+    // leg is decided by which root child they descend from — everyone under
+    // the root's left child is left team even when they sit on a right
+    // position deeper down. (The old walker re-classified by each node's own
+    // position and leaked most of the left subtree into the right team.)
+    // Same semantics as pairing income in engine.ts.
     const leftLeg: typeof descendants = [];
     const rightLeg: typeof descendants = [];
 
-    function classify(currentId: number, leg: "left" | "right") {
-      for (const u of descendants) {
-        if (u.parentId === currentId && u.position === leg) {
-          if (leg === "left") leftLeg.push(u);
-          else rightLeg.push(u);
-          classify(u.id, "left");
-          classify(u.id, "right");
+    const childrenOf = new Map<number, typeof descendants>();
+    for (const u of descendants) {
+      if (u.parentId == null || u.id === userId) continue;
+      const list = childrenOf.get(u.parentId) || [];
+      list.push(u);
+      childrenOf.set(u.parentId, list);
+    }
+
+    function collectLeg(rootChild: (typeof descendants)[number], bucket: typeof descendants) {
+      bucket.push(rootChild);
+      const queue = [rootChild.id];
+      const seen = new Set<number>([rootChild.id]);
+      while (queue.length > 0) {
+        const currentId = queue.shift()!;
+        for (const u of childrenOf.get(currentId) || []) {
+          if (seen.has(u.id)) continue;
+          seen.add(u.id);
+          bucket.push(u);
+          queue.push(u.id);
         }
       }
     }
-    classify(userId, "left");
-    classify(userId, "right");
+
+    for (const child of childrenOf.get(userId) || []) {
+      if (child.position === "left") collectLeg(child, leftLeg);
+      else if (child.position === "right") collectLeg(child, rightLeg);
+    }
 
     // Direct team = people the user personally referred (not just tree children)
     const directTeam = descendants.filter((u) => u.referredBy === userId);

@@ -193,7 +193,9 @@ function PurchasesPage() {
               <div className="flex justify-between"><span className="text-emerald/70">Gold Value</span><span>₹{detail.purchase.goldValue?.toLocaleString("en-IN")}</span></div>
               <div className="flex justify-between"><span className="text-emerald/70">Making</span><span>₹{detail.purchase.makingCharges?.toLocaleString("en-IN")}</span></div>
               <div className="flex justify-between"><span className="text-emerald/70">GST</span><span>₹{detail.purchase.gst?.toLocaleString("en-IN")}</span></div>
-              <div className="flex justify-between"><span className="text-emerald/70">Hallmark</span><span>₹{detail.purchase.hallmarkCharges?.toLocaleString("en-IN")}</span></div>
+              {detail.purchase.hallmarkCharges > 0 && (
+                <div className="flex justify-between"><span className="text-emerald/70">Hallmark</span><span>₹{detail.purchase.hallmarkCharges?.toLocaleString("en-IN")}</span></div>
+              )}
               <div className="border-t border-gold/10 pt-3 flex justify-between font-semibold">
                 <span>Total</span>
                 <span className="font-display text-gold text-lg">₹{detail.purchase.totalAmount?.toLocaleString("en-IN")}</span>

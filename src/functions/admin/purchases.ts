@@ -5,10 +5,10 @@ import { eq, and, sql, desc, like, or } from "drizzle-orm";
 import { getCookie } from "@tanstack/react-start/server";
 
 const MIN_PURCHASE = 10000;
-const CGST_PCT = 9;
-const SGST_PCT = 9;
-const HALLMARK_CHARGES = 500;
-const MAKING_CHARGES_PCT = 8;
+// ── Billing split (user-confirmed 2026-09-29) ──
+// Gold Value (weight × current gold rate) = 70% of total;
+// Making 25% + CGST 1.5% + SGST 1.5% + Additional 2% = 30% → 100%.
+// The admin's current gold rate is used as-is (no purity multiplication).
 
 // ── Admin auth helper ──
 async function getAdminId(): Promise<number> {
@@ -35,32 +35,29 @@ async function getLatestGoldRate(): Promise<number> {
 }
 
 // ── Compute billing from carat + weight ──
-function computeBilling(carat: number, weight: number, goldRatePerGram: number, additionalCharges: number = 0) {
-  const purityMap: Record<number, number> = { 24: 1.0, 22: 0.9167, 18: 0.75 };
-  const purity = purityMap[carat];
-  if (!purity) throw new Error("Invalid carat. Must be 18, 22, or 24.");
+function computeBilling(carat: number, weight: number, goldRatePerGram: number) {
+  if (![18, 22, 24].includes(carat)) throw new Error("Invalid carat. Must be 18, 22, or 24.");
 
-  const effectiveRate = goldRatePerGram * purity;
-  const goldValue = effectiveRate * weight;
-  const makingCharges = Math.round(goldValue * MAKING_CHARGES_PCT / 100);
-  const subtotal = goldValue + makingCharges;
-  const cgst = Math.round(subtotal * CGST_PCT / 100);
-  const sgst = Math.round(subtotal * SGST_PCT / 100);
+  const goldValue = Math.round(goldRatePerGram * weight);
+  const makingCharges = Math.round(goldValue * 25 / 70);
+  const cgst = Math.round(goldValue * 1.5 / 70);
+  const sgst = cgst;
+  const additionalCharges = Math.round(goldValue * 2 / 70);
   const gst = cgst + sgst;
-  const total = Math.round(subtotal + gst + HALLMARK_CHARGES + additionalCharges);
+  const total = goldValue + makingCharges + cgst + sgst + additionalCharges;
 
   return {
     carat,
     weight,
     goldRatePerGram,
-    effectiveRate: Math.round(effectiveRate),
-    goldValue: Math.round(goldValue),
+    effectiveRate: Math.round(goldRatePerGram),
+    goldValue,
     makingCharges,
     cgst,
     sgst,
     gst,
     additionalCharges,
-    hallmarkCharges: HALLMARK_CHARGES,
+    hallmarkCharges: 0,
     total,
   };
 }
@@ -125,15 +122,15 @@ export const adminSearchUsers = createServerFn({ method: "POST" })
 
 // ── Admin: Preview billing (weight-based) ──
 export const adminPreviewPurchase = createServerFn({ method: "POST" })
-  .validator((data: { carat: number; weight: number; additionalCharges?: number }) => data)
+  .validator((data: { carat: number; weight: number }) => data)
   .handler(async ({ data }) => {
     await getAdminId();
-    const { carat, weight, additionalCharges = 0 } = data;
+    const { carat, weight } = data;
     if (!weight || weight <= 0) throw new Error("Invalid weight");
     if (![18, 22, 24].includes(carat)) throw new Error("Invalid carat");
 
     const goldRate = await getLatestGoldRate();
-    const billing = computeBilling(carat, weight, goldRate, additionalCharges);
+    const billing = computeBilling(carat, weight, goldRate);
     const pkg = await findPackage(billing.total);
     if (!pkg) throw new Error("No matching package found");
     const monthlyReturn = Math.round(billing.total * pkg.monthlyReturnPct / 100);
@@ -148,17 +145,17 @@ export const adminPreviewPurchase = createServerFn({ method: "POST" })
 
 // ── Admin: Create purchase (weight-based, auto-approved) ──
 export const adminCreatePurchaseWeight = createServerFn({ method: "POST" })
-  .validator((data: { targetUserId: number; carat: number; weight: number; additionalCharges?: number; adminNote?: string }) => data)
+  .validator((data: { targetUserId: number; carat: number; weight: number; adminNote?: string }) => data)
   .handler(async ({ data }) => {
     const adminId = await getAdminId();
-    const { targetUserId, carat, weight, additionalCharges = 0, adminNote } = data;
+    const { targetUserId, carat, weight, adminNote } = data;
 
     // Verify target user exists
     const targetUser = await db.select().from(users).where(eq(users.id, targetUserId));
     if (targetUser.length === 0) throw new Error("Target user not found");
 
     const goldRate = await getLatestGoldRate();
-    const billing = computeBilling(carat, weight, goldRate, additionalCharges);
+    const billing = computeBilling(carat, weight, goldRate);
     if (billing.total < MIN_PURCHASE) throw new Error(`Minimum purchase is ₹${MIN_PURCHASE.toLocaleString("en-IN")}`);
 
     const pkg = await findPackage(billing.total);

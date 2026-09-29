@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { previewPurchase, confirmPurchase, getMyPurchases } from "../../functions/user/purchase";
+import { previewPurchase, getMyPurchases } from "../../functions/user/purchase";
 import { generatePurchaseBill, type PurchaseBillData } from "../../lib/pdf-bill";
 import { getMe } from "../../functions/auth/me";
 
@@ -11,10 +11,8 @@ export const Route = createFileRoute("/dashboard/purchase")({
 function PurchasePage() {
   const [carat, setCarat] = useState<18 | 22 | 24>(22);
   const [weight, setWeight] = useState("");
-  const [additionalCharges, setAdditionalCharges] = useState("");
   const [preview, setPreview] = useState<any>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [activeTab, setActiveTab] = useState<"purchase" | "history">("purchase");
@@ -40,62 +38,14 @@ function PurchasePage() {
   const handlePreview = async () => {
     const w = parseFloat(weight);
     if (!w || w <= 0) return alert("Enter a valid weight in grams");
-    const addl = parseFloat(additionalCharges) || 0;
     setPreviewLoading(true);
     try {
-      const data = await previewPurchase({ data: { carat, weight: w, additionalCharges: addl } });
+      const data = await previewPurchase({ data: { carat, weight: w } });
       setPreview(data);
     } catch (err: any) {
       alert(err.message || "Failed to compute billing");
     } finally {
       setPreviewLoading(false);
-    }
-  };
-
-  const handleConfirm = async () => {
-    const w = parseFloat(weight);
-    if (!w || w <= 0) return alert("Enter a valid weight in grams");
-    if (!confirm("Are you sure you want to confirm this purchase?")) return;
-
-    const addl = parseFloat(additionalCharges) || 0;
-    setConfirmLoading(true);
-    try {
-      const result = await confirmPurchase({ data: { carat, weight: w, additionalCharges: addl } });
-      alert(`Purchase successful! ID: #${result.purchaseId}\nTotal: ₹${result.totalAmount.toLocaleString("en-IN")}\nMonthly Return: ₹${result.monthlyReturnAmount.toLocaleString("en-IN")}`);
-      // Auto-generate PDF bill
-      try {
-        await generatePurchaseBill({
-          purchaseId: result.purchaseId,
-          carat,
-          weight: w,
-          goldRatePerGram: preview?.effectiveRate,
-          goldValue: preview?.goldValue,
-          makingCharges: preview?.makingCharges,
-          gst: preview?.gst,
-          cgst: preview?.cgst,
-          sgst: preview?.sgst,
-          additionalCharges: preview?.additionalCharges,
-          hallmarkCharges: preview?.hallmarkCharges,
-          totalAmount: result.totalAmount,
-          status: "approved",
-          createdAt: new Date().toISOString(),
-          userName: user?.name,
-          userEmail: user?.email,
-          userId: user?.id,
-          monthlyReturnAmount: result.monthlyReturnAmount,
-          monthlyReturnPct: preview?.monthlyReturnPct,
-          packageName: preview?.packageName,
-        });
-      } catch { /* PDF generation is best-effort */ }
-      setWeight("");
-      setAdditionalCharges("");
-      setPreview(null);
-      setActiveTab("history");
-      await loadHistory();
-    } catch (err: any) {
-      alert(err.message || "Purchase failed");
-    } finally {
-      setConfirmLoading(false);
     }
   };
 
@@ -220,19 +170,6 @@ function PurchasePage() {
                   className="w-full border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/60 focus:border-gold"
                 />
               </div>
-              <div>
-                <label className="mb-2 block text-xs uppercase tracking-widest text-emerald/70">Additional Charges (₹) <span className="text-emerald/40 normal-case">optional</span></label>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={additionalCharges}
-                  onChange={(e) => { setAdditionalCharges(e.target.value); setPreview(null); }}
-                  placeholder="0"
-                  className="w-full border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/60 focus:border-gold"
-                />
-                <p className="mt-1 text-xs text-emerald/50">Any extra charges (stone charges, labour, etc.)</p>
-              </div>
             </div>
             <p className="mt-2 text-xs text-emerald/50">Minimum purchase: ₹10,000</p>
             <button
@@ -267,27 +204,21 @@ function PurchasePage() {
                   <span className="font-semibold">₹{preview.goldValue.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-emerald/70">Making Charges (8%)</span>
+                  <span className="text-emerald/70">Making Charges</span>
                   <span className="font-semibold">₹{preview.makingCharges.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-emerald/70">CGST (9%)</span>
+                  <span className="text-emerald/70">CGST</span>
                   <span className="font-semibold">₹{(preview.cgst || 0).toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-emerald/70">SGST (9%)</span>
+                  <span className="text-emerald/70">SGST</span>
                   <span className="font-semibold">₹{(preview.sgst || 0).toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-emerald/70">Hallmark</span>
-                  <span className="font-semibold">₹{preview.hallmarkCharges.toLocaleString("en-IN")}</span>
+                  <span className="text-emerald/70">Additional Charges</span>
+                  <span className="font-semibold">₹{(preview.additionalCharges || 0).toLocaleString("en-IN")}</span>
                 </div>
-                {(preview.additionalCharges || 0) > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-emerald/70">Additional Charges</span>
-                    <span className="font-semibold">₹{preview.additionalCharges.toLocaleString("en-IN")}</span>
-                  </div>
-                )}
               </div>
 
               <div className="border-t border-gold/20 pt-4">
@@ -300,16 +231,8 @@ function PurchasePage() {
               <div className="rounded-lg border border-emerald/20 bg-emerald/5 p-4">
                 <p className="text-xs uppercase tracking-widest text-emerald/70">Monthly Return</p>
                 <p className="mt-1 font-display text-2xl text-emerald">₹{preview.monthlyReturnAmount.toLocaleString("en-IN")}</p>
-                <p className="text-xs text-emerald/60">{preview.monthlyReturnPct}% per month • Package: {preview.packageName}</p>
+                <p className="text-xs text-emerald/60">Package: {preview.packageName}</p>
               </div>
-
-              <button
-                onClick={handleConfirm}
-                disabled={confirmLoading}
-                className="w-full bg-gold py-3 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald disabled:opacity-50"
-              >
-                {confirmLoading ? "Processing..." : "Confirm Purchase"}
-              </button>
             </div>
           )}
         </>

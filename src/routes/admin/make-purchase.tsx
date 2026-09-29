@@ -22,7 +22,6 @@ function MakePurchasePage() {
   const [carat, setCarat] = useState<18 | 22 | 24>(22);
   const [weight, setWeight] = useState("");
   const [amount, setAmount] = useState("");
-  const [additionalCharges, setAdditionalCharges] = useState("");
   const [adminNote, setAdminNote] = useState("");
 
   const [preview, setPreview] = useState<any>(null);
@@ -43,13 +42,12 @@ function MakePurchasePage() {
   };
 
   const handlePreview = async () => {
-    const addl = parseFloat(additionalCharges) || 0;
     if (method === "weight") {
       const w = parseFloat(weight);
       if (!w || w <= 0) return alert("Enter a valid weight");
       setPreviewLoading(true);
       try {
-        const data = await adminPreviewPurchase({ data: { carat, weight: w, additionalCharges: addl } });
+        const data = await adminPreviewPurchase({ data: { carat, weight: w } });
         setPreview(data);
       } catch (err: any) {
         alert(err.message || "Preview failed");
@@ -59,7 +57,7 @@ function MakePurchasePage() {
     } else {
       const a = parseInt(amount, 10);
       if (!a || a < 10000) return alert("Minimum purchase is ₹10,000");
-      setPreview({ total: a + addl, packageName: "Auto", monthlyReturnPct: 3, monthlyReturnAmount: Math.round((a + addl) * 0.03), additionalCharges: addl });
+      setPreview({ total: a, packageName: "Auto", monthlyReturnPct: 3, monthlyReturnAmount: Math.round(a * 0.03) });
     }
   };
 
@@ -67,7 +65,6 @@ function MakePurchasePage() {
     if (!selectedUser) return alert("Select a user first");
     if (!confirm(`Create purchase for ${selectedUser.name}?`)) return;
 
-    const addl = parseFloat(additionalCharges) || 0;
     setCreateLoading(true);
     try {
       let result;
@@ -75,7 +72,7 @@ function MakePurchasePage() {
         const w = parseFloat(weight);
         if (!w || w <= 0) throw new Error("Enter valid weight");
         result = await adminCreatePurchaseWeight({
-          data: { targetUserId: selectedUser.id, carat, weight: w, additionalCharges: addl, adminNote: adminNote || undefined },
+          data: { targetUserId: selectedUser.id, carat, weight: w, adminNote: adminNote || undefined },
         });
       } else {
         const a = parseInt(amount, 10);
@@ -119,7 +116,6 @@ function MakePurchasePage() {
       setSearchResults([]);
       setWeight("");
       setAmount("");
-      setAdditionalCharges("");
       setAdminNote("");
       setPreview(null);
     } catch (err: any) {
@@ -297,21 +293,6 @@ function MakePurchasePage() {
               </div>
             )}
 
-            {/* Additional Charges */}
-            <div className="mt-4">
-              <label className="mb-2 block text-xs uppercase tracking-widest text-emerald/70">Additional Charges (₹) <span className="text-emerald/40 normal-case">optional</span></label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={additionalCharges}
-                onChange={(e) => { setAdditionalCharges(e.target.value); setPreview(null); }}
-                placeholder="0"
-                className="w-full rounded-lg border border-gold/20 bg-card px-4 py-2.5 text-sm outline-none transition-all placeholder:text-emerald/40 focus:border-gold/40 focus:ring-2 focus:ring-gold/10"
-              />
-              <p className="mt-1 text-xs text-emerald/50">Stone charges, labour, or other extra costs</p>
-            </div>
-
             <div className="mt-4">
               <label className="mb-2 block text-xs uppercase tracking-widest text-emerald/70">Admin Note (optional)</label>
               <input
@@ -343,13 +324,10 @@ function MakePurchasePage() {
                   <div className="flex justify-between"><span className="text-emerald/70">Weight</span><span className="font-semibold">{preview.weight}g</span></div>
                   <div className="flex justify-between"><span className="text-emerald/70">Gold Rate/g</span><span className="font-semibold">₹{preview.effectiveRate?.toLocaleString("en-IN")}</span></div>
                   <div className="flex justify-between"><span className="text-emerald/70">Gold Value</span><span className="font-semibold">₹{preview.goldValue?.toLocaleString("en-IN")}</span></div>
-                  <div className="flex justify-between"><span className="text-emerald/70">Making (8%)</span><span className="font-semibold">₹{preview.makingCharges?.toLocaleString("en-IN")}</span></div>
-                  <div className="flex justify-between"><span className="text-emerald/70">CGST (9%)</span><span className="font-semibold">₹{(preview.cgst || 0).toLocaleString("en-IN")}</span></div>
-                  <div className="flex justify-between"><span className="text-emerald/70">SGST (9%)</span><span className="font-semibold">₹{(preview.sgst || 0).toLocaleString("en-IN")}</span></div>
-                  <div className="flex justify-between"><span className="text-emerald/70">Hallmark</span><span className="font-semibold">₹{preview.hallmarkCharges?.toLocaleString("en-IN")}</span></div>
-                  {(preview.additionalCharges || 0) > 0 && (
-                    <div className="flex justify-between"><span className="text-emerald/70">Additional</span><span className="font-semibold">₹{preview.additionalCharges.toLocaleString("en-IN")}</span></div>
-                  )}
+                  <div className="flex justify-between"><span className="text-emerald/70">Making</span><span className="font-semibold">₹{preview.makingCharges?.toLocaleString("en-IN")}</span></div>
+                  <div className="flex justify-between"><span className="text-emerald/70">CGST</span><span className="font-semibold">₹{(preview.cgst || 0).toLocaleString("en-IN")}</span></div>
+                  <div className="flex justify-between"><span className="text-emerald/70">SGST</span><span className="font-semibold">₹{(preview.sgst || 0).toLocaleString("en-IN")}</span></div>
+                  <div className="flex justify-between"><span className="text-emerald/70">Additional Charges</span><span className="font-semibold">₹{(preview.additionalCharges || 0).toLocaleString("en-IN")}</span></div>
                 </div>
               )}
 
@@ -363,7 +341,7 @@ function MakePurchasePage() {
               <div className="mt-3 rounded-lg border border-emerald/20 bg-emerald/5 p-4">
                 <p className="text-xs uppercase tracking-widest text-emerald/70">Monthly Return</p>
                 <p className="mt-1 font-display text-2xl text-emerald">₹{preview.monthlyReturnAmount.toLocaleString("en-IN")}</p>
-                <p className="text-xs text-emerald/60">{preview.monthlyReturnPct}% per month • {preview.packageName}</p>
+                <p className="text-xs text-emerald/60">{preview.packageName}</p>
               </div>
 
               <button
