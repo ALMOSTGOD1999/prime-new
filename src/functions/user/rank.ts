@@ -28,15 +28,34 @@ function calculateRank(teamSize: number): "bronze" | "silver" | "gold" | "platin
   return "bronze";
 }
 
-// ── Count total team size recursively ───────────────────
-async function countTeamSize(parentId: number): Promise<number> {
-  const children = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(eq(users.parentId, parentId));
-  let total = children.length;
-  for (const child of children) {
-    total += await countTeamSize(child.id);
+// ── Count total team size (one query, in-memory walk) ───
+// Was an N+1 recursion: one SQL round-trip per team member, serially.
+// With neon-http each query is an HTTP request to Neon, so large teams
+// hung getRankInfo for minutes (profile page stuck on skeleton).
+async function countTeamSize(rootId: number): Promise<number> {
+  const all = await db
+    .select({ id: users.id, parentId: users.parentId })
+    .from(users);
+
+  const children = new Map<number, number[]>();
+  for (const u of all) {
+    if (u.parentId == null) continue;
+    const list = children.get(u.parentId);
+    if (list) list.push(u.id);
+    else children.set(u.parentId, [u.id]);
+  }
+
+  let total = 0;
+  const seen = new Set<number>([rootId]);
+  const queue: number[] = [rootId];
+  while (queue.length > 0) {
+    const cur = queue.pop()!;
+    for (const child of children.get(cur) ?? []) {
+      if (seen.has(child)) continue; // cycle guard
+      seen.add(child);
+      total++;
+      queue.push(child);
+    }
   }
   return total;
 }

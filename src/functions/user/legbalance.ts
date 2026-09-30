@@ -30,34 +30,42 @@ export const getLegBalance = createServerFn({ method: "GET" })
       .from(users)
       .where(and(eq(users.parentId, userId), eq(users.position, "right"), eq(users.isActive, true)));
 
-    // Count total left (recursive)
-    async function countLeftRecursive(parentId: number): Promise<number> {
-      const children = await db
-        .select({ id: users.id })
-        .from(users)
-        .where(and(eq(users.parentId, parentId), eq(users.position, "left")));
-      let total = children.length;
-      for (const child of children) {
-        total += await countLeftRecursive(child.id);
-      }
-      return total;
+    // Count totals: one query + in-memory walk (was N+1 recursion).
+    // Leg = subtree of each root child (same semantics as getTeamStats).
+    const all = await db
+      .select({ id: users.id, parentId: users.parentId, position: users.position })
+      .from(users);
+
+    const children = new Map<number, { id: number; position: string | null }[]>();
+    for (const u of all) {
+      if (u.parentId == null) continue;
+      const list = children.get(u.parentId);
+      if (list) list.push({ id: u.id, position: u.position });
+      else children.set(u.parentId, [{ id: u.id, position: u.position }]);
     }
 
-    // Count total right (recursive)
-    async function countRightRecursive(parentId: number): Promise<number> {
-      const children = await db
-        .select({ id: users.id })
-        .from(users)
-        .where(and(eq(users.parentId, parentId), eq(users.position, "right")));
-      let total = children.length;
-      for (const child of children) {
-        total += await countRightRecursive(child.id);
-      }
-      return total;
+    let leftTotal = 0;
+    let rightTotal = 0;
+    const seen = new Set<number>([userId]);
+    const queue: { id: number; leg: "left" | "right" }[] = [];
+    for (const child of children.get(userId) ?? []) {
+      if (child.position !== "left" && child.position !== "right") continue;
+      if (seen.has(child.id)) continue;
+      seen.add(child.id);
+      if (child.position === "left") leftTotal++;
+      else rightTotal++;
+      queue.push({ id: child.id, leg: child.position });
     }
-
-    const leftTotal = await countLeftRecursive(userId);
-    const rightTotal = await countRightRecursive(userId);
+    while (queue.length > 0) {
+      const cur = queue.pop()!;
+      for (const grandchild of children.get(cur.id) ?? []) {
+        if (seen.has(grandchild.id)) continue; // cycle guard
+        seen.add(grandchild.id);
+        if (cur.leg === "left") leftTotal++;
+        else rightTotal++;
+        queue.push({ id: grandchild.id, leg: cur.leg });
+      }
+    }
 
     return {
       leftDirect: leftResult[0]?.count ?? 0,

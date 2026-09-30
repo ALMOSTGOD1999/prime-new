@@ -63,13 +63,43 @@ export const getProfile = createServerFn({ method: "GET" })
         panNumber: k.panNumber,
         aadhaarNumber: k.aadhaarNumber,
         bankName: k.bankName,
+        holderName: k.holderName,
         accountNumber: k.accountNumber,
         ifscCode: k.ifscCode,
+        upi: k.upi,
         status: k.status,
       };
     }
 
     return { user, parent, kyc: kycData };
+  });
+
+// ── Update banking details ──────────────────────────────
+export const updateBankDetails = createServerFn({ method: "POST" })
+  .validator((data: { holderName?: string; accountNumber?: string; ifscCode?: string; upi?: string }) => data)
+  .handler(async ({ data }) => {
+    const userId = await getAuthUserId();
+
+    const holderName = (data.holderName || "").trim();
+    const accountNumber = (data.accountNumber || "").replace(/\D/g, "");
+    const ifscCode = (data.ifscCode || "").trim().toUpperCase();
+    const upi = (data.upi || "").trim();
+
+    if (holderName.length < 2) throw new Error("Account holder name is required");
+    if (accountNumber.length < 9 || accountNumber.length > 18) throw new Error("Account number must be 9-18 digits");
+    if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifscCode)) throw new Error("IFSC code must be 11 characters (e.g. HDFC0001234)");
+    if (upi && !/^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$/.test(upi)) throw new Error("UPI ID must look like name@bank");
+
+    const values = { holderName, accountNumber, ifscCode, upi: upi || null };
+
+    const existing = await db.select({ id: kyc.id }).from(kyc).where(eq(kyc.userId, userId));
+    if (existing.length > 0) {
+      await db.update(kyc).set(values).where(eq(kyc.id, existing[0]!.id));
+    } else {
+      await db.insert(kyc).values({ userId, ...values });
+    }
+
+    return { success: true };
   });
 
 // ── Update profile ──────────────────────────────────────

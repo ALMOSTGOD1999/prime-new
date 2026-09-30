@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getProfile, updateProfile, changePassword } from "../../functions/user/profile";
+import { getProfile, updateProfile, changePassword, updateBankDetails } from "../../functions/user/profile";
 import { getRankInfo } from "../../functions/user/rank";
 
 export const Route = createFileRoute("/dashboard/profile")({
@@ -38,6 +38,15 @@ function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
 
+  // Banking details state
+  const [bankHolder, setBankHolder] = useState("");
+  const [bankAccount, setBankAccount] = useState("");
+  const [bankConfirm, setBankConfirm] = useState("");
+  const [bankIfsc, setBankIfsc] = useState("");
+  const [bankUpi, setBankUpi] = useState("");
+  const [savingBank, setSavingBank] = useState(false);
+  const [bankMsg, setBankMsg] = useState("");
+
   // Password change state
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -62,6 +71,11 @@ function ProfilePage() {
         setEditProfileImage(profileData.user.profileImage || "");
         setEditDarkMode(profileData.user.darkMode || false);
         setPhotoUrl(profileData.user.profileImage || "");
+        setBankHolder(profileData.kyc?.holderName || "");
+        setBankAccount(profileData.kyc?.accountNumber || "");
+        setBankConfirm(profileData.kyc?.accountNumber || "");
+        setBankIfsc(profileData.kyc?.ifscCode || "");
+        setBankUpi(profileData.kyc?.upi || "");
       })
       .catch(() => navigate({ to: "/auth" }))
       .finally(() => setLoading(false));
@@ -79,6 +93,53 @@ function ProfilePage() {
       setSaveMsg(err.message || "Failed to update profile");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveBank = async () => {
+    setBankMsg("");
+    const acct = bankAccount.replace(/\D/g, "");
+    if (bankHolder.trim().length < 2) {
+      setBankMsg("Account holder name is required");
+      return;
+    }
+    if (!acct) {
+      setBankMsg("Account number is required");
+      return;
+    }
+    if (acct !== bankConfirm.replace(/\D/g, "")) {
+      setBankMsg("Account numbers do not match");
+      return;
+    }
+    if (!bankIfsc.trim()) {
+      setBankMsg("IFSC code is required");
+      return;
+    }
+    setSavingBank(true);
+    try {
+      const ifsc = bankIfsc.trim().toUpperCase();
+      const upi = bankUpi.trim();
+      await updateBankDetails({ data: { holderName: bankHolder.trim(), accountNumber: acct, ifscCode: ifsc, upi } });
+      setKyc({
+        ...(kyc || {}),
+        panNumber: kyc?.panNumber ?? null,
+        aadhaarNumber: kyc?.aadhaarNumber ?? null,
+        bankName: kyc?.bankName ?? null,
+        status: kyc?.status ?? "pending",
+        holderName: bankHolder.trim(),
+        accountNumber: acct,
+        ifscCode: ifsc,
+        upi: upi || null,
+      });
+      setBankAccount(acct);
+      setBankConfirm(acct);
+      setBankIfsc(ifsc);
+      setBankMsg("Banking details saved!");
+      setTimeout(() => setBankMsg(""), 3000);
+    } catch (err: any) {
+      setBankMsg(err.message || "Failed to save banking details");
+    } finally {
+      setSavingBank(false);
     }
   };
 
@@ -226,8 +287,10 @@ function ProfilePage() {
                   <Field label="PAN Number" value={kyc.panNumber || "Not submitted"} />
                   <Field label="Aadhaar Number" value={kyc.aadhaarNumber ? "••••" + kyc.aadhaarNumber.slice(-4) : "Not submitted"} />
                   <Field label="Bank Name" value={kyc.bankName || "Not submitted"} />
+                  <Field label="Account Holder Name" value={kyc.holderName || "Not set"} />
                   <Field label="Account Number" value={kyc.accountNumber ? "••••" + kyc.accountNumber.slice(-4) : "Not submitted"} />
                   <Field label="IFSC Code" value={kyc.ifscCode || "Not submitted"} />
+                  <Field label="UPI ID" value={kyc.upi || "Not set"} />
                   <Field label="KYC Status" value={kyc.status?.charAt(0).toUpperCase() + kyc.status?.slice(1)} />
                 </div>
               ) : (
@@ -242,7 +305,7 @@ function ProfilePage() {
           <div className="space-y-6">
             <div className="rounded-lg border border-gold/10 bg-emerald/5 p-3">
               <p className="text-xs text-emerald/70">
-                You can update your email, profile image, and dark mode preference. Name, phone, bank details, and PAN cannot be changed.
+                You can update your email, profile image, dark mode preference, and banking details. Name, phone, and PAN cannot be changed.
               </p>
             </div>
 
@@ -292,6 +355,78 @@ function ProfilePage() {
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>
+
+            {/* Banking Details */}
+            <div className="space-y-4 border-t border-gold/10 pt-6">
+              <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">Banking Details</h3>
+              <div>
+                <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Account Holder Name</label>
+                <input
+                  type="text"
+                  value={bankHolder}
+                  onChange={(e) => setBankHolder(e.target.value)}
+                  placeholder="Name as per bank records"
+                  className="w-full border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/40 focus:border-gold"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Account Number</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={bankAccount}
+                  onChange={(e) => setBankAccount(e.target.value.replace(/\D/g, ""))}
+                  placeholder="Bank account number"
+                  className="w-full border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/40 focus:border-gold"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">Confirm Account Number</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={bankConfirm}
+                  onChange={(e) => setBankConfirm(e.target.value.replace(/\D/g, ""))}
+                  placeholder="Re-enter account number"
+                  className="w-full border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/40 focus:border-gold"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">IFSC Code</label>
+                <input
+                  type="text"
+                  value={bankIfsc}
+                  onChange={(e) => setBankIfsc(e.target.value.toUpperCase())}
+                  placeholder="e.g. HDFC0001234"
+                  maxLength={11}
+                  className="w-full border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/40 focus:border-gold"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs uppercase tracking-widest text-emerald/70">UPI ID (optional)</label>
+                <input
+                  type="text"
+                  value={bankUpi}
+                  onChange={(e) => setBankUpi(e.target.value)}
+                  placeholder="yourname@upi"
+                  className="w-full border-b border-gold/40 bg-transparent py-2 text-sm outline-none placeholder:text-emerald/40 focus:border-gold"
+                />
+              </div>
+
+              {bankMsg && (
+                <p className={`text-xs font-semibold ${bankMsg.includes("saved") ? "text-emerald" : "text-red-500"}`}>
+                  {bankMsg}
+                </p>
+              )}
+
+              <button
+                onClick={handleSaveBank}
+                disabled={savingBank}
+                className="bg-emerald px-6 py-2 text-xs font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80 disabled:opacity-50"
+              >
+                {savingBank ? "Saving..." : "Save Banking Details"}
+              </button>
+            </div>
           </div>
         )}
 
