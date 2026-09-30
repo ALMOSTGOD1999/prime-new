@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "../../lib/db";
 import { purchases, investments, investmentPackages, users, wallet, income, goldRates } from "../../lib/db/schema";
-import { eq, and, sql, desc, like, or } from "drizzle-orm";
+import { eq, and, sql, desc, like, or, lte } from "drizzle-orm";
 import { getCookie } from "@tanstack/react-start/server";
 
 const MIN_PURCHASE = 10000;
@@ -32,6 +32,32 @@ async function getLatestGoldRate(): Promise<number> {
     .limit(1);
   if (latest.length === 0) throw new Error("Gold rate not set by admin");
   return latest[0].price;
+}
+
+// ── Parse optional backdate (YYYY-MM-DD) ──
+// Returns the effective purchase timestamp: the backdate (noon UTC so the
+// date renders correctly in IST) or now. Rejects future dates.
+function parsePurchaseDate(purchaseDate?: string): Date {
+  if (!purchaseDate) return new Date();
+  const d = new Date(`${purchaseDate}T12:00:00Z`);
+  if (Number.isNaN(d.getTime())) throw new Error("Invalid purchase date");
+  if (d.getTime() > Date.now() + 24 * 60 * 60 * 1000) {
+    throw new Error("Purchase date cannot be in the future");
+  }
+  return d;
+}
+
+// ── Gold rate as of a date (for backdated weight-based purchases) ──
+async function getGoldRateAsOf(at: Date): Promise<number> {
+  const rows = await db
+    .select()
+    .from(goldRates)
+    .where(lte(goldRates.createdAt, at))
+    .orderBy(desc(goldRates.createdAt))
+    .limit(1);
+  if (rows.length > 0) return rows[0]!.price;
+  // No rate recorded on/before that date — fall back to latest
+  return getLatestGoldRate();
 }
 
 // ── Compute billing from carat + weight ──
@@ -145,16 +171,17 @@ export const adminPreviewPurchase = createServerFn({ method: "POST" })
 
 // ── Admin: Create purchase (weight-based, auto-approved) ──
 export const adminCreatePurchaseWeight = createServerFn({ method: "POST" })
-  .validator((data: { targetUserId: number; carat: number; weight: number; adminNote?: string }) => data)
+  .validator((data: { targetUserId: number; carat: number; weight: number; adminNote?: string; purchaseDate?: string }) => data)
   .handler(async ({ data }) => {
     const adminId = await getAdminId();
     const { targetUserId, carat, weight, adminNote } = data;
+    const effectiveAt = parsePurchaseDate(data.purchaseDate);
 
     // Verify target user exists
     const targetUser = await db.select().from(users).where(eq(users.id, targetUserId));
     if (targetUser.length === 0) throw new Error("Target user not found");
 
-    const goldRate = await getLatestGoldRate();
+    const goldRate = data.purchaseDate ? await getGoldRateAsOf(effectiveAt) : await getLatestGoldRate();
     const billing = computeBilling(carat, weight, goldRate);
     if (billing.total < MIN_PURCHASE) throw new Error(`Minimum purchase is ₹${MIN_PURCHASE.toLocaleString("en-IN")}`);
 
@@ -179,9 +206,10 @@ export const adminCreatePurchaseWeight = createServerFn({ method: "POST" })
         hallmarkCharges: billing.hallmarkCharges,
         totalAmount: billing.total,
         status: "approved",
-        approvedAt: new Date(),
+        approvedAt: effectiveAt,
         createdByAdmin: true,
         adminNote: adminNote || `Created by admin #${adminId}`,
+        createdAt: effectiveAt,
       })
       .returning();
 
@@ -196,6 +224,7 @@ export const adminCreatePurchaseWeight = createServerFn({ method: "POST" })
         monthlyReturnPct: pkg.monthlyReturnPct,
         monthlyReturnAmount,
         status: "active",
+        startDate: effectiveAt,
       })
       .returning();
 
@@ -217,6 +246,7 @@ export const adminCreatePurchaseWeight = createServerFn({ method: "POST" })
       type: "direct",
       amount: Math.round(billing.total),
       description: `Gold purchase (admin) — ${carat}K ${weight}g · Invoice #${purchase.id}`,
+      createdAt: effectiveAt,
     });
 
     return {
@@ -231,10 +261,11 @@ export const adminCreatePurchaseWeight = createServerFn({ method: "POST" })
 
 // ── Admin: Create purchase (amount-based, auto-approved) ──
 export const adminCreatePurchaseAmount = createServerFn({ method: "POST" })
-  .validator((data: { targetUserId: number; amount: number; adminNote?: string }) => data)
+  .validator((data: { targetUserId: number; amount: number; adminNote?: string; purchaseDate?: string }) => data)
   .handler(async ({ data }) => {
     const adminId = await getAdminId();
     const { targetUserId, amount, adminNote } = data;
+    const effectiveAt = parsePurchaseDate(data.purchaseDate);
 
     if (!amount || amount < MIN_PURCHASE) throw new Error(`Minimum purchase is ₹${MIN_PURCHASE.toLocaleString("en-IN")}`);
 
@@ -257,9 +288,10 @@ export const adminCreatePurchaseAmount = createServerFn({ method: "POST" })
         hallmarkCharges: 0,
         totalAmount: amount,
         status: "approved",
-        approvedAt: new Date(),
+        approvedAt: effectiveAt,
         createdByAdmin: true,
         adminNote: adminNote || `Amount-based purchase by admin #${adminId}`,
+        createdAt: effectiveAt,
       })
       .returning();
 
@@ -273,6 +305,7 @@ export const adminCreatePurchaseAmount = createServerFn({ method: "POST" })
         monthlyReturnPct: pkg.monthlyReturnPct,
         monthlyReturnAmount,
         status: "active",
+        startDate: effectiveAt,
       })
       .returning();
 
@@ -293,6 +326,7 @@ export const adminCreatePurchaseAmount = createServerFn({ method: "POST" })
       type: "direct",
       amount,
       description: `Amount-based purchase (admin) · Invoice #${purchase.id}`,
+      createdAt: effectiveAt,
     });
 
     return {

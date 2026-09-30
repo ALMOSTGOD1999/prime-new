@@ -23,6 +23,7 @@ function MakePurchasePage() {
   const [weight, setWeight] = useState("");
   const [amount, setAmount] = useState("");
   const [adminNote, setAdminNote] = useState("");
+  const [purchaseDate, setPurchaseDate] = useState(() => new Date().toISOString().slice(0, 10));
 
   const [preview, setPreview] = useState<any>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -63,7 +64,8 @@ function MakePurchasePage() {
 
   const handleCreate = async () => {
     if (!selectedUser) return alert("Select a user first");
-    if (!confirm(`Create purchase for ${selectedUser.name}?`)) return;
+    const isBackdate = purchaseDate !== new Date().toISOString().slice(0, 10);
+    if (!confirm(`Create purchase for ${selectedUser.name}${isBackdate ? ` (backdated to ${purchaseDate})` : ""}?`)) return;
 
     setCreateLoading(true);
     try {
@@ -72,13 +74,13 @@ function MakePurchasePage() {
         const w = parseFloat(weight);
         if (!w || w <= 0) throw new Error("Enter valid weight");
         result = await adminCreatePurchaseWeight({
-          data: { targetUserId: selectedUser.id, carat, weight: w, adminNote: adminNote || undefined },
+          data: { targetUserId: selectedUser.id, carat, weight: w, adminNote: adminNote || undefined, purchaseDate },
         });
       } else {
         const a = parseInt(amount, 10);
         if (!a || a < 10000) throw new Error("Minimum purchase is ₹10,000");
         result = await adminCreatePurchaseAmount({
-          data: { targetUserId: selectedUser.id, amount: a, adminNote: adminNote || undefined },
+          data: { targetUserId: selectedUser.id, amount: a, adminNote: adminNote || undefined, purchaseDate },
         });
       }
 
@@ -100,7 +102,7 @@ function MakePurchasePage() {
           hallmarkCharges: preview?.hallmarkCharges,
           totalAmount: result.totalAmount,
           status: "approved",
-          createdAt: new Date().toISOString(),
+          createdAt: new Date(`${purchaseDate}T12:00:00Z`).toISOString(),
           userName: selectedUser.name,
           userEmail: selectedUser.email,
           userId: selectedUser.id,
@@ -292,6 +294,17 @@ function MakePurchasePage() {
                 />
               </div>
             )}
+
+            <div className="mt-4">
+              <label className="mb-2 block text-xs uppercase tracking-widest text-emerald/70">Purchase Date (backdate allowed)</label>
+              <input
+                type="date"
+                value={purchaseDate}
+                max={new Date().toISOString().slice(0, 10)}
+                onChange={(e) => setPurchaseDate(e.target.value)}
+                className="w-full rounded-lg border border-gold/20 bg-card px-4 py-2.5 text-sm outline-none transition-all focus:border-gold/40 focus:ring-2 focus:ring-gold/10"
+              />
+            </div>
 
             <div className="mt-4">
               <label className="mb-2 block text-xs uppercase tracking-widest text-emerald/70">Admin Note (optional)</label>
