@@ -6,6 +6,7 @@ import { getRankInfo } from "../../functions/user/rank";
 import { getTeamStats, getDownlineUsers, getDirectUsers } from "../../functions/user/tree";
 import { getMyPerformanceIncentive } from "../../functions/user/incentive";
 import { getLegPurchases, getIncomeDetails, type IncomeDetailKind } from "../../functions/user/dashboard-details";
+import { getMyPurchases } from "../../functions/user/purchase";
 import { DashCard } from "../../components/DashCard";
 
 export const Route = createFileRoute("/dashboard/")({
@@ -71,6 +72,36 @@ function DashboardIndex() {
     try {
       const rows = await getIncomeDetails({ data: { kind } });
       setDetailModal({ title, notes, rows, loading: false });
+    } catch (err) {
+      console.error(err);
+      setDetailModal((m) => (m ? { ...m, loading: false } : m));
+    }
+  };
+
+  // Total Business = own purchases + both legs (all-time)
+  const selfBusiness = data?.user?.packageAmount ?? 0;
+  const leftBusinessAll = teamStats?.totalBusinessLeft ?? 0;
+  const rightBusinessAll = teamStats?.totalBusinessRight ?? 0;
+  const totalBusinessAll = selfBusiness + leftBusinessAll + rightBusinessAll;
+
+  const openTotalBusiness = async () => {
+    const notes = [
+      `My purchases: ₹${selfBusiness.toLocaleString("en-IN")}`,
+      `Left team: ₹${leftBusinessAll.toLocaleString("en-IN")} · Right team: ₹${rightBusinessAll.toLocaleString("en-IN")}`,
+      `All-time total (own + both legs): ₹${totalBusinessAll.toLocaleString("en-IN")}`,
+    ];
+    setDetailModal({ title: "Total Business — My Purchases", notes, rows: [], loading: true });
+    try {
+      const res = await getMyPurchases();
+      const rows = (res.purchases ?? []).map((p: any) => ({
+        purchaseId: p.id,
+        name: data?.user?.name ?? "Me",
+        code: data?.user?.referralCode ?? "",
+        amount: p.totalAmount,
+        createdAt: p.createdAt,
+        description: `Own purchase #${p.id} · ${p.status}`,
+      }));
+      setDetailModal({ title: "Total Business — My Purchases", notes, rows, loading: false });
     } catch (err) {
       console.error(err);
       setDetailModal((m) => (m ? { ...m, loading: false } : m));
@@ -239,8 +270,9 @@ function DashboardIndex() {
             </>} />
           </div>
 
-          {/* Row 2: Last-month leg business + income + awards */}
-          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
+          {/* Row 2: Total business + last-month leg business + income */}
+          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-5 lg:gap-4">
+            <DashCard title="Total Business" subtitle="All-time · Own + Team" value={`₹${totalBusinessAll.toLocaleString("en-IN")}`} gradient={gradients.green} icon="🏪" onMoreInfo={openTotalBusiness} />
             <DashCard title="Left Business" subtitle="Last month" value={`₹${(perfBusiness?.left ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" onMoreInfo={() => openLegDetails("left")} />
             <DashCard title="Right Business" subtitle="Last month" value={`₹${(perfBusiness?.right ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="📊" onMoreInfo={() => openLegDetails("right")} />
             <DashCard title="Cashback" value={`₹${(income.cashbackBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="💰" onMoreInfo={() =>
