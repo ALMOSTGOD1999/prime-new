@@ -88,6 +88,7 @@ export const getLegPurchases = createServerFn({ method: "POST" })
 export type IncomeDetailKind =
   | "cashback"
   | "direct"
+  | "purchase"
   | "matching"
   | "performance_incentive"
   | "level";

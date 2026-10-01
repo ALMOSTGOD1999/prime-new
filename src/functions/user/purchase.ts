@@ -187,7 +187,7 @@ export const confirmPurchase = createServerFn({ method: "POST" })
     // Record as business income
     await db.insert(income).values({
       userId,
-      type: "direct" as const,
+      type: "purchase" as const,
       amount: Math.round(billing.total),
       description: `Gold purchase — ${carat}K ${weight}g · Invoice #${purchase.id}`,
     });

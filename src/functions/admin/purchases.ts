@@ -243,7 +243,7 @@ export const adminCreatePurchaseWeight = createServerFn({ method: "POST" })
     // Record as business income
     await db.insert(income).values({
       userId: targetUserId,
-      type: "direct",
+      type: "purchase",
       amount: Math.round(billing.total),
       description: `Gold purchase (admin) — ${carat}K ${weight}g · Invoice #${purchase.id}`,
       createdAt: effectiveAt,
@@ -323,7 +323,7 @@ export const adminCreatePurchaseAmount = createServerFn({ method: "POST" })
     // Record as business income
     await db.insert(income).values({
       userId: targetUserId,
-      type: "direct",
+      type: "purchase",
       amount,
       description: `Amount-based purchase (admin) · Invoice #${purchase.id}`,
       createdAt: effectiveAt,

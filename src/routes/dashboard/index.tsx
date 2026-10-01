@@ -283,8 +283,8 @@ function DashboardIndex() {
             } />
             <DashCard title="Referral Income" value={`₹${(income.direct ?? 0).toLocaleString("en-IN")}`} gradient={gradients.pink} icon="🔗" onMoreInfo={() =>
               openIncomeDetails("direct", "Referral Income Details", [
-                "Direct commission + purchase business credited as type 'direct'",
-                "5% one-time direct commission on activation (₹150)",
+                "5% one-time direct commission on activation (₹150 per referral)",
+                "Purchase business is tracked separately under Total Business",
               ])
             } />
           </div>

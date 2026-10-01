@@ -36,6 +36,7 @@ function AdminIncome() {
   const filters = [
     { key: "", label: "All", color: "emerald" },
     { key: "direct", label: "Direct", color: "emerald" },
+    { key: "purchase", label: "Purchase", color: "gold" },
     { key: "matching", label: "Matching", color: "gold" },
     { key: "award", label: "Awards", color: "gold" },
     { key: "cashback", label: "Cashback", color: "gold" },
