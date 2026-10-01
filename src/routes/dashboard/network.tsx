@@ -68,6 +68,7 @@ function UserTable({ users, title }: { users: any[]; title: string }) {
                 <th className="px-3 py-2">Name</th>
                 <th className="px-3 py-2">Member ID</th>
                 <th className="px-3 py-2">Position</th>
+                <th className="px-3 py-2">Level</th>
                 <th className="px-3 py-2">Status</th>
                 <th className="px-3 py-2">Rank</th>
                 <th className="px-3 py-2">Business</th>
@@ -82,6 +83,15 @@ function UserTable({ users, title }: { users: any[]; title: string }) {
                   <td className="px-3 py-2 font-semibold">{u.name}</td>
                   <td className="px-3 py-2 font-mono text-emerald/70">{u.referralCode}</td>
                   <td className="px-3 py-2 capitalize">{u.position || "\u2014"}</td>
+                  <td className="px-3 py-2">
+                    {u.level != null ? (
+                      <span className="inline-flex items-center rounded-full bg-gold/10 px-2 py-0.5 text-[10px] font-semibold text-gold">
+                        L{u.level}
+                      </span>
+                    ) : (
+                      "\u2014"
+                    )}
+                  </td>
                   <td className="px-3 py-2">
                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${u.isActive ? "bg-emerald/15 text-emerald-700" : "bg-red-50 text-red-600"}`}>
                       {u.isActive ? "Active" : "Inactive"}

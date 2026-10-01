@@ -5,6 +5,7 @@ import { requestWithdrawal, getWithdrawals, getWithdrawalInfo } from "../../func
 import { getRankInfo } from "../../functions/user/rank";
 import { getTeamStats, getDownlineUsers, getDirectUsers } from "../../functions/user/tree";
 import { getMyPerformanceIncentive } from "../../functions/user/incentive";
+import { getLegPurchases, getIncomeDetails, type IncomeDetailKind } from "../../functions/user/dashboard-details";
 import { DashCard } from "../../components/DashCard";
 
 export const Route = createFileRoute("/dashboard/")({
@@ -27,6 +28,54 @@ function DashboardIndex() {
   const [memberList, setMemberList] = useState<any[] | null>(null);
   const [memberLoading, setMemberLoading] = useState(false);
   const [memberSearch, setMemberSearch] = useState("");
+  // Detail modal for tile "More info" (leg purchasers / income rows)
+  const [detailModal, setDetailModal] = useState<{
+    title: string;
+    notes: string[];
+    rows: any[];
+    loading: boolean;
+  } | null>(null);
+
+  const openLegDetails = async (leg: "left" | "right") => {
+    const side = leg === "left" ? "Left" : "Right";
+    setDetailModal({
+      title: `${side} Leg Purchases`,
+      notes: ["Approved purchases in the trailing 30 days"],
+      rows: [],
+      loading: true,
+    });
+    try {
+      const res = await getLegPurchases({ data: { leg } });
+      setDetailModal({
+        title: `${side} Leg Purchases`,
+        notes: [
+          `Trailing 30 days · ${res.count} purchase(s) · ₹${res.total.toLocaleString("en-IN")}`,
+          `Gold/Platinum volume: ₹${((leg === "left" ? teamStats?.teamBusinessLeftGold : teamStats?.teamBusinessRightGold) ?? 0).toLocaleString("en-IN")}`,
+          `All-time ${side.toLowerCase()} team business: ₹${((leg === "left" ? teamStats?.totalBusinessLeft : teamStats?.totalBusinessRight) ?? 0).toLocaleString("en-IN")}`,
+        ],
+        rows: res.rows,
+        loading: false,
+      });
+    } catch (err) {
+      console.error(err);
+      setDetailModal((m) => (m ? { ...m, loading: false } : m));
+    }
+  };
+
+  const openIncomeDetails = async (
+    kind: IncomeDetailKind,
+    title: string,
+    notes: string[],
+  ) => {
+    setDetailModal({ title, notes, rows: [], loading: true });
+    try {
+      const rows = await getIncomeDetails({ data: { kind } });
+      setDetailModal({ title, notes, rows, loading: false });
+    } catch (err) {
+      console.error(err);
+      setDetailModal((m) => (m ? { ...m, loading: false } : m));
+    }
+  };
 
   const openMemberModal = async (kind: "downline" | "direct") => {
     setMemberModal(kind);
@@ -119,6 +168,15 @@ function DashboardIndex() {
     red: "from-red-400 via-rose-400 to-pink-300",
   };
 
+  // Actual last-month L:R split for the 60:40 card
+  const monthLeft = perfBusiness?.left ?? 0;
+  const monthRight = perfBusiness?.right ?? 0;
+  const monthTotal = monthLeft + monthRight;
+  const monthSplit = {
+    lPct: monthTotal > 0 ? Math.round((monthLeft / monthTotal) * 100) : 0,
+    rPct: monthTotal > 0 ? 100 - Math.round((monthLeft / monthTotal) * 100) : 0,
+  };
+
   const memberQuery = memberSearch.trim().toLowerCase();
   const filteredMembers = (memberList ?? []).filter((m: any) =>
     !memberQuery ||
@@ -183,42 +241,42 @@ function DashboardIndex() {
 
           {/* Row 2: Last-month leg business + income + awards */}
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
-            <DashCard title="Left Business" subtitle="Last month" value={`₹${(perfBusiness?.left ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" details={<>
-              <p>Trailing 30-day team purchases — left leg</p>
-              <p>Gold/Platinum volume: ₹{(teamStats.teamBusinessLeftGold ?? 0).toLocaleString("en-IN")}</p>
-              <p>All-time left team business: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}</p>
-            </>} />
-            <DashCard title="Right Business" subtitle="Last month" value={`₹${(perfBusiness?.right ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="📊" details={<>
-              <p>Trailing 30-day team purchases — right leg</p>
-              <p>Gold/Platinum volume: ₹{(teamStats.teamBusinessRightGold ?? 0).toLocaleString("en-IN")}</p>
-              <p>All-time right team business: ₹{(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}</p>
-            </>} />
-            <DashCard title="Cashback" value={`₹${(income.cashbackBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="💰" details={<>
-              <p>Gold purchase cashback credited monthly</p>
-              <p>3% / 3.5% / 4% based on purchase value</p>
-            </>} />
-            <DashCard title="Referral Income" value={`₹${(income.direct ?? 0).toLocaleString("en-IN")}`} gradient={gradients.pink} icon="🔗" details={<>
-              <p>Earn for every direct referral</p>
-              <p>5% one-time direct commission</p>
-            </>} />
+            <DashCard title="Left Business" subtitle="Last month" value={`₹${(perfBusiness?.left ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" onMoreInfo={() => openLegDetails("left")} />
+            <DashCard title="Right Business" subtitle="Last month" value={`₹${(perfBusiness?.right ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="📊" onMoreInfo={() => openLegDetails("right")} />
+            <DashCard title="Cashback" value={`₹${(income.cashbackBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="💰" onMoreInfo={() =>
+              openIncomeDetails("cashback", "Cashback Details", [
+                "Gold purchase cashback credited monthly",
+                "3% / 3.5% / 4% based on purchase value · cap 60%",
+              ])
+            } />
+            <DashCard title="Referral Income" value={`₹${(income.direct ?? 0).toLocaleString("en-IN")}`} gradient={gradients.pink} icon="🔗" onMoreInfo={() =>
+              openIncomeDetails("direct", "Referral Income Details", [
+                "Direct commission + purchase business credited as type 'direct'",
+                "5% one-time direct commission on activation (₹150)",
+              ])
+            } />
           </div>
 
           {/* Row 3: Matching right after Referral, then Performance + Level, then Joining Awards */}
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
-            <DashCard title="Matching Income" value={`₹${(income.matching ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="💎" details={<>
-              <p>20% of each qualifying pair match</p>
-              <p>Direct: ₹{(income.direct ?? 0).toLocaleString("en-IN")}</p>
-              <p>Total earned: ₹{(income.totalEarned ?? 0).toLocaleString("en-IN")}</p>
-            </>} />
-            <DashCard title="Performance Incentive" value={`₹${(income.performanceTotal ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="📈" details={<>
-              <p>Rank bonus from last-month team business</p>
-              <p>Pays monthly for up to 6 months once reached</p>
-              <p>Last month (L+R): ₹{(perfBusiness?.total ?? 0).toLocaleString("en-IN")}</p>
-            </>} />
-            <DashCard title="Level Income" value={`₹${(income.levelTotal ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="🎚" details={<>
-              <p>% of team business at each open level</p>
-              <p>Working income — credited via 70/20/10 split</p>
-            </>} />
+            <DashCard title="Matching Income" value={`₹${(income.matching ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="💎" onMoreInfo={() =>
+              openIncomeDetails("matching", "Matching Income Details", [
+                "Pair matching 20% (₹600/pair) + monthly investment returns",
+                `Total earned: ₹${(income.totalEarned ?? 0).toLocaleString("en-IN")}`,
+              ])
+            } />
+            <DashCard title="Performance Incentive" value={`₹${(income.performanceTotal ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="📈" onMoreInfo={() =>
+              openIncomeDetails("performance_incentive", "Performance Incentive Details", [
+                "Rank bonus from last-month team business · pays monthly up to 6 months",
+                `Last month (L+R): ₹${(perfBusiness?.total ?? 0).toLocaleString("en-IN")}`,
+              ])
+            } />
+            <DashCard title="Level Income" value={`₹${(income.levelTotal ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="🎚" onMoreInfo={() =>
+              openIncomeDetails("level", "Level Income Details", [
+                "% of team business at each open level",
+                "Working income — credited via 70/20/10 split",
+              ])
+            } />
             <DashCard title="Joining Awards" value={income.awards?.length ?? 0} gradient={gradients.blue} icon="🏆" details={<>
               <p>Milestone rewards for pair matching</p>
               <p>Bag at 100 pairs · Phone at 500</p>
@@ -252,11 +310,19 @@ function DashboardIndex() {
 
           {/* Row 4: Ratio, Rank, Joining Wallet (joining income = last tile) */}
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
-            <DashCard title="60:40 Ratio" value="Business Split" gradient={gradients.red} icon="⚖️" details={<>
-              <p>Left: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")}</p>
-              <p>Right: ₹{(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}</p>
-              <p>Income on weaker leg (60:40 split)</p>
-            </>} />
+            <DashCard
+              title="60:40 Ratio"
+              subtitle="Actual L : R (Last month)"
+              value={`${monthSplit.lPct} : ${monthSplit.rPct}`}
+              gradient={gradients.red}
+              icon="⚖️"
+              details={<>
+                <p>Last month Left: ₹{(perfBusiness?.left ?? 0).toLocaleString("en-IN")} ({monthSplit.lPct}%)</p>
+                <p>Last month Right: ₹{(perfBusiness?.right ?? 0).toLocaleString("en-IN")} ({monthSplit.rPct}%)</p>
+                <p>All-time Left: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")} · Right: ₹{(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}</p>
+                <p>Income on weaker leg (60:40 split)</p>
+              </>}
+            />
             <DashCard title="Rank & Reward" value={rankInfo?.currentRankLabel ?? "Bronze"} gradient={gradients.blue} icon="🎖" details={<>
               <p>Team size: {rankInfo?.teamSize ?? 0} members</p>
               {rankInfo?.nextRank && <p>Next: {rankInfo.nextRankLabel} ({rankInfo.progress}%)</p>}
@@ -456,6 +522,72 @@ function DashboardIndex() {
                       >
                         {m.isActive ? "Active" : "Inactive"}
                       </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tile detail modal — leg purchases / customer-wise income rows */}
+      {detailModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setDetailModal(null)}
+        >
+          <div
+            className="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-gold/30 bg-background shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-gold/20 px-5 py-4">
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">
+                  {detailModal.title}
+                </h3>
+                {detailModal.notes.map((n, i) => (
+                  <p key={i} className="mt-0.5 text-[10px] uppercase tracking-widest text-emerald/60">
+                    {n}
+                  </p>
+                ))}
+              </div>
+              <button
+                onClick={() => setDetailModal(null)}
+                className="text-lg leading-none text-emerald/60 transition-colors hover:text-gold"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              {detailModal.loading ? (
+                <p className="px-5 py-6 text-center text-xs text-emerald/60">Loading details…</p>
+              ) : detailModal.rows.length === 0 ? (
+                <p className="px-5 py-6 text-center text-xs text-emerald/60">No entries yet.</p>
+              ) : (
+                <ul className="divide-y divide-gold/10">
+                  {detailModal.rows.map((r: any) => (
+                    <li key={r.purchaseId ?? r.id} className="px-5 py-3 text-xs">
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="font-semibold text-emerald">
+                          {r.name
+                            ? `${r.name} ( ${r.code || r.referralCode} )`
+                            : r.member
+                              ? `${r.member}${r.memberCode ? ` ( ${r.memberCode} )` : ""}`
+                              : "\u2014"}
+                        </span>
+                        <span className="shrink-0 font-bold text-gold">
+                          ₹{(r.amount ?? 0).toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                      {r.description && (
+                        <p className="mt-0.5 text-[11px] text-emerald/60">{r.description}</p>
+                      )}
+                      <p className="mt-0.5 text-[10px] text-emerald/40">
+                        {new Date(r.createdAt).toLocaleDateString("en-IN")}
+                      </p>
                     </li>
                   ))}
                 </ul>

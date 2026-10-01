@@ -457,6 +457,68 @@ export const getDownlineUsers = createServerFn({ method: "GET" })
     const userId = await getAuthUserId();
     const descendants = await fetchAllUsersInTree(userId);
     const userMap = new Map(descendants.map((u) => [u.id, u]));
+
+    // Level = sponsorship generation (1 = direct referral, matches Level
+    // Income / Levels tab). Members not reachable through the sponsor chain
+    // (rare auto-placed rows) fall back to placement-tree depth so the
+    // column is always filled for anyone in the downline list.
+    const onlyDescendants = descendants.filter((u) => u.id !== userId);
+    const byReferred = new Map<number, typeof onlyDescendants>();
+    const byParent = new Map<number, typeof onlyDescendants>();
+    for (const u of onlyDescendants) {
+      if (u.referredBy) {
+        const list = byReferred.get(u.referredBy) || [];
+        list.push(u);
+        byReferred.set(u.referredBy, list);
+      }
+      if (u.parentId) {
+        const list = byParent.get(u.parentId) || [];
+        list.push(u);
+        byParent.set(u.parentId, list);
+      }
+    }
+
+    const levelOf = new Map<number, number>();
+    let queue: number[] = [userId];
+    let gen = 0;
+    while (queue.length > 0) {
+      gen += 1;
+      const next: number[] = [];
+      for (const pid of queue) {
+        for (const kid of byReferred.get(pid) || []) {
+          if (!levelOf.has(kid.id)) {
+            levelOf.set(kid.id, gen);
+            next.push(kid.id);
+          }
+        }
+      }
+      queue = next;
+    }
+
+    const missing = onlyDescendants.filter((u) => !levelOf.has(u.id));
+    if (missing.length > 0) {
+      const placeOf = new Map<number, number>();
+      queue = [userId];
+      gen = 0;
+      while (queue.length > 0) {
+        gen += 1;
+        const next: number[] = [];
+        for (const pid of queue) {
+          for (const kid of byParent.get(pid) || []) {
+            if (!placeOf.has(kid.id)) {
+              placeOf.set(kid.id, gen);
+              next.push(kid.id);
+            }
+          }
+        }
+        queue = next;
+      }
+      for (const u of missing) {
+        const depth = placeOf.get(u.id);
+        if (depth != null) levelOf.set(u.id, depth);
+      }
+    }
+
     return descendants
       .filter((u) => u.id !== userId)
       .map((u) => {
@@ -471,6 +533,7 @@ export const getDownlineUsers = createServerFn({ method: "GET" })
           parentId: u.parentId,
           packageAmount: u.packageAmount,
           createdAt: u.createdAt,
+          level: levelOf.get(u.id) ?? null,
           sponsorId: sponsor?.referralCode || u.referredBy?.toString() || "—",
         };
       });
@@ -495,6 +558,7 @@ export const getDirectUsers = createServerFn({ method: "GET" })
         position: u.position,
         packageAmount: u.packageAmount,
         createdAt: u.createdAt,
+        level: 1,
         sponsorId: myCode,
       }));
   });
