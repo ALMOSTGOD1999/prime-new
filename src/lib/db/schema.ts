@@ -291,8 +291,8 @@ export const performanceIncentives = pgTable(
     monthlyAmount: integer("monthly_amount").notNull(),
     businessLastMonth: bigint("business_last_month", { mode: "number" }).notNull(),
     paidCount: integer("paid_count").default(0).notNull(),
-    status: text("status", { enum: ["active", "completed"] })
-      .default("active")
+  status: text("status", { enum: ["active", "completed", "superseded"] })
+    .default("active")
       .notNull(),
     lastPaidAt: timestamp("last_paid_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),

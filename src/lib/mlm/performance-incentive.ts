@@ -11,6 +11,9 @@ import { distributeIncome } from "./engine";
 // PAYOUT: once a rank is reached, the FULL bonus pays every month for 6
 // months (e.g. STARTER ₹5L → ₹1,999 × 6). Payments are unconditional once
 // enrolled — a later month's business only matters for reaching HIGHER ranks.
+// ONE RANK PER USER: only the single highest rank the user is eligible for
+// is enrolled and paid; lower active ranks are superseded (user-confirmed
+// 2026-09-27: "one user should get only the highest package eligible").
 export const PERFORMANCE_PAYOUT_MODE: "installment" | "monthly" = "monthly";
 export const PERFORMANCE_MONTHS = 6;
 
@@ -116,18 +119,20 @@ export async function runPerformanceIncentivePayout() {
     const existingRanks = new Set(existing.map((r) => r.rankName));
     const name = nameById.get(u.id) ?? `User #${u.id}`;
 
-    // 1) Enroll newly reached ranks
+    // 1) Enroll ONLY the highest rank the user is eligible for (never a
+    //    lower rank than one already enrolled).
     if (business > 0) {
-      for (const rank of PERFORMANCE_RANKS) {
-        if (business < rank.target || existingRanks.has(rank.name)) continue;
+      const topEligible = [...PERFORMANCE_RANKS].reverse().find((r) => business >= r.target);
+      const existingTopBonus = existing.reduce((m, r) => Math.max(m, r.bonusAmount), 0);
+      if (topEligible && !existingRanks.has(topEligible.name) && topEligible.bonus > existingTopBonus) {
         const [row] = await db
           .insert(performanceIncentives)
           .values({
             userId: u.id,
-            rankName: rank.name,
-            targetBusiness: rank.target,
-            bonusAmount: rank.bonus,
-            monthlyAmount: monthlyAmountFor(rank.bonus),
+            rankName: topEligible.name,
+            targetBusiness: topEligible.target,
+            bonusAmount: topEligible.bonus,
+            monthlyAmount: monthlyAmountFor(topEligible.bonus),
             businessLastMonth: business,
             paidCount: 0,
             status: "active",
@@ -135,42 +140,55 @@ export async function runPerformanceIncentivePayout() {
           .returning();
         if (row) {
           existing.push(row);
-          existingRanks.add(rank.name);
-          enrolled.push({ userId: u.id, name, rankName: rank.name });
+          existingRanks.add(topEligible.name);
+          enrolled.push({ userId: u.id, name, rankName: topEligible.name });
         }
       }
     }
 
-    // 2) Pay this month's bonus for every schedule row (full bonus, unconditional)
-    for (const row of existing) {
-      if (row.status !== "active" || row.paidCount >= PERFORMANCE_MONTHS) continue;
-
-      const amount = row.monthlyAmount;
-      if (amount <= 0) continue;
-
-      const month = row.paidCount + 1;
-      await distributeIncome(u.id, amount);
-      await db.insert(income).values({
-        userId: u.id,
-        type: "performance_incentive",
-        amount,
-        description: `Performance Incentive — ${row.rankName} bonus, month ${month}/${PERFORMANCE_MONTHS} (last-month team business ₹${business.toLocaleString("en-IN")})`,
-      });
-
-      const done = month >= PERFORMANCE_MONTHS;
+    // 2) Pay this month's bonus — only the single highest active rank.
+    //    Any other active schedule rows are superseded and never paid.
+    const active = existing.filter((r) => r.status === "active" && r.paidCount < PERFORMANCE_MONTHS);
+    let payRow: (typeof active)[number] | undefined;
+    for (const r of active) {
+      if (!payRow || r.bonusAmount > payRow.bonusAmount) payRow = r;
+    }
+    for (const r of active) {
+      if (r === payRow) continue;
+      r.status = "superseded";
       await db
         .update(performanceIncentives)
-        .set({
-          paidCount: month,
-          businessLastMonth: business,
-          lastPaidAt: new Date(),
-          ...(done ? { status: "completed" as const } : {}),
-        })
-        .where(eq(performanceIncentives.id, row.id));
+        .set({ status: "superseded" })
+        .where(eq(performanceIncentives.id, r.id));
+    }
 
-      paid.push({ userId: u.id, name, rankName: row.rankName, amount, month });
-      totalCredited += amount;
-      if (done) completedCount++;
+    if (payRow) {
+      const amount = payRow.monthlyAmount;
+      if (amount > 0) {
+        const month = payRow.paidCount + 1;
+        await distributeIncome(u.id, amount);
+        await db.insert(income).values({
+          userId: u.id,
+          type: "performance_incentive",
+          amount,
+          description: `Performance Incentive — ${payRow.rankName} bonus, month ${month}/${PERFORMANCE_MONTHS} (last-month team business ₹${business.toLocaleString("en-IN")})`,
+        });
+
+        const done = month >= PERFORMANCE_MONTHS;
+        await db
+          .update(performanceIncentives)
+          .set({
+            paidCount: month,
+            businessLastMonth: business,
+            lastPaidAt: new Date(),
+            ...(done ? { status: "completed" as const } : {}),
+          })
+          .where(eq(performanceIncentives.id, payRow.id));
+
+        paid.push({ userId: u.id, name, rankName: payRow.rankName, amount, month });
+        totalCredited += amount;
+        if (done) completedCount++;
+      }
     }
   }
 
