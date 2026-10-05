@@ -14,14 +14,9 @@ export const getAdminUsers = createServerFn({ method: "GET" })
     const payload = await verifyJwt(token);
     if (!payload || typeof payload.userId !== "number") throw new Error("Not authenticated");
 
-    // Check admin (PR0006 / admin1@test.com = partial admin: user management)
-    const caller = await db
-      .select({ isAdmin: users.isAdmin, referralCode: users.referralCode })
-      .from(users)
-      .where(eq(users.id, payload["userId"]));
-    const viewerIsFullAdmin = !!caller[0]?.isAdmin;
-    const isPR0006 = caller[0]?.referralCode?.toUpperCase() === "PR0006" || payload["userId"] === 12;
-    if (!viewerIsFullAdmin && !isPR0006) {
+    // Check admin
+    const adminCheck = await db.select({ isAdmin: users.isAdmin }).from(users).where(sql`id = ${payload.userId}`);
+    if (!adminCheck.length || !adminCheck[0].isAdmin) {
       throw new Error("Forbidden");
     }
 
@@ -57,7 +52,7 @@ export const getAdminUsers = createServerFn({ method: "GET" })
     const countResult = await db.select({ count: sql<number>`count(*)::int` }).from(users);
     const total = countResult[0]?.count ?? 0;
 
-    return { users: allUsers, total, page, limit, viewerIsFullAdmin };
+    return { users: allUsers, total, page, limit };
   });
 
 // Limited search for PR0006 — only for position manager (no other admin data)
