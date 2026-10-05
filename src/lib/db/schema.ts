@@ -20,6 +20,7 @@ export const users = pgTable("users", {
   darkMode: boolean("dark_mode").default(false).notNull(),
   totalInvested: real("total_invested").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  activatedAt: timestamp("activated_at"),
 });
 
 // ── Pairs (matching income events) ────────────────────

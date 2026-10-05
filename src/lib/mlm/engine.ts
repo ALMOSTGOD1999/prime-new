@@ -342,7 +342,7 @@ export async function activateUser(userId: number) {
   // Activate the user
   await db
     .update(users)
-    .set({ isActive: true, packageAmount: JOINING_AMOUNT })
+    .set({ isActive: true, packageAmount: JOINING_AMOUNT, activatedAt: new Date() })
     .where(eq(users.id, userId));
 
   // Create wallet with all 4 wallet fields

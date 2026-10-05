@@ -192,7 +192,7 @@ export const activateAccountWithPin = createServerFn({ method: "POST" })
 
     const now = new Date();
     await db.update(activationPins).set({ isUsed: true, usedBy: target.id, usedAt: now }).where(eq(activationPins.id, pin.id));
-    await db.update(users).set({ isActive: true }).where(eq(users.id, target.id));
+    await db.update(users).set({ isActive: true, activatedAt: now }).where(eq(users.id, target.id));
 
     const existingWallet = await db.select().from(wallet).where(eq(wallet.userId, target.id));
     if (!existingWallet.length) {

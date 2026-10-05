@@ -270,6 +270,39 @@ function DashboardIndex() {
             </>} />
           </div>
 
+          {/* Row 1.5: This month business + today's joinings/activations */}
+          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
+            <DashCard title="This Month Total Business" subtitle={teamStats.monthLabel ?? "This month"} value={`₹${(teamStats.thisMonthBusiness ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="🗓" onMoreInfo={() =>
+              setDetailModal({
+                title: `This Month Total Business · ${teamStats.monthLabel ?? ""}`,
+                notes: [
+                  "Approved purchases from the 1st of this month (IST) — own + both legs",
+                  `Month total: ₹${(teamStats.thisMonthBusiness ?? 0).toLocaleString("en-IN")}`,
+                ],
+                rows: [
+                  { id: "own", member: "My purchases", amount: teamStats.thisMonthOwn ?? 0, description: "Own purchases this month", createdAt: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString() },
+                  { id: "left", member: "Left leg", amount: teamStats.thisMonthLeft ?? 0, description: "Team purchases — left leg", createdAt: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString() },
+                  { id: "right", member: "Right leg", amount: teamStats.thisMonthRight ?? 0, description: "Team purchases — right leg", createdAt: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString() },
+                ],
+                loading: false,
+              })
+            } />
+            <DashCard title="Today's Joining" value={teamStats.todayJoined ?? 0} gradient={gradients.green} icon="🆕" details={<>
+              <p>Joined today: {teamStats.todayJoined ?? 0}</p>
+              <p>Active: {teamStats.todayJoinedActive ?? 0}</p>
+              <p>Direct referrals: {teamStats.todayJoinedDirect ?? 0}</p>
+              <p className="text-white/50">IST calendar day · team-wide</p>
+            </>} />
+            <DashCard title="Today's Left Activation" value={teamStats.todayLeftActivated ?? 0} gradient={gradients.blue} icon="⬅️" details={<>
+              <p>Activated today (left leg): {teamStats.todayLeftActivated ?? 0}</p>
+              <p className="text-white/50">IST calendar day · root-leg subtree</p>
+            </>} />
+            <DashCard title="Today's Right Activation" value={teamStats.todayRightActivated ?? 0} gradient={gradients.orange} icon="➡️" details={<>
+              <p>Activated today (right leg): {teamStats.todayRightActivated ?? 0}</p>
+              <p className="text-white/50">IST calendar day · root-leg subtree</p>
+            </>} />
+          </div>
+
           {/* Row 2: Total business + last-month leg business + income */}
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-5 lg:gap-4">
             <DashCard title="Total Business" subtitle="All-time · Own + Team" value={`₹${totalBusinessAll.toLocaleString("en-IN")}`} gradient={gradients.green} icon="🏪" onMoreInfo={openTotalBusiness} />

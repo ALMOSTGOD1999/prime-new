@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "../../lib/db";
-import { users } from "../../lib/db/schema";
-import { eq, isNull } from "drizzle-orm";
+import { purchases, users } from "../../lib/db/schema";
+import { and, eq, gte, isNull, sql } from "drizzle-orm";
 import { getCookie } from "@tanstack/react-start/server";
 
 async function getAuthUserId(): Promise<number> {
@@ -64,6 +64,7 @@ type FlatUser = {
   referredBy: number | null;
   packageAmount: number | null;
   createdAt: Date | null;
+  activatedAt: Date | null;
 };
 
 // ── Efficient batch fetch: get all descendants of a root user via BFS ──
@@ -81,6 +82,7 @@ async function fetchAllDescendants(rootId: number): Promise<FlatUser[]> {
       referredBy: users.referredBy,
       packageAmount: users.packageAmount,
       createdAt: users.createdAt,
+      activatedAt: users.activatedAt,
     })
     .from(users)
     .where(eq(users.id, rootId));
@@ -105,6 +107,7 @@ async function fetchAllDescendants(rootId: number): Promise<FlatUser[]> {
         parentId: users.parentId,
         referredBy: users.referredBy,
         packageAmount: users.packageAmount,
+        activatedAt: users.activatedAt,
         createdAt: users.createdAt,
       })
       .from(users);
@@ -142,6 +145,7 @@ async function fetchAllUsersInTree(rootId: number): Promise<FlatUser[]> {
       referredBy: users.referredBy,
       packageAmount: users.packageAmount,
       createdAt: users.createdAt,
+      activatedAt: users.activatedAt,
     })
     .from(users);
 
@@ -428,6 +432,47 @@ export const getTeamStats = createServerFn({ method: "GET" })
     const totalBusinessRight = rightLeg.reduce((s, u) => s + (u.packageAmount || 0), 0);
     const teamBusinessRightGold = rightLeg.filter((u) => u.rank === "gold" || u.rank === "platinum").reduce((s, u) => s + (u.packageAmount || 0), 0);
 
+    // ── Calendar month / calendar day tiles (IST) ──
+    const IST = 5.5 * 60 * 60 * 1000;
+    const istNow = new Date(Date.now() + IST);
+    const monthStart = new Date(
+      Date.UTC(istNow.getUTCFullYear(), istNow.getUTCMonth(), 1) - IST,
+    );
+    const dayStart = new Date(
+      Date.UTC(istNow.getUTCFullYear(), istNow.getUTCMonth(), istNow.getUTCDate()) - IST,
+    );
+    const dayStartMs = dayStart.getTime();
+    const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthLabel = `${MONTH_NAMES[istNow.getUTCMonth()]} ${istNow.getUTCFullYear()}`;
+
+    // This month's approved purchases — own + both legs (leg = root-child subtree)
+    const monthSales = await db
+      .select({ userId: purchases.userId, total: sql<number>`coalesce(sum(${purchases.totalAmount}), 0)` })
+      .from(purchases)
+      .where(and(eq(purchases.status, "approved"), gte(purchases.createdAt, monthStart)))
+      .groupBy(purchases.userId);
+    const leftIds = new Set(leftLeg.map((u) => u.id));
+    const rightIds = new Set(rightLeg.map((u) => u.id));
+    let monthOwn = 0;
+    let monthLeft = 0;
+    let monthRight = 0;
+    for (const s of monthSales) {
+      const amt = Math.round(Number(s.total) || 0);
+      if (s.userId === userId) monthOwn += amt;
+      else if (leftIds.has(s.userId)) monthLeft += amt;
+      else if (rightIds.has(s.userId)) monthRight += amt;
+    }
+
+    // Today's joinings (IST calendar day) — team members who signed up today
+    const joinedToday = descendants.filter(
+      (u) => u.id !== userId && u.createdAt != null && u.createdAt.getTime() >= dayStartMs,
+    );
+
+    // Today's activations per leg
+    const activatedTodayCount = (leg: typeof leftLeg) =>
+      leg.filter((u) => u.isActive && u.activatedAt != null && u.activatedAt.getTime() >= dayStartMs)
+        .length;
+
     return {
       directTeam: directTeam.length,
       leftCount,
@@ -448,6 +493,18 @@ export const getTeamStats = createServerFn({ method: "GET" })
       teamRightActive,
       totalBusinessRight,
       teamBusinessRightGold,
+
+      // Month/day tiles
+      monthLabel,
+      thisMonthBusiness: monthOwn + monthLeft + monthRight,
+      thisMonthOwn: monthOwn,
+      thisMonthLeft: monthLeft,
+      thisMonthRight: monthRight,
+      todayJoined: joinedToday.length,
+      todayJoinedActive: joinedToday.filter((u) => u.isActive).length,
+      todayJoinedDirect: joinedToday.filter((u) => u.referredBy === userId).length,
+      todayLeftActivated: activatedTodayCount(leftLeg),
+      todayRightActivated: activatedTodayCount(rightLeg),
     };
   });
 

@@ -30,7 +30,7 @@ export const reactivateAccount = createServerFn({ method: "POST" })
     // Reactivate
     await db
       .update(users)
-      .set({ isActive: true })
+      .set({ isActive: true, activatedAt: new Date() })
       .where(eq(users.id, userId));
 
     // Ensure wallet exists
