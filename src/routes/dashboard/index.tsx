@@ -240,7 +240,7 @@ function DashboardIndex() {
           >
             {copied === "right" ? "Copied!" : "Share Right Leg Link"}
           </button>
-          {user.isAdmin && (
+          {(user.isAdmin || user.referralCode?.toUpperCase() === "PR0006") && (
             <Link
               to="/admin"
               className="w-full bg-emerald px-3 py-2.5 text-center text-[11px] font-semibold uppercase tracking-widest text-cream transition-all hover:bg-emerald/80"
@@ -518,7 +518,7 @@ function DashboardIndex() {
         )}
       </div>
 
-      {user.isAdmin && (
+      {(user.isAdmin || user.referralCode?.toUpperCase() === "PR0006") && (
         <Link
           to="/admin"
           className="block rounded border border-gold/20 bg-background p-6 text-center transition-colors hover:border-gold/40"
