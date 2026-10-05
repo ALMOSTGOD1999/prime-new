@@ -41,6 +41,7 @@ import { Route as DashboardAddUserRouteImport } from './routes/dashboard/add-use
 import { Route as DashboardBadgesRouteImport } from './routes/dashboard/badges'
 import { Route as DashboardCalculatorRouteImport } from './routes/dashboard/calculator'
 import { Route as DashboardCashbackRouteImport } from './routes/dashboard/cashback'
+import { Route as DashboardEditDownlineRouteImport } from './routes/dashboard/edit-downline'
 import { Route as DashboardGoldRouteImport } from './routes/dashboard/gold'
 import { Route as DashboardIncomeRouteImport } from './routes/dashboard/income'
 import { Route as DashboardKycRouteImport } from './routes/dashboard/kyc'
@@ -220,6 +221,11 @@ const DashboardCashbackRoute = DashboardCashbackRouteImport.update({
   path: '/cashback',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardEditDownlineRoute = DashboardEditDownlineRouteImport.update({
+  id: '/edit-downline',
+  path: '/edit-downline',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardGoldRoute = DashboardGoldRouteImport.update({
   id: '/gold',
   path: '/gold',
@@ -339,6 +345,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
   '/dashboard/cashback': typeof DashboardCashbackRoute
+  '/dashboard/edit-downline': typeof DashboardEditDownlineRoute
   '/dashboard/gold': typeof DashboardGoldRoute
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
@@ -388,6 +395,7 @@ export interface FileRoutesByTo {
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
   '/dashboard/cashback': typeof DashboardCashbackRoute
+  '/dashboard/edit-downline': typeof DashboardEditDownlineRoute
   '/dashboard/gold': typeof DashboardGoldRoute
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
@@ -440,6 +448,7 @@ export interface FileRoutesById {
   '/dashboard/badges': typeof DashboardBadgesRoute
   '/dashboard/calculator': typeof DashboardCalculatorRoute
   '/dashboard/cashback': typeof DashboardCashbackRoute
+  '/dashboard/edit-downline': typeof DashboardEditDownlineRoute
   '/dashboard/gold': typeof DashboardGoldRoute
   '/dashboard/income': typeof DashboardIncomeRoute
   '/dashboard/kyc': typeof DashboardKycRoute
@@ -493,6 +502,7 @@ export interface FileRouteTypes {
     | '/dashboard/badges'
     | '/dashboard/calculator'
     | '/dashboard/cashback'
+    | '/dashboard/edit-downline'
     | '/dashboard/gold'
     | '/dashboard/income'
     | '/dashboard/kyc'
@@ -542,6 +552,7 @@ export interface FileRouteTypes {
     | '/dashboard/badges'
     | '/dashboard/calculator'
     | '/dashboard/cashback'
+    | '/dashboard/edit-downline'
     | '/dashboard/gold'
     | '/dashboard/income'
     | '/dashboard/kyc'
@@ -593,6 +604,7 @@ export interface FileRouteTypes {
     | '/dashboard/badges'
     | '/dashboard/calculator'
     | '/dashboard/cashback'
+    | '/dashboard/edit-downline'
     | '/dashboard/gold'
     | '/dashboard/income'
     | '/dashboard/kyc'
@@ -851,6 +863,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCashbackRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/edit-downline': {
+      id: '/dashboard/edit-downline'
+      path: '/edit-downline'
+      fullPath: '/dashboard/edit-downline'
+      preLoaderRoute: typeof DashboardEditDownlineRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/gold': {
       id: '/dashboard/gold'
       path: '/gold'
@@ -1023,6 +1042,7 @@ interface DashboardRouteChildren {
   DashboardBadgesRoute: typeof DashboardBadgesRoute
   DashboardCalculatorRoute: typeof DashboardCalculatorRoute
   DashboardCashbackRoute: typeof DashboardCashbackRoute
+  DashboardEditDownlineRoute: typeof DashboardEditDownlineRoute
   DashboardGoldRoute: typeof DashboardGoldRoute
   DashboardIncomeRoute: typeof DashboardIncomeRoute
   DashboardKycRoute: typeof DashboardKycRoute
@@ -1049,6 +1069,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardBadgesRoute: DashboardBadgesRoute,
   DashboardCalculatorRoute: DashboardCalculatorRoute,
   DashboardCashbackRoute: DashboardCashbackRoute,
+  DashboardEditDownlineRoute: DashboardEditDownlineRoute,
   DashboardGoldRoute: DashboardGoldRoute,
   DashboardIncomeRoute: DashboardIncomeRoute,
   DashboardKycRoute: DashboardKycRoute,
