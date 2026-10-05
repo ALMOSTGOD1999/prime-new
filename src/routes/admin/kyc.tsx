@@ -126,7 +126,7 @@ function AdminKycPage() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase text-emerald/70">Account</p>
-                  <p className="text-xs font-semibold">{k.accountNumber ? `****${k.accountNumber.slice(-4)}` : "-"}</p>
+                  <p className="text-xs font-semibold">{k.accountNumber || "-"}</p>
                 </div>
                 <div>
                   <p className="text-[10px] uppercase text-emerald/70">IFSC</p>

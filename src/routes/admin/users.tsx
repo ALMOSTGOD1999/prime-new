@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getAdminUsers, updateUserPosition } from "../../functions/admin/users";
+import { getAdminUsers, updateUserPosition, updateUserDetails } from "../../functions/admin/users";
 import { impersonateUser } from "../../functions/admin/impersonate";
 import { deleteUser } from "../../functions/admin/deleteuser";
 import { toggleUserActivation } from "../../functions/admin/activate";
@@ -20,6 +20,10 @@ function AdminUsers() {
   const [deleting, setDeleting] = useState(false);
   const [activatingId, setActivatingId] = useState<number | null>(null);
   const [updatingPosId, setUpdatingPosId] = useState<number | null>(null);
+  const [editTarget, setEditTarget] = useState<{ id: number; name: string; email: string; phone: string } | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", email: "", phone: "" });
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState("");
   const navigate = useNavigate();
 
   const fetchUsers = (s: string, p: number) => {
@@ -37,6 +41,29 @@ function AdminUsers() {
   const handleSearch = () => {
     setPage(1);
     fetchUsers(search, 1);
+  };
+
+  const openEdit = (u: any) => {
+    setEditTarget({ id: u.id, name: u.name, email: u.email, phone: u.phone ?? "" });
+    setEditForm({ name: u.name, email: u.email, phone: u.phone ?? "" });
+    setEditError("");
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editTarget) return;
+    setEditSaving(true);
+    setEditError("");
+    try {
+      await updateUserDetails({
+        data: { userId: editTarget.id, name: editForm.name, email: editForm.email, phone: editForm.phone },
+      });
+      setEditTarget(null);
+      fetchUsers(search, page);
+    } catch (err: any) {
+      setEditError(err?.message || "Update failed");
+    } finally {
+      setEditSaving(false);
+    }
   };
 
   const handleImpersonate = async (userId: number, userName: string) => {
@@ -229,6 +256,14 @@ function AdminUsers() {
                         {new Date(user.createdAt).toLocaleDateString("en-IN")}
                       </td>
                       <td className="px-3 sm:px-6 py-3.5 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => openEdit(user)}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-emerald/30 bg-emerald/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-emerald transition-all duration-200 hover:bg-emerald/20 hover:shadow-sm"
+                          >
+                            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
+                            Edit
+                          </button>
                         {!user.isAdmin && (
                           <div className="flex items-center justify-end gap-2">
                             <button
@@ -274,6 +309,7 @@ function AdminUsers() {
                             </button>
                           </div>
                         )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -311,6 +347,68 @@ function AdminUsers() {
           </>
         )}
       </div>
+
+      {/* Edit User Details Modal */}
+      {editTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg border border-gold/30 bg-background shadow-2xl">
+            <div className="border-b border-gold/20 px-6 py-4">
+              <h3 className="font-display text-lg text-gold">Edit User Details</h3>
+              <p className="text-xs text-emerald/60">Editing {editTarget.name} · ID #{editTarget.id}</p>
+            </div>
+            <div className="space-y-4 px-6 py-4">
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-emerald/70">Name</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gold/20 bg-card px-4 py-2.5 text-sm text-emerald outline-none transition-all focus:border-gold/50 focus:ring-2 focus:ring-gold/20"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-emerald/70">Email</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gold/20 bg-card px-4 py-2.5 text-sm text-emerald outline-none transition-all focus:border-gold/50 focus:ring-2 focus:ring-gold/20"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-emerald/70">Phone</label>
+                <input
+                  type="text"
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm((f) => ({ ...f, phone: e.target.value }))}
+                  placeholder="Not set"
+                  className="mt-1 w-full rounded-lg border border-gold/20 bg-card px-4 py-2.5 text-sm text-emerald outline-none transition-all focus:border-gold/50 focus:ring-2 focus:ring-gold/20"
+                />
+              </div>
+              <p className="text-[10px] text-emerald/50">
+                Referral code, tree position, rank and balances cannot be edited here.
+              </p>
+              {editError && <p className="text-xs font-semibold text-red-600">{editError}</p>}
+            </div>
+            <div className="flex items-center justify-end gap-3 border-t border-gold/15 px-6 py-4">
+              <button
+                onClick={() => setEditTarget(null)}
+                className="rounded-lg border border-gold/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-emerald/60 transition-all hover:border-gold/40 hover:bg-gold/5"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={editSaving || !editForm.name.trim() || !editForm.email.trim()}
+                className="rounded-lg border border-gold/40 bg-gold/10 px-5 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-gold transition-all hover:bg-gold/20 disabled:opacity-40"
+              >
+                {editSaving ? "Saving…" : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteTarget && (

@@ -29,6 +29,7 @@ export const getAdminUsers = createServerFn({ method: "GET" })
       id: users.id,
       name: users.name,
       email: users.email,
+      phone: users.phone,
       referralCode: users.referralCode,
       position: users.position,
       isActive: users.isActive,
@@ -150,4 +151,45 @@ export const updateUserPosition = createServerFn({ method: "POST" })
 
     await db.update(users).set({ parentId: newParentId, position: newPosition }).where(eq(users.id, userId));
     return { ok: true, parentId: newParentId, position: newPosition };
+  });
+
+// ── Admin: edit any user's profile details (name, email, phone) ──
+// Deliberately excludes referralCode / position / parent / rank — those are
+// structural and must never be edited from this surface.
+export const updateUserDetails = createServerFn({ method: "POST" })
+  .validator((data: { userId: number; name: string; email: string; phone?: string }) => data)
+  .handler(async ({ data }) => {
+    const token = getCookie("auth_token");
+    if (!token) throw new Error("Not authenticated");
+    const { verifyJwt } = await import("../../lib/auth");
+    const payload = await verifyJwt(token);
+    if (!payload || typeof (payload as any)["userId"] !== "number") throw new Error("Not authenticated");
+    const adminId = (payload as any)["userId"] as number;
+    const caller = await db.select({ isAdmin: users.isAdmin, referralCode: users.referralCode }).from(users).where(eq(users.id, adminId));
+    const isPR0006 = caller.length && (caller[0].referralCode?.toUpperCase() === "PR0006" || adminId === 12);
+    if (!caller.length || (!caller[0].isAdmin && !isPR0006)) throw new Error("Forbidden: only admin can edit user details");
+
+    const name = (data.name || "").trim();
+    const email = (data.email || "").trim();
+    const phone = (data.phone || "").trim() || null;
+
+    if (!name) throw new Error("Name is required");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Enter a valid email address");
+
+    const target = await db.select({ id: users.id }).from(users).where(eq(users.id, data.userId));
+    if (!target.length) throw new Error("User not found");
+
+    const dup = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(sql`lower(${users.email}) = lower(${email}) AND ${users.id} != ${data.userId}`)
+      .limit(1);
+    if (dup.length) throw new Error("That email is already used by another user");
+
+    await db
+      .update(users)
+      .set({ name, email, phone })
+      .where(eq(users.id, data.userId));
+
+    return { ok: true };
   });
