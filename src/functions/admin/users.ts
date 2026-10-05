@@ -165,9 +165,8 @@ export const updateUserDetails = createServerFn({ method: "POST" })
     const payload = await verifyJwt(token);
     if (!payload || typeof (payload as any)["userId"] !== "number") throw new Error("Not authenticated");
     const adminId = (payload as any)["userId"] as number;
-    const caller = await db.select({ isAdmin: users.isAdmin, referralCode: users.referralCode }).from(users).where(eq(users.id, adminId));
-    const isPR0006 = caller.length && (caller[0].referralCode?.toUpperCase() === "PR0006" || adminId === 12);
-    if (!caller.length || (!caller[0].isAdmin && !isPR0006)) throw new Error("Forbidden: only admin can edit user details");
+    const caller = await db.select({ isAdmin: users.isAdmin }).from(users).where(eq(users.id, adminId));
+    if (!caller.length || !caller[0].isAdmin) throw new Error("Forbidden: only admin can edit user details");
 
     const name = (data.name || "").trim();
     const email = (data.email || "").trim();
