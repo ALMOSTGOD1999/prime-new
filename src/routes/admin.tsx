@@ -21,7 +21,8 @@ function AdminLayout() {
   useEffect(() => {
     getMe()
       .then((d) => {
-        if (!d.user?.isAdmin) throw new Error("Not admin");
+        // PR0006 (admin1@test.com) has partial admin: user management only
+        if (!d.user?.isAdmin && d.user?.referralCode?.toUpperCase() !== "PR0006") throw new Error("Not admin");
         setUser(d.user);
       })
       .catch(() => navigate({ to: "/auth" }))
