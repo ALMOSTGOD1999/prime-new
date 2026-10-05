@@ -165,8 +165,8 @@ export const updateUserDetails = createServerFn({ method: "POST" })
     const payload = await verifyJwt(token);
     if (!payload || typeof (payload as any)["userId"] !== "number") throw new Error("Not authenticated");
     const adminId = (payload as any)["userId"] as number;
-    const caller = await db.select({ isAdmin: users.isAdmin }).from(users).where(eq(users.id, adminId));
-    if (!caller.length || !caller[0].isAdmin) throw new Error("Forbidden: only admin can edit user details");
+    const caller = await db.select({ isAdmin: users.isAdmin, referralCode: users.referralCode }).from(users).where(eq(users.id, adminId));
+    if (!caller.length) throw new Error("Forbidden");
 
     const name = (data.name || "").trim();
     const email = (data.email || "").trim();
@@ -175,8 +175,32 @@ export const updateUserDetails = createServerFn({ method: "POST" })
     if (!name) throw new Error("Name is required");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Enter a valid email address");
 
-    const target = await db.select({ id: users.id }).from(users).where(eq(users.id, data.userId));
+    const target = await db.select({ id: users.id, parentId: users.parentId }).from(users).where(eq(users.id, data.userId));
     if (!target.length) throw new Error("User not found");
+    const targetRow = target[0]!;
+
+    if (caller[0].isAdmin) {
+      // Full admin: any user
+    } else if (caller[0].referralCode?.toUpperCase() === "PR7727") {
+      // PR7727 (D Radhamohan Reddy): only users inside his own downline
+      if (targetRow.id === adminId) throw new Error("You cannot edit your own details here");
+      const allParents = await db.select({ id: users.id, parentId: users.parentId }).from(users);
+      const parentOf = new Map(allParents.map((u) => [u.id, u.parentId]));
+      let cur = targetRow.parentId;
+      let steps = 0;
+      let inDownline = false;
+      while (cur != null && steps < 1000) {
+        if (cur === adminId) {
+          inDownline = true;
+          break;
+        }
+        cur = parentOf.get(cur) ?? null;
+        steps++;
+      }
+      if (!inDownline) throw new Error("Forbidden: you can only edit users in your own downline");
+    } else {
+      throw new Error("Forbidden: only admin can edit user details");
+    }
 
     const dup = await db
       .select({ id: users.id })

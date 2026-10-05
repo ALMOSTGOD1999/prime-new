@@ -180,6 +180,9 @@ function DashboardLayout() {
     },
     { to: "/dashboard/send-pins", label: "Send PINs", icon: "✉️" },
     { to: "/dashboard/manage-positions", label: "Manage Positions", icon: "🔀" },
+    ...(user?.referralCode?.toUpperCase() === "PR7727"
+      ? [{ to: "/dashboard/edit-downline", label: "Edit Downline", icon: "✏️" }]
+      : []),
     { to: "/dashboard/rewards", label: "Rewards", icon: "🏆" },
     { to: "/dashboard/notifications", label: "Notifications", icon: "🔔", badge: unreadCount },
   ];
