@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getDownlineEditList } from "../../functions/user/downline-edit";
+import { getDownlineEditList, changeDownlinePassword } from "../../functions/user/downline-edit";
 import { updateUserDetails } from "../../functions/admin/users";
 
 export const Route = createFileRoute("/dashboard/edit-downline")({
@@ -29,6 +29,12 @@ function EditDownlinePage() {
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState("");
 
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState("");
+
   useEffect(() => {
     getDownlineEditList()
       .then((d) => setRows(d as Row[]))
@@ -40,6 +46,35 @@ function EditDownlinePage() {
     setEditTarget(row);
     setEditForm({ name: row.name, email: row.email, phone: row.phone || "" });
     setEditError("");
+    setNewPw("");
+    setConfirmPw("");
+    setPwError("");
+    setPwSuccess("");
+  };
+
+  const handleChangePassword = async () => {
+    if (!editTarget) return;
+    setPwError("");
+    setPwSuccess("");
+    if (newPw.length < 6) {
+      setPwError("Password must be at least 6 characters");
+      return;
+    }
+    if (newPw !== confirmPw) {
+      setPwError("Passwords do not match");
+      return;
+    }
+    setPwSaving(true);
+    try {
+      await changeDownlinePassword({ data: { userId: editTarget.id, password: newPw } });
+      setPwSuccess(`Password updated for ${editTarget.name}`);
+      setNewPw("");
+      setConfirmPw("");
+    } catch (e: any) {
+      setPwError(e.message || "Failed to change password");
+    } finally {
+      setPwSaving(false);
+    }
   };
 
   const handleSaveEdit = async () => {
@@ -221,6 +256,48 @@ function EditDownlinePage() {
                 Referral code, tree position, rank and balances cannot be edited here.
               </p>
               {editError && <p className="text-xs font-semibold text-red-600">{editError}</p>}
+
+              {/* Change Password */}
+              <div className="rounded-lg border border-dashed border-gold/30 bg-gold/5 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-gold">
+                  Change Password
+                </p>
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-emerald/70">
+                      New Password
+                    </label>
+                    <input
+                      type="password"
+                      value={newPw}
+                      onChange={(e) => setNewPw(e.target.value)}
+                      placeholder="Min 6 characters"
+                      className="mt-1 w-full rounded-lg border border-gold/20 bg-card px-4 py-2.5 text-sm text-emerald outline-none transition-all focus:border-gold/50 focus:ring-2 focus:ring-gold/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-emerald/70">
+                      Confirm Password
+                    </label>
+                    <input
+                      type="password"
+                      value={confirmPw}
+                      onChange={(e) => setConfirmPw(e.target.value)}
+                      placeholder="Repeat password"
+                      className="mt-1 w-full rounded-lg border border-gold/20 bg-card px-4 py-2.5 text-sm text-emerald outline-none transition-all focus:border-gold/50 focus:ring-2 focus:ring-gold/20"
+                    />
+                  </div>
+                </div>
+                {pwError && <p className="mt-2 text-xs font-semibold text-red-600">{pwError}</p>}
+                {pwSuccess && <p className="mt-2 text-xs font-semibold text-emerald">{pwSuccess}</p>}
+                <button
+                  onClick={handleChangePassword}
+                  disabled={pwSaving || !newPw || !confirmPw}
+                  className="mt-3 rounded-lg border border-gold/40 bg-gold/10 px-5 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-gold transition-all hover:bg-gold/20 disabled:opacity-40"
+                >
+                  {pwSaving ? "Updating…" : "Update Password"}
+                </button>
+              </div>
             </div>
             <div className="flex items-center justify-end gap-3 border-t border-gold/15 px-6 py-4">
               <button
