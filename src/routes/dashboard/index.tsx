@@ -199,14 +199,9 @@ function DashboardIndex() {
     red: "from-red-400 via-rose-400 to-pink-300",
   };
 
-  // Actual last-month L:R split for the 60:40 card
-  const monthLeft = perfBusiness?.left ?? 0;
-  const monthRight = perfBusiness?.right ?? 0;
-  const monthTotal = monthLeft + monthRight;
-  const monthSplit = {
-    lPct: monthTotal > 0 ? Math.round((monthLeft / monthTotal) * 100) : 0,
-    rPct: monthTotal > 0 ? 100 - Math.round((monthLeft / monthTotal) * 100) : 0,
-  };
+  // 60:40 card shows ALL-TIME actual L:R business values
+  const ratioLeftAll = teamStats?.totalBusinessLeft ?? 0;
+  const ratioRightAll = teamStats?.totalBusinessRight ?? 0;
 
   const memberQuery = memberSearch.trim().toLowerCase();
   const filteredMembers = (memberList ?? []).filter((m: any) =>
@@ -377,14 +372,13 @@ function DashboardIndex() {
           <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
             <DashCard
               title="60:40 Ratio"
-              subtitle="Actual L : R (Last month)"
-              value={`${monthSplit.lPct} : ${monthSplit.rPct}`}
+              subtitle="Actual L : R (All-time)"
+              value={`${ratioLeftAll.toLocaleString("en-IN")} : ${ratioRightAll.toLocaleString("en-IN")}`}
               gradient={gradients.red}
               icon="⚖️"
               details={<>
-                <p>Last month Left: ₹{(perfBusiness?.left ?? 0).toLocaleString("en-IN")} ({monthSplit.lPct}%)</p>
-                <p>Last month Right: ₹{(perfBusiness?.right ?? 0).toLocaleString("en-IN")} ({monthSplit.rPct}%)</p>
-                <p>All-time Left: ₹{(teamStats.totalBusinessLeft ?? 0).toLocaleString("en-IN")} · Right: ₹{(teamStats.totalBusinessRight ?? 0).toLocaleString("en-IN")}</p>
+                <p>All-time Left: ₹{ratioLeftAll.toLocaleString("en-IN")}</p>
+                <p>All-time Right: ₹{ratioRightAll.toLocaleString("en-IN")}</p>
                 <p>Income on weaker leg (60:40 split)</p>
               </>}
             />

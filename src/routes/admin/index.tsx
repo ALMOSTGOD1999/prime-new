@@ -230,7 +230,7 @@ function AdminDashboard() {
                 </div>
                 <div>
                   <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-gold">Gold Purchase Cashback Payout</h3>
-                  <p className="mt-0.5 text-[11px] sm:text-xs text-emerald/60">Credits monthly cashback (3% up to ₹1,99,999 · 3.5% ₹2–5L · 4% ₹5L+ per approved purchase ≥ ₹10,000, capped at 60% of purchase value) to eligible users</p>
+                  <p className="mt-0.5 text-[11px] sm:text-xs text-emerald/60">Day-based cashback: (3% up to ₹1,99,999 · 3.5% ₹2–5L · 4% ₹5L+ of each approved purchase ≥ ₹10,000) ÷ 30 × days remaining in its purchase month (30-day months) — credits each purchase's full remaining entitlement and completes it</p>
             </div>
           </div>
           <button

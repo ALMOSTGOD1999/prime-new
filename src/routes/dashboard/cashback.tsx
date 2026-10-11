@@ -7,9 +7,9 @@ export const Route = createFileRoute("/dashboard/cashback")({
 });
 
 const RATE_CARDS = [
-  { rate: "@3% per month", detail: "on purchase value up to Rs 1,99,999/-", cap: "for up to 60% Purchase value" },
-  { rate: "@3.5% per month", detail: "on purchase value of Rs 2,00,000/- to Rs 4,99,999/-", cap: "for up to 60% Purchase value" },
-  { rate: "@4% per month", detail: "on purchase value of Rs 5,00,000/- and above", cap: "for up to 60% Purchase value" },
+  { rate: "@3% per month", detail: "on purchase value up to Rs 1,99,999/-", cap: "day-based: paid for days left in the purchase month (30-day months)" },
+  { rate: "@3.5% per month", detail: "on purchase value of Rs 2,00,000/- to Rs 4,99,999/-", cap: "day-based: paid for days left in the purchase month (30-day months)" },
+  { rate: "@4% per month", detail: "on purchase value of Rs 5,00,000/- and above", cap: "day-based: paid for days left in the purchase month (30-day months)" },
 ];
 
 function CashbackPage() {
@@ -37,7 +37,7 @@ function CashbackPage() {
   if (error) return <div className="rounded border border-gold/20 bg-background p-6 text-sm text-red-500">{error}</div>;
   if (!data) return null;
 
-  const { balance, minBilling, capPct, ledger, history } = data;
+  const { balance, minBilling, daysPerMonth, ledger, history } = data;
 
   return (
     <div className="space-y-8">
@@ -48,7 +48,7 @@ function CashbackPage() {
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight text-gold sm:text-4xl">
             Gold Purchase Cashback
           </h1>
-          <p className="mt-2 text-sm italic text-emerald/60">Purchase Cashback generates on a monthly basis</p>
+          <p className="mt-2 text-sm italic text-emerald/60">Cashback is calculated by day — only the remaining days of the purchase month (30-day months)</p>
         </div>
       </div>
 
@@ -84,9 +84,9 @@ function CashbackPage() {
           <p className="mt-1 text-[11px] text-emerald/60">per purchase to qualify</p>
         </div>
         <div className="rounded-lg border border-emerald/20 bg-background p-5">
-          <p className="text-[10px] uppercase tracking-widest text-emerald/60">Lifetime Cap</p>
-          <p className="mt-1 font-display text-2xl text-emerald">{capPct ?? 60}%</p>
-          <p className="mt-1 text-[11px] text-emerald/60">of each purchase value</p>
+          <p className="text-[10px] uppercase tracking-widest text-emerald/60">Cashback Basis</p>
+          <p className="mt-1 font-display text-2xl text-emerald">{daysPerMonth ?? 30}-day month</p>
+          <p className="mt-1 text-[11px] text-emerald/60">daily cashback = rate% ÷ 30, for days left in the purchase month</p>
         </div>
       </div>
 
@@ -95,12 +95,12 @@ function CashbackPage() {
         <div className="border-b border-gold/10 px-5 py-4">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">My Cashback Purchases</h3>
           <p className="mt-0.5 text-[11px] text-emerald/60">
-            Each approved purchase of Rs {minBilling?.toLocaleString("en-IN")}/- or more earns monthly cashback until {capPct}% of its value is reached.
+            Each approved purchase of Rs {minBilling?.toLocaleString("en-IN")}/- or more earns day-based cashback: rate% ÷ 30 per day × the days remaining in its purchase month (30-day months). Example: purchase on the 10th → 20 days of cashback.
           </p>
         </div>
         {ledger.length === 0 ? (
           <p className="px-5 py-6 text-sm text-emerald/60">
-            No cashback-eligible purchases yet. Make a gold purchase of Rs {minBilling?.toLocaleString("en-IN")}/- or more (approved by admin) to start earning monthly cashback.
+            No cashback-eligible purchases yet. Make a gold purchase of Rs {minBilling?.toLocaleString("en-IN")}/- or more (approved by admin) to start earning cashback.
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -110,24 +110,33 @@ function CashbackPage() {
                   <th className="px-5 py-3">Purchase</th>
                   <th className="px-5 py-3 text-right">Value</th>
                   <th className="px-5 py-3 text-right">Rate</th>
-                  <th className="px-5 py-3 text-right">Monthly</th>
+                  <th className="px-5 py-3 text-right">Month Ref</th>
+                  <th className="px-5 py-3 text-right">Days</th>
                   <th className="px-5 py-3 text-right">Paid</th>
-                  <th className="px-5 py-3 text-right">Cap (60%)</th>
+                  <th className="px-5 py-3 text-right">Entitlement</th>
                   <th className="px-5 py-3">Progress</th>
                   <th className="px-5 py-3">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {ledger.map((l: any) => {
-                  const pct = Math.min(100, Math.round((l.totalPaid / l.capAmount) * 100));
+                  // Day-based entitlement = Month Ref × days remaining ÷ 30 (30-day months)
+                  const iso = l.purchaseDate
+                    ? new Date(l.purchaseDate).toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" })
+                    : "";
+                  const dom = iso ? Math.min(Math.max(Number(iso.slice(8, 10)), 1), 30) : 30;
+                  const daysLeft = 30 - dom;
+                  const entitlement = Math.max(0, Math.round((l.monthlyAmount * daysLeft) / 30));
+                  const pct = Math.min(100, entitlement > 0 ? Math.round((l.totalPaid / entitlement) * 100) : 0);
                   return (
                     <tr key={l.id} className="border-b border-gold/5 last:border-0">
                       <td className="px-5 py-3 text-xs text-emerald">#{l.purchaseId}</td>
                       <td className="px-5 py-3 text-right text-xs text-gold">₹{Number(l.purchaseValue).toLocaleString("en-IN")}</td>
                       <td className="px-5 py-3 text-right text-xs text-emerald">{l.ratePct}%</td>
                       <td className="px-5 py-3 text-right text-xs font-semibold text-gold">₹{l.monthlyAmount.toLocaleString("en-IN")}</td>
+                      <td className="px-5 py-3 text-right text-xs text-emerald">{daysLeft}</td>
                       <td className="px-5 py-3 text-right text-xs text-emerald/70">₹{l.totalPaid.toLocaleString("en-IN")} ({l.paidCount}×)</td>
-                      <td className="px-5 py-3 text-right text-xs text-emerald/70">₹{l.capAmount.toLocaleString("en-IN")}</td>
+                      <td className="px-5 py-3 text-right text-xs text-emerald/70">₹{entitlement.toLocaleString("en-IN")}</td>
                       <td className="px-5 py-3">
                         <div className="h-1.5 w-24 overflow-hidden rounded-full bg-emerald/10">
                           <div className="h-full rounded-full bg-gold" style={{ width: `${pct}%` }} />

@@ -47,7 +47,7 @@ export const income = pgTable("income", {
 // workingBalance  = gross income (user sees ALL income, no deductions)
 // incomeBalance   = net income after 20% repurchase + 10% admin = 70% (withdrawable)
 // repurchaseBalance = 20% of every income (spendable on products)
-// cashbackBalance = gold purchase cashback gross (3%–4%/month per approved purchase, capped at 60% of purchase value)
+// cashbackBalance = gold purchase cashback gross (day-based: 3%–4% rate ÷ 30 per day × days remaining in the purchase month, 30-day months, min billing ₹10,000)
 // Working Income (dashboard section) = cashback + level income + performance incentive (gross),
 // split 70/20/10 at credit time: 70% → incomeBalance, 20% → repurchaseBalance, 10% admin (wiped)
 export const wallet = pgTable("wallet", {

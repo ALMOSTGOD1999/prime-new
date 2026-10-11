@@ -3,7 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import { getCookie } from "@tanstack/react-start/server";
 import { db } from "../../lib/db";
 import { cashbackLedger, income, purchases, wallet } from "../../lib/db/schema";
-import { CASHBACK_CAP_PCT, CASHBACK_MIN_BILLING } from "../../lib/mlm/gold-cashback";
+import { CASHBACK_DAYS_PER_MONTH, CASHBACK_MIN_BILLING } from "../../lib/mlm/gold-cashback";
 
 async function getAuthUserId(): Promise<number> {
   const token = getCookie("auth_token");
@@ -53,7 +53,7 @@ export const getMyCashback = createServerFn({ method: "GET" })
     return {
       balance,
       minBilling: CASHBACK_MIN_BILLING,
-      capPct: CASHBACK_CAP_PCT,
+      daysPerMonth: CASHBACK_DAYS_PER_MONTH,
       ledger: ledgerRows,
       history: history.filter((h) => h.type === "cashback"),
     };
