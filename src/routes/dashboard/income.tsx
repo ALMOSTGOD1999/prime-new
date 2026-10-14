@@ -43,7 +43,7 @@ function IncomePage() {
         <span className="italic text-gold">Income</span> Statement
       </h1>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded border border-emerald/20 bg-emerald/5 p-6">
           <p className="text-xs uppercase tracking-widest text-emerald/70">Direct Commission</p>
           <p className="mt-2 font-display text-2xl text-emerald">
@@ -57,6 +57,13 @@ function IncomePage() {
             ₹{income.matching.toLocaleString("en-IN")}
           </p>
           <p className="mt-1 text-xs text-emerald/60">20% per pair</p>
+        </div>
+        <div className="rounded border border-sky-200 bg-sky-50 p-6">
+          <p className="text-xs uppercase tracking-widest text-emerald/70">Investment Income</p>
+          <p className="mt-2 font-display text-2xl text-sky-700">
+            ₹{(income.investment ?? 0).toLocaleString("en-IN")}
+          </p>
+          <p className="mt-1 text-xs text-emerald/60">Monthly investment returns</p>
         </div>
         <div className="rounded border border-gold/20 bg-background p-6">
           <p className="text-xs uppercase tracking-widest text-emerald/70">Total Earned</p>
@@ -110,7 +117,7 @@ function IncomePage() {
       )}
 
       <div className="flex gap-2">
-        {["all", "direct", "purchase", "matching", "award", "cashback", "level", "performance_incentive"].map((f) => (
+        {["all", "direct", "purchase", "matching", "investment", "award", "cashback", "level", "performance_incentive"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}

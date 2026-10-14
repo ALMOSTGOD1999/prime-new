@@ -305,8 +305,8 @@ function DashboardIndex() {
             <DashCard title="Right Business" subtitle="Last month" value={`₹${(perfBusiness?.right ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="📊" onMoreInfo={() => openLegDetails("right")} />
             <DashCard title="Cashback" value={`₹${(income.cashbackBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="💰" onMoreInfo={() =>
               openIncomeDetails("cashback", "Cashback Details", [
-                "Gold purchase cashback credited monthly",
-                "3% / 3.5% / 4% based on purchase value · cap 60%",
+                "Day-based gold purchase cashback — rate% ÷ 30 per day",
+                "Paid for the days remaining in the purchase month (30-day months)",
               ])
             } />
             <DashCard title="Referral Income" value={`₹${(income.direct ?? 0).toLocaleString("en-IN")}`} gradient={gradients.pink} icon="🔗" onMoreInfo={() =>
@@ -317,12 +317,18 @@ function DashboardIndex() {
             } />
           </div>
 
-          {/* Row 3: Matching right after Referral, then Performance + Level, then Joining Awards */}
-          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-4">
+          {/* Row 3: Matching + Investment right after Referral, then Performance + Level, then Joining Awards */}
+          <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-5 lg:gap-4">
             <DashCard title="Matching Income" value={`₹${(income.matching ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="💎" onMoreInfo={() =>
               openIncomeDetails("matching", "Matching Income Details", [
-                "Pair matching 20% (₹600/pair) + monthly investment returns",
-                `Total earned: ₹${(income.totalEarned ?? 0).toLocaleString("en-IN")}`,
+                "Pair matching 20% (₹600/pair) — binary leg pairs only",
+                "Investment returns are shown under Investment Income",
+              ])
+            } />
+            <DashCard title="Investment Income" value={`₹${(income.investment ?? 0).toLocaleString("en-IN")}`} gradient={gradients.blue} icon="📈" onMoreInfo={() =>
+              openIncomeDetails("investment", "Investment Income Details", [
+                "Monthly return on gold purchases (investment packages)",
+                "Credited 70/20/10 — working / repurchase / admin",
               ])
             } />
             <DashCard title="Performance Incentive" value={`₹${(income.performanceTotal ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="📈" onMoreInfo={() =>

@@ -13,7 +13,7 @@ async function getAuthUserId(): Promise<number> {
   return payload["userId"] as number;
 }
 
-type DayEntry = { date: string; direct: number; matching: number; award: number; total: number };
+type DayEntry = { date: string; direct: number; matching: number; investment: number; award: number; total: number };
 
 function buildDays(rows: { date: string; type: string; total: number }[], count: number): DayEntry[] {
   const now = new Date();
@@ -23,7 +23,7 @@ function buildDays(rows: { date: string; type: string; total: number }[], count:
     const d = new Date(now);
     d.setDate(d.getDate() - i);
     const dateStr = d.toISOString().split("T")[0]!;
-    dayMap.set(dateStr, { date: dateStr, direct: 0, matching: 0, award: 0, total: 0 });
+    dayMap.set(dateStr, { date: dateStr, direct: 0, matching: 0, investment: 0, award: 0, total: 0 });
   }
 
   for (const row of rows) {
@@ -31,8 +31,9 @@ function buildDays(rows: { date: string; type: string; total: number }[], count:
     if (entry) {
       if (row.type === "direct") entry.direct = row.total;
       else if (row.type === "matching") entry.matching = row.total;
+      else if (row.type === "investment") entry.investment = row.total;
       else if (row.type === "award") entry.award = row.total;
-      entry.total = entry.direct + entry.matching + entry.award;
+      entry.total = entry.direct + entry.matching + entry.investment + entry.award;
     }
   }
 
@@ -44,10 +45,11 @@ function calcTotals(days: DayEntry[]) {
     (acc, d) => ({
       direct: acc.direct + d.direct,
       matching: acc.matching + d.matching,
+      investment: acc.investment + d.investment,
       award: acc.award + d.award,
       total: acc.total + d.total,
     }),
-    { direct: 0, matching: 0, award: 0, total: 0 },
+    { direct: 0, matching: 0, investment: 0, award: 0, total: 0 },
   );
 }
 

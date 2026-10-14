@@ -401,6 +401,10 @@ export async function getIncomeSummary(userId: number) {
     .filter((i) => i.type === "matching")
     .reduce((sum, i) => sum + i.amount, 0);
 
+  const investment = allIncome
+    .filter((i) => i.type === "investment")
+    .reduce((sum, i) => sum + i.amount, 0);
+
   const referral = allIncome
     .filter((i) => i.type === "referral")
     .reduce((sum, i) => sum + i.amount, 0);
@@ -426,8 +430,9 @@ export async function getIncomeSummary(userId: number) {
   return {
     direct,
     matching,
+    investment,
     referral,
-    totalIncome: direct + matching + referral,
+    totalIncome: direct + matching + investment + referral,
     workingGross,                                              // gross working income (cashback+level+performance)
     workingWithdraw,                                           // 70% of working income (withdrawable)
     performanceTotal,                                          // gross performance-incentive credits

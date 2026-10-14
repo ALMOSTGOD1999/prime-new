@@ -65,10 +65,10 @@ export async function computeMonthlyReturns() {
     // Credit to wallet (70/20/10 split)
     const split = await distributeToWallet(inv.userId, returnAmount);
 
-    // Record as income
+    // Record as income (own type — NOT "matching"; matching = pair bonuses only)
     await db.insert(income).values({
       userId: inv.userId,
-      type: "matching",
+      type: "investment",
       amount: returnAmount,
       description: `Monthly investment return — Purchase #${inv.purchaseId} (${returnAmount / inv.amount * 100}% of ₹${inv.amount.toLocaleString("en-IN")})`,
     });

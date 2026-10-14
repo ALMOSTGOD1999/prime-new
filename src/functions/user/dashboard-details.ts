@@ -90,6 +90,7 @@ export type IncomeDetailKind =
   | "direct"
   | "purchase"
   | "matching"
+  | "investment"
   | "performance_incentive"
   | "level";
 
@@ -120,7 +121,7 @@ export const getIncomeDetails = createServerFn({ method: "POST" })
       if (data.kind === "direct") {
         const m = /user #(\d+)/.exec(r.description);
         if (m) referredIds.push(Number(m[1]));
-      } else if (data.kind === "cashback") {
+      } else if (data.kind === "cashback" || data.kind === "investment") {
         const m = /purchase #(\d+)/.exec(r.description);
         if (m) purchaseIds.push(Number(m[1]));
       } else if (data.kind === "matching" && r.pairId) {

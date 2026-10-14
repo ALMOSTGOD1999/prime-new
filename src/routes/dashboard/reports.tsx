@@ -57,7 +57,7 @@ function ReportsPage() {
 
       {/* Summary Cards */}
       {data?.totals && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded border border-gold/20 bg-background p-6">
             <p className="text-xs uppercase tracking-widest text-emerald/70">Direct Commission</p>
             <p className="mt-2 font-display text-2xl text-emerald">₹{data.totals.direct.toLocaleString("en-IN")}</p>
@@ -65,6 +65,10 @@ function ReportsPage() {
           <div className="rounded border border-gold/20 bg-background p-6">
             <p className="text-xs uppercase tracking-widest text-emerald/70">Matching Income</p>
             <p className="mt-2 font-display text-2xl text-gold">₹{data.totals.matching.toLocaleString("en-IN")}</p>
+          </div>
+          <div className="rounded border border-gold/20 bg-background p-6">
+            <p className="text-xs uppercase tracking-widest text-emerald/70">Investment Income</p>
+            <p className="mt-2 font-display text-2xl text-gold">₹{(data.totals.investment ?? 0).toLocaleString("en-IN")}</p>
           </div>
           <div className="rounded border border-gold/20 bg-background p-6">
             <p className="text-xs uppercase tracking-widest text-emerald/70">Total Earned</p>
@@ -93,6 +97,12 @@ function ReportsPage() {
                         style={{ height: `${(day.matching / maxTotal) * 140}px` }}
                       />
                     )}
+                    {(day.investment ?? 0) > 0 && (
+                      <div
+                        className="w-full bg-sky-500"
+                        style={{ height: `${((day.investment ?? 0) / maxTotal) * 140}px` }}
+                      />
+                    )}
                     {day.direct > 0 && (
                       <div
                         className="w-full bg-emerald"
@@ -116,6 +126,10 @@ function ReportsPage() {
               <div className="h-3 w-3 bg-gold" />
               <span className="text-xs text-emerald/70">Matching</span>
             </div>
+            <div className="flex items-center gap-1">
+              <div className="h-3 w-3 bg-sky-500" />
+              <span className="text-xs text-emerald/70">Investment</span>
+            </div>
           </div>
         </div>
       ) : (
@@ -137,6 +151,7 @@ function ReportsPage() {
                   <th className="px-6 py-3 text-left">Date</th>
                   <th className="px-6 py-3 text-right">Direct</th>
                   <th className="px-6 py-3 text-right">Matching</th>
+                  <th className="px-6 py-3 text-right">Investment</th>
                   <th className="px-6 py-3 text-right">Total</th>
                 </tr>
               </thead>
@@ -146,6 +161,7 @@ function ReportsPage() {
                     <td className="px-6 py-3 text-xs">{new Date(day.date).toLocaleDateString("en-IN")}</td>
                     <td className="px-6 py-3 text-right text-xs text-emerald">₹{day.direct.toLocaleString("en-IN")}</td>
                     <td className="px-6 py-3 text-right text-xs text-gold">₹{day.matching.toLocaleString("en-IN")}</td>
+                    <td className="px-6 py-3 text-right text-xs text-sky-600">₹{(day.investment ?? 0).toLocaleString("en-IN")}</td>
                     <td className="px-6 py-3 text-right text-xs font-semibold">₹{day.total.toLocaleString("en-IN")}</td>
                   </tr>
                 ))}
