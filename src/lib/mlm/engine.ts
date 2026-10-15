@@ -441,6 +441,7 @@ export async function getIncomeSummary(userId: number) {
     incomeBalance: walletRow[0]?.incomeBalance ?? 0,      // Net income (after 20%+10% deductions)
     repurchaseBalance: walletRow[0]?.repurchaseBalance ?? 0, // 20% (spendable on products)
     cashbackBalance: walletRow[0]?.cashbackBalance ?? 0,     // Monthly cashback (spendable on products)
+    paid: walletRow[0]?.paid ?? false,   // true after an admin paid out (zeroed) the spendable balances
     totalEarned: walletRow[0]?.totalEarned ?? 0,
     totalPairs: (await getTotalPairs(userId)),
     todayPairs: (await getTodayPairs(userId)),

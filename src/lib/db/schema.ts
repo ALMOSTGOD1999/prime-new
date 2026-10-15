@@ -58,6 +58,9 @@ export const wallet = pgTable("wallet", {
   repurchaseBalance: integer("repurchase_balance").default(0).notNull(),
   cashbackBalance: integer("cashback_balance").default(0).notNull(),
   totalEarned: integer("total_earned").default(0).notNull(),
+  // True once an admin has paid out (zeroed) the four spendable balances.
+  // Drives the "Paid" display instead of "₹0"; totalEarned stays a lifetime record.
+  paid: boolean("paid").default(false).notNull(),
 });
 
 // ── Matching awards ────────────────────────────────────

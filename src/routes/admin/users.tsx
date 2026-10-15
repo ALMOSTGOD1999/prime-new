@@ -4,6 +4,7 @@ import { getAdminUsers, updateUserPosition, updateUserDetails } from "../../func
 import { impersonateUser } from "../../functions/admin/impersonate";
 import { deleteUser } from "../../functions/admin/deleteuser";
 import { toggleUserActivation } from "../../functions/admin/activate";
+import { markWalletPaid } from "../../functions/admin/wallet";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsers,
@@ -24,6 +25,8 @@ function AdminUsers() {
   const [editForm, setEditForm] = useState({ name: "", email: "", phone: "" });
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState("");
+  const [payingId, setPayingId] = useState<number | null>(null);
+  const [payingAll, setPayingAll] = useState(false);
   const navigate = useNavigate();
 
   const fetchUsers = (s: string, p: number) => {
@@ -126,18 +129,68 @@ function AdminUsers() {
     }
   };
 
+  // Zero a single user's spendable wallets (Working / Income / Repurchase / Cashback)
+  // and mark them paid. totalEarned is left untouched as a lifetime record.
+  const handleMarkPaid = async (userId: number, userName: string) => {
+    if (!confirm(`Pay out ${userName}'s wallet?\n\nThis zeroes Working, Income, Repurchase and Cashback balances (Total Earned is kept) and cannot be undone.`)) return;
+    setPayingId(userId);
+    try {
+      const r = await markWalletPaid({ data: { userId } });
+      if (r.paid > 0) {
+        alert(`${userName}'s wallet paid out — ₹${r.paid.toLocaleString("en-IN")} now shows as Paid`);
+      } else if (r.alreadyPaid) {
+        alert(`${userName}'s wallet is already at ₹0 and marked Paid`);
+      } else {
+        alert(`${userName}'s wallet is already at ₹0 — nothing to pay`);
+      }
+      fetchUsers(search, page);
+    } catch (err: any) {
+      alert(err.message || "Wallet payout failed");
+    } finally {
+      setPayingId(null);
+    }
+  };
+
+  const handleMarkAllPaid = async () => {
+    if (!confirm("Pay out EVERY wallet?\n\nThis zeroes the Working, Income, Repurchase and Cashback balances of ALL users (Total Earned is kept). This cannot be undone.")) return;
+    setPayingAll(true);
+    try {
+      const r = await markWalletPaid({ data: { all: true } });
+      alert(`Paid ${r.updated} wallet${r.updated === 1 ? "" : "s"} — ₹${(r.paid ?? 0).toLocaleString("en-IN")} total now shows as Paid`);
+      fetchUsers(search, page);
+    } catch (err: any) {
+      alert(err.message || "Wallet payout failed");
+    } finally {
+      setPayingAll(false);
+    }
+  };
+
   const totalPages = data ? Math.ceil(data.total / data.limit) : 1;
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <div>
-        <h1 className="font-display text-3xl sm:text-4xl tracking-tight">
-          <span className="italic text-gold">User</span> Management
-        </h1>
-        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">
-          {data?.total || 0} registered members
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="font-display text-3xl sm:text-4xl tracking-tight">
+            <span className="italic text-gold">User</span> Management
+          </h1>
+          <p className="mt-1 text-xs uppercase tracking-[0.2em] text-emerald/60">
+            {data?.total || 0} registered members
+          </p>
+        </div>
+        <button
+          onClick={handleMarkAllPaid}
+          disabled={payingAll}
+          className="inline-flex items-center gap-2 self-start rounded-lg border border-gold/40 bg-gold/10 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-gold shadow-sm transition-all duration-200 hover:bg-gold/20 hover:shadow-md disabled:opacity-40"
+        >
+          {payingAll ? (
+            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gold border-t-transparent" />
+          ) : (
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+          )}
+          {payingAll ? "Paying all..." : "Make All Wallets Paid"}
+        </button>
       </div>
 
       {/* Search */}
@@ -263,6 +316,19 @@ function AdminUsers() {
                           >
                             <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
                             Edit
+                          </button>
+                          <button
+                            onClick={() => handleMarkPaid(user.id, user.name)}
+                            disabled={payingId === user.id}
+                            title="Zero this wallet's Working, Income, Repurchase & Cashback balances and show Paid"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-gold/30 bg-gold/5 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-gold transition-all duration-200 hover:bg-gold/10 hover:border-gold/40 hover:shadow-sm disabled:opacity-40"
+                          >
+                            {payingId === user.id ? (
+                              <span className="h-3 w-3 animate-spin rounded-full border border-gold border-t-transparent" />
+                            ) : (
+                              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                            )}
+                            {payingId === user.id ? "..." : "Pay"}
                           </button>
                         {!user.isAdmin && (
                           <div className="flex items-center justify-end gap-2">

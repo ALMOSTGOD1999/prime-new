@@ -13,6 +13,14 @@ export const Route = createFileRoute("/dashboard/")({
   component: DashboardIndex,
 });
 
+// A spendable wallet balance renders as "Paid" once an admin has zeroed it out.
+// Until then — and again as soon as new income pushes it above 0 — it shows the
+// normal ₹amount. totalEarned is a lifetime record and never uses this.
+function fmtPaid(amount: number | undefined, paid?: boolean): string {
+  const a = amount ?? 0;
+  return a === 0 && paid ? "Paid" : `₹${a.toLocaleString("en-IN")}`;
+}
+
 function DashboardIndex() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -303,7 +311,7 @@ function DashboardIndex() {
             <DashCard title="Total Business" subtitle="All-time · Own + Team" value={`₹${totalBusinessAll.toLocaleString("en-IN")}`} gradient={gradients.green} icon="🏪" onMoreInfo={openTotalBusiness} />
             <DashCard title="Left Business" subtitle="Last month" value={`₹${(perfBusiness?.left ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="📊" onMoreInfo={() => openLegDetails("left")} />
             <DashCard title="Right Business" subtitle="Last month" value={`₹${(perfBusiness?.right ?? 0).toLocaleString("en-IN")}`} gradient={gradients.green} icon="📊" onMoreInfo={() => openLegDetails("right")} />
-            <DashCard title="Cashback" value={`₹${(income.cashbackBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.red} icon="💰" onMoreInfo={() =>
+            <DashCard title="Cashback" value={fmtPaid(income.cashbackBalance, income.paid)} gradient={gradients.red} icon="💰" onMoreInfo={() =>
               openIncomeDetails("cashback", "Cashback Details", [
                 "Day-based gold purchase cashback — rate% ÷ 30 per day",
                 "Paid for the days remaining in the purchase month (30-day months)",
@@ -368,7 +376,7 @@ function DashboardIndex() {
                 <p>Level Income: ₹{(income.levelTotal ?? 0).toLocaleString("en-IN")}</p>
               </>}
             />
-            <DashCard title="Repurchase Wallet" value={`₹${(income.repurchaseBalance ?? 0).toLocaleString("en-IN")}`} gradient={gradients.orange} icon="🔁" details={<>
+            <DashCard title="Repurchase Wallet" value={fmtPaid(income.repurchaseBalance, income.paid)} gradient={gradients.orange} icon="🔁" details={<>
               <p>20% of every income credit</p>
               <p>Spendable on products</p>
             </>} />
@@ -447,7 +455,7 @@ function DashboardIndex() {
             </div>
             <div className="mt-1 flex items-center justify-end gap-2">
               <span className="text-xs text-emerald/60">Available to withdraw:</span>
-              <span className="font-display text-lg text-emerald">₹{income.incomeBalance.toLocaleString("en-IN")}</span>
+              <span className="font-display text-lg text-emerald">{fmtPaid(income.incomeBalance, income.paid)}</span>
             </div>
           </div>
         </div>
