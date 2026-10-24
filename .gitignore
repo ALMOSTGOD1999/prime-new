@@ -22,6 +22,9 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Database backups (contain live user data - never commit)
+backups/
+
 # Deepwork state
 .slim/deepwork/
 

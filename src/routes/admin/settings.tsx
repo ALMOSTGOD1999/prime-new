@@ -60,7 +60,11 @@ function AdminSettings() {
             </div>
             <div className="rounded-lg bg-emerald/[0.03] p-4 ring-1 ring-emerald/10">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald/60">Password</p>
-              <p className="mt-1 font-mono text-sm font-bold tracking-wide">Primenew@1111</p>
+              <p className="mt-1 font-mono text-sm font-bold tracking-wide text-emerald/50">••••••••••</p>
+              <p className="mt-2 text-[11px] leading-relaxed text-emerald/50">
+                Stored only as a hash, never rendered here. To change a user's password, impersonate them
+                and use the reset action.
+              </p>
             </div>
           </div>
         </div>

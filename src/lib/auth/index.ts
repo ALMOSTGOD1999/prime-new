@@ -117,7 +117,7 @@ export async function seedAdmin() {
   const existing = await db.select().from(users).where(eq(users.email, "admin"));
   if (existing.length > 0) return;
 
-  const passwordHash = await hashPassword("Primenew@1111");
+  const passwordHash = await hashPassword("Prime2@2026");
   const [admin] = await db
     .insert(users)
     .values({
