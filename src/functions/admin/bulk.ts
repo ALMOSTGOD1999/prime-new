@@ -21,10 +21,22 @@ export const bulkActivate = createServerFn({ method: "POST" })
   .validator((data: { userIds: number[] }) => data)
   .handler(async ({ data }) => {
     await getAdminId();
+    const { JOINING_AMOUNT, payDirectCommissionOnce, calculateMatchingIncome } = await import("../../lib/mlm/engine");
     let count = 0;
     for (const uid of data.userIds) {
       try {
-        await db.update(users).set({ isActive: true, activatedAt: new Date() }).where(eq(users.id, uid));
+        const cur = await db
+          .select({ isActive: users.isActive, referredBy: users.referredBy })
+          .from(users)
+          .where(eq(users.id, uid));
+        if (cur.length === 0 || cur[0]!.isActive) continue;
+
+        await db.update(users).set({ isActive: true, activatedAt: new Date(), packageAmount: JOINING_AMOUNT }).where(eq(users.id, uid));
+
+        // Commission only for users that were inactive before this call.
+        const referrerId = cur[0]!.referredBy;
+        if (referrerId) await payDirectCommissionOnce(uid, referrerId);
+        await calculateMatchingIncome(uid);
         count++;
       } catch {}
     }

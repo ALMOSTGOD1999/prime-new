@@ -51,9 +51,10 @@ export const activateWithPin = createServerFn({ method: "POST" })
       .where(eq(activationPins.id, unusedPin[0].id));
 
     // Activate the user
+    const { JOINING_AMOUNT } = await import("../../lib/mlm/engine");
     await db
       .update(users)
-      .set({ isActive: true, activatedAt: new Date() })
+      .set({ isActive: true, activatedAt: new Date(), packageAmount: JOINING_AMOUNT })
       .where(eq(users.id, userId));
 
     // Create wallet if not exists

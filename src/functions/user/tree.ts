@@ -415,8 +415,9 @@ export const getTeamStats = createServerFn({ method: "GET" })
 
     // Direct team = people the user personally referred (not just tree children)
     const directTeam = descendants.filter((u) => u.referredBy === userId);
-    const totalTeam = descendants.length;
-    const activeTeam = descendants.filter((u) => u.isActive).length;
+    // Downline must exclude the queried user themself ("Total Downline" card).
+    const totalTeam = descendants.filter((u) => u.id !== userId).length;
+    const activeTeam = descendants.filter((u) => u.id !== userId && u.isActive).length;
     // How many direct referrals ended up on each leg
     const leftCount = directTeam.filter((u) => leftLeg.some((l) => l.id === u.id)).length;
     const rightCount = directTeam.filter((u) => rightLeg.some((r) => r.id === u.id)).length;

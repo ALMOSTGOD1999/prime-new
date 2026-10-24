@@ -22,16 +22,29 @@ export const toggleUserActivation = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await getAdminId();
 
-    const user = await db.select({ isActive: users.isActive, packageAmount: users.packageAmount }).from(users).where(eq(users.id, data.userId));
+    const user = await db.select({ isActive: users.isActive, referredBy: users.referredBy }).from(users).where(eq(users.id, data.userId));
     if (user.length === 0) throw new Error("User not found");
 
-    const newActive = !user[0]!.isActive;
-    await db
-      .update(users)
-      .set({
-        isActive: newActive,
-      })
-      .where(eq(users.id, data.userId));
+    const wasActive = user[0]!.isActive;
+    const newActive = !wasActive;
+
+    if (newActive) {
+      // Activating: stamp activation fields, then pay any commission not already
+      // paid for this join (payDirectCommissionOnce is idempotent; matching income
+      // is self-limiting because it is gated on the existing pair count).
+      const { JOINING_AMOUNT, payDirectCommissionOnce, calculateMatchingIncome } = await import("../../lib/mlm/engine");
+      await db
+        .update(users)
+        .set({ isActive: true, activatedAt: new Date(), packageAmount: JOINING_AMOUNT })
+        .where(eq(users.id, data.userId));
+
+      const referrerId = user[0]!.referredBy;
+      if (referrerId) await payDirectCommissionOnce(data.userId, referrerId);
+      await calculateMatchingIncome(data.userId);
+    } else {
+      // Deactivating: flag only, keep activation history intact.
+      await db.update(users).set({ isActive: false }).where(eq(users.id, data.userId));
+    }
 
     return { success: true, isActive: newActive };
   });

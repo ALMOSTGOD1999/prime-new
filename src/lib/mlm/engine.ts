@@ -3,7 +3,7 @@ import { db } from "../db";
 import { users, pairs, income, wallet, matchingAwards, dailyPairs, dailyActivations } from "../db/schema";
 
 // ── Constants ──────────────────────────────────────────
-const JOINING_AMOUNT = 2999;
+export const JOINING_AMOUNT = 2999;
 const DIRECT_COMMISSION_PCT = 5;
 const MATCHING_INCOME_PCT = 20;
 const DAILY_PAIR_CAP = 3;
@@ -162,6 +162,23 @@ export async function payDirectCommission(newUserId: number, referrerId: number)
   await distributeIncome(referrerId, amount);
 
   return amount;
+}
+
+// ── Pay direct commission at most once per (referrer, joiner) pair ──
+// Safe to call from re-entrant paths (admin toggle / bulk / reactivation)
+// where the same join could otherwise be paid repeatedly.
+export async function payDirectCommissionOnce(newUserId: number, referrerId: number) {
+  const existing = await db
+    .select({ description: income.description })
+    .from(income)
+    .where(and(eq(income.userId, referrerId), eq(income.type, "direct")));
+
+  // Description format is `Direct commission for referring user #<id>` with the id
+  // last, so an exact suffix match avoids `#24` falsely matching `#249`.
+  const alreadyPaid = existing.some((row) => row.description?.endsWith(`#${newUserId}`));
+  if (alreadyPaid) return 0;
+
+  return payDirectCommission(newUserId, referrerId);
 }
 
 // ── Count total pairs for a user (ancestors) ───────────

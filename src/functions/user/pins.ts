@@ -191,14 +191,14 @@ export const activateAccountWithPin = createServerFn({ method: "POST" })
     if (target.isActive) throw new Error("Target account is already active");
 
     const now = new Date();
+    const { JOINING_AMOUNT, payDirectCommission, calculateMatchingIncome } = await import("../../lib/mlm/engine");
     await db.update(activationPins).set({ isUsed: true, usedBy: target.id, usedAt: now }).where(eq(activationPins.id, pin.id));
-    await db.update(users).set({ isActive: true, activatedAt: now }).where(eq(users.id, target.id));
+    await db.update(users).set({ isActive: true, activatedAt: now, packageAmount: JOINING_AMOUNT }).where(eq(users.id, target.id));
 
     const existingWallet = await db.select().from(wallet).where(eq(wallet.userId, target.id));
     if (!existingWallet.length) {
       await db.insert(wallet).values({ userId: target.id, workingBalance: 0, incomeBalance: 0, repurchaseBalance: 0, cashbackBalance: 0, totalEarned: 0 });
     }
-    const { payDirectCommission, calculateMatchingIncome } = await import("../../lib/mlm/engine");
     let directAmount = 0;
     if (target.referredBy) directAmount = await payDirectCommission(target.id, target.referredBy);
     const matchingEvents = await calculateMatchingIncome(target.id);

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "../../lib/db";
-import { users, wallet, income } from "../../lib/db/schema";
+import { users, wallet } from "../../lib/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { getCookie } from "@tanstack/react-start/server";
 
@@ -28,39 +28,24 @@ export const reactivateAccount = createServerFn({ method: "POST" })
     if (userResult[0]!.isActive) throw new Error("Account is already active");
 
     // Reactivate
+    const { JOINING_AMOUNT, payDirectCommissionOnce, calculateMatchingIncome } = await import("../../lib/mlm/engine");
     await db
       .update(users)
-      .set({ isActive: true, activatedAt: new Date() })
+      .set({ isActive: true, activatedAt: new Date(), packageAmount: JOINING_AMOUNT })
       .where(eq(users.id, userId));
 
     // Ensure wallet exists
     const walletResult = await db.select().from(wallet).where(eq(wallet.userId, userId));
     if (walletResult.length === 0) {
-      await db.insert(wallet).values({ userId, balance: 0, totalEarned: 0 });
+      await db
+        .insert(wallet)
+        .values({ userId, workingBalance: 0, incomeBalance: 0, repurchaseBalance: 0, cashbackBalance: 0, totalEarned: 0 });
     }
 
-    // Pay direct commission to referrer (5% of ₹2,999 = ₹150)
+    // Pay direct commission to referrer (idempotent) + matching income up the tree
     const referrerId = userResult[0]!.referredBy;
-    if (referrerId) {
-      const commission = 150;
-      const refWallet = await db.select().from(wallet).where(eq(wallet.userId, referrerId));
-      if (refWallet.length > 0) {
-        await db
-          .update(wallet)
-          .set({
-            balance: refWallet[0]!.balance + commission,
-            totalEarned: refWallet[0]!.totalEarned + commission,
-          })
-          .where(eq(wallet.userId, referrerId));
-
-        await db.insert(income).values({
-          userId: referrerId,
-          type: "direct",
-          amount: commission,
-          description: `Direct commission from reactivation of user #${userId}`,
-        });
-      }
-    }
+    if (referrerId) await payDirectCommissionOnce(userId, referrerId);
+    await calculateMatchingIncome(userId);
 
     return { success: true };
   });

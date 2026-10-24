@@ -10,9 +10,10 @@ function CalculatorPage() {
   const [teamGrowth, setTeamGrowth] = useState(2);
   const [months, setMonths] = useState(6);
 
-  // Calculate projections
-  const directCommission = 150; // 5% of 2999
-  const matchingPerPair = 599; // 20% of 2999
+  // Calculate projections (kept in sync with src/lib/mlm/engine.ts)
+  const JOINING_AMOUNT = 2999;
+  const directCommission = Math.round((JOINING_AMOUNT * 5) / 100); // 5% -> 150
+  const matchingPerPair = Math.round((JOINING_AMOUNT * 20) / 100); // 20% -> 600
 
   // Simple projection model
   let totalTeam = 0;
