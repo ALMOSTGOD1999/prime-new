@@ -9,18 +9,35 @@ const MATCHING_INCOME_PCT = 20;
 const DAILY_PAIR_CAP = 3;
 
 // ── Payout cutoff ──────────────────────────────────────
-// Referral (direct) and matching income is paid ONLY to referrers activated
-// on or after this date. Activations before it — and users whose activation
-// date was never recorded (null) — earn neither income type.
+// 2026-09-15 rule set:
+//   • direct (referral) — paid when the JOINER activated on/after the cutoff
+//     (not when the referrer did).
+//   • matching          — eligibility = min(L', R') where L'/R' count only
+//     members activated on/after the cutoff; the counter counts pairs formed
+//     on/after the cutoff; strict 3 pairs per user per IST day.
 export const PAYOUT_CUTOFF = "2026-09-15";
 
+// Business runs in IST (UTC+05:30). Every "which calendar day is it" decision
+// must use the IST date — the UTC date only rolls over at 05:30 IST.
+const IST_OFFSET_MS = 330 * 60_000;
+const istDateOfMs = (t: number): string =>
+  new Date(t + IST_OFFSET_MS).toISOString().slice(0, 10);
+
+function istDateOf(d: Date | string | null | undefined): string | null {
+  if (!d) return null;
+  const t = d instanceof Date ? d.getTime() : new Date(d).getTime();
+  return Number.isNaN(t) ? null : istDateOfMs(t);
+}
+
+/** Today's calendar date in IST — use for every daily key/reset. */
+export function istToday(): string {
+  return istDateOfMs(Date.now());
+}
+
 export function isPayoutEligible(activatedAt: Date | string | null | undefined): boolean {
-  if (!activatedAt) return false;
-  const d = activatedAt instanceof Date ? activatedAt : new Date(activatedAt);
-  if (Number.isNaN(d.getTime())) return false;
-  // Business runs in IST, so compare the India calendar date, not UTC.
-  const ist = new Date(d.getTime() + 330 * 60_000);
-  return ist.toISOString().slice(0, 10) >= PAYOUT_CUTOFF;
+  const ist = istDateOf(activatedAt);
+  // Users whose activation date was never recorded earn nothing.
+  return ist != null && ist >= PAYOUT_CUTOFF;
 }
 
 // Matching award milestones (left:right pairs → award)
@@ -195,13 +212,22 @@ export async function distributeCommission(userId: number, grossAmount: number) 
 
 // ── Pay direct commission (5% one-time) ────────────────
 export async function payDirectCommission(newUserId: number, referrerId: number) {
-  // Referral income only ever pays referrers activated on/after the cutoff.
+  // Rule (a): the gate is the JOINER's activation date, not the referrer's.
+  // A referrer who activated before the cutoff still earns the 5% for a
+  // downline who joined on/after it — and a joiner from before the cutoff
+  // pays their referrer nothing.
+  const joiner = await db
+    .select({ isActive: users.isActive, activatedAt: users.activatedAt })
+    .from(users)
+    .where(eq(users.id, newUserId));
+  const joinerRow = joiner[0];
+  if (!joinerRow || !joinerRow.isActive || !isPayoutEligible(joinerRow.activatedAt)) return 0;
+
   const referrer = await db
-    .select({ activatedAt: users.activatedAt })
+    .select({ id: users.id })
     .from(users)
     .where(eq(users.id, referrerId));
-  const referrerRow = referrer[0];
-  if (!referrerRow || !isPayoutEligible(referrerRow.activatedAt)) return 0;
+  if (!referrer[0]) return 0;
 
   const amount = Math.round(JOINING_AMOUNT * DIRECT_COMMISSION_PCT / 100);
 
@@ -235,6 +261,7 @@ export async function payDirectCommissionOnce(newUserId: number, referrerId: num
 }
 
 // ── Count total pairs for a user (ancestors) ───────────
+// Lifetime count — used for display and matching-award milestones.
 async function getTotalPairs(userId: number): Promise<number> {
   const result = await db
     .select({ count: sql<number>`count(*)::int` })
@@ -243,9 +270,25 @@ async function getTotalPairs(userId: number): Promise<number> {
   return result[0]?.count ?? 0;
 }
 
-// ── Get today's pair count ─────────────────────────────
+// ── Count pairs formed ON/AFTER the payout cutoff ──────
+// Option A: pre-cutoff pairs never paid out, so they are ignored by the
+// matching counter. Only this figure is compared against min(L', R').
+async function getInWindowPairs(userId: number): Promise<number> {
+  const result = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(pairs)
+    .where(
+      and(
+        eq(pairs.userId, userId),
+        sql`(created_at + interval '5 hours 30 minutes')::date >= ${PAYOUT_CUTOFF}::date`,
+      ),
+    );
+  return result[0]?.count ?? 0;
+}
+
+// ── Get today's pair count (IST day) ───────────────────
 async function getTodayPairs(userId: number): Promise<number> {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = istToday();
   const result = await db
     .select()
     .from(dailyPairs)
@@ -253,9 +296,9 @@ async function getTodayPairs(userId: number): Promise<number> {
   return result[0]?.pairsCount ?? 0;
 }
 
-// ── Increment today's pair count ───────────────────────
+// ── Increment today's pair count (IST day) ─────────────
 async function incrementTodayPairs(userId: number): Promise<number> {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = istToday();
   const existing = await db
     .select()
     .from(dailyPairs)
@@ -282,8 +325,9 @@ export async function calculateMatchingIncome(newUserId: number) {
   const events: { userId: number; amount: number; pairId: number }[] = [];
 
   // ── Leg truth = parent_id + position (never the rendered tree) ──
-  // Load the placement graph once and count ACTIVE MEMBERS per leg subtree:
-  // a direct child contributes its whole active subtree to its own side.
+  // L'/R' count only members who are active AND activated on/after the
+  // cutoff: pre-cutoff members never produced matching income, so they
+  // don't count toward forming a new pair either.
   const all = await db
     .select({
       id: users.id,
@@ -294,7 +338,7 @@ export async function calculateMatchingIncome(newUserId: number) {
     })
     .from(users);
   const parentOf = new Map(all.map((u) => [u.id, u.parentId]));
-  const activeById = new Map(all.map((u) => [u.id, u.isActive]));
+  const isActiveById = new Map(all.map((u) => [u.id, u.isActive]));
   const activatedAtById = new Map(all.map((u) => [u.id, u.activatedAt]));
   const childrenByParent = new Map<number, { id: number; position: string | null }[]>();
   for (const u of all) {
@@ -304,19 +348,55 @@ export async function calculateMatchingIncome(newUserId: number) {
     childrenByParent.set(u.parentId, list);
   }
 
-  // Memoized active-member count of a subtree (cycle-safe).
+  const countsTowardLegs = (id: number): boolean =>
+    isActiveById.get(id) === true && isPayoutEligible(activatedAtById.get(id));
+
+  // Memoized eligible-member count of a subtree (cycle-safe).
   const sizeMemo = new Map<number, number>();
   const onPath = new Set<number>();
-  const activeSizeOf = (id: number): number => {
+  const legSizeOf = (id: number): number => {
     const cached = sizeMemo.get(id);
     if (cached != null) return cached;
     if (onPath.has(id)) return 0;
     onPath.add(id);
-    let sum = activeById.get(id) ? 1 : 0;
-    for (const c of childrenByParent.get(id) ?? []) sum += activeSizeOf(c.id);
+    let sum = countsTowardLegs(id) ? 1 : 0;
+    for (const c of childrenByParent.get(id) ?? []) sum += legSizeOf(c.id);
     onPath.delete(id);
     sizeMemo.set(id, sum);
     return sum;
+  };
+
+  // Members already consumed by an ancestor's earlier pairs, so a new pair
+  // is always built from two members that have not been paired before.
+  const allPairs = await db
+    .select({
+      userId: pairs.userId,
+      leftUserId: pairs.leftUserId,
+      rightUserId: pairs.rightUserId,
+    })
+    .from(pairs);
+  const usedByOwner = new Map<number, Set<number>>();
+  for (const p of allPairs) {
+    let used = usedByOwner.get(p.userId);
+    if (!used) {
+      used = new Set<number>();
+      usedByOwner.set(p.userId, used);
+    }
+    if (p.leftUserId != null) used.add(p.leftUserId);
+    if (p.rightUserId != null) used.add(p.rightUserId);
+  }
+
+  // Collect the still-unpaired eligible members of one leg subtree.
+  const collectFree = (
+    id: number,
+    out: number[],
+    seen: Set<number>,
+    used: Set<number>,
+  ): void => {
+    if (seen.has(id)) return;
+    seen.add(id);
+    if (countsTowardLegs(id) && !used.has(id)) out.push(id);
+    for (const c of childrenByParent.get(id) ?? []) collectFree(c.id, out, seen, used);
   };
 
   // Walk up the placement chain, checking each ancestor for pair matches
@@ -325,86 +405,91 @@ export async function calculateMatchingIncome(newUserId: number) {
   while (currentUserId != null && !seenAncestors.has(currentUserId)) {
     seenAncestors.add(currentUserId);
 
-    // Matching income only pays ancestors activated on/after the cutoff —
-    // advance to the next ancestor without forming a pair or crediting.
-    if (!isPayoutEligible(activatedAtById.get(currentUserId))) {
-      currentUserId = parentOf.get(currentUserId) ?? null;
-      continue;
-    }
-
+    // Deliberately NO gate on the earner's own activation date — eligibility
+    // comes purely from the legs below them, so a pre-cutoff ancestor still
+    // earns from post-cutoff members it has accumulated.
     let leftLeg = 0;
     let rightLeg = 0;
     for (const child of childrenByParent.get(currentUserId) ?? []) {
-      const size = activeSizeOf(child.id);
+      const size = legSizeOf(child.id);
       if (child.position === "left") leftLeg += size;
       else if (child.position === "right") rightLeg += size;
     }
     const possiblePairs = Math.min(leftLeg, rightLeg);
-    const totalPairs = await getTotalPairs(currentUserId);
+    // Option A: only pairs formed on/after the cutoff consume a slot.
+    const inWindowPairs = await getInWindowPairs(currentUserId);
+    const lifetimePairs = await getTotalPairs(currentUserId);
     const todayPairsCount = await getTodayPairs(currentUserId);
 
-    // Check if we can form a new pair
-    if (possiblePairs > totalPairs) {
-      // Check daily cap (3 pairs per day + 1 per salary milestone)
-      const salaryMilestone = Math.floor(totalPairs / DAILY_PAIR_CAP);
-      const dailyCap = DAILY_PAIR_CAP + salaryMilestone;
+    // Form one pair when another match is still available and the strict
+    // cap of 3 pairs per user per IST day still has room.
+    if (possiblePairs > inWindowPairs && todayPairsCount < DAILY_PAIR_CAP) {
+      const used = usedByOwner.get(currentUserId) ?? new Set<number>();
+      const free: { left: number[]; right: number[] } = { left: [], right: [] };
+      const seenMembers = new Set<number>();
+      for (const child of childrenByParent.get(currentUserId) ?? []) {
+        if (child.position === "left") collectFree(child.id, free.left, seenMembers, used);
+        else if (child.position === "right") collectFree(child.id, free.right, seenMembers, used);
+      }
 
-      if (todayPairsCount < dailyCap) {
+      if (free.left.length > 0 && free.right.length > 0) {
         const amount = Math.round(JOINING_AMOUNT * MATCHING_INCOME_PCT / 100);
 
-        // Record the pair
+        // Record the pair with one real member from each leg
         const [newPair] = await db
           .insert(pairs)
           .values({
             userId: currentUserId,
-            leftUserId: newUserId, // simplified — in production track actual leg members
-            rightUserId: newUserId,
+            leftUserId: free.left[0]!,
+            rightUserId: free.right[0]!,
           })
           .returning();
 
-        // Record income
-        await db.insert(income).values({
-          userId: currentUserId,
-          type: "matching",
-          amount,
-          pairId: newPair.id,
-          description: `Matching income pair #${totalPairs + 1}`,
-        });
+        if (newPair) {
+          // Record income
+          await db.insert(income).values({
+            userId: currentUserId,
+            type: "matching",
+            amount,
+            pairId: newPair.id,
+            description: `Matching income pair #${inWindowPairs + 1}`,
+          });
 
-        // Matching income: 10% admin charge, 90% withdrawable, 0% repurchase
-        await distributeCommission(currentUserId, amount);
+          // Matching income: 10% admin charge, 90% withdrawable, 0% repurchase
+          await distributeCommission(currentUserId, amount);
 
-        // Increment daily pairs
-        await incrementTodayPairs(currentUserId);
+          // Increment daily pairs
+          await incrementTodayPairs(currentUserId);
 
-        events.push({ userId: currentUserId, amount, pairId: newPair.id });
+          events.push({ userId: currentUserId, amount, pairId: newPair.id });
 
-        // Check matching awards
-        const newTotalPairs = totalPairs + 1;
-        for (const award of MATCHING_AWARDS) {
-          if (newTotalPairs === award.threshold) {
-            // Check if already awarded
-            const alreadyAwarded = await db
-              .select()
-              .from(matchingAwards)
-              .where(
-                and(
-                  eq(matchingAwards.userId, currentUserId),
-                  eq(matchingAwards.awardName, award.name),
-                ),
-              );
-            if (alreadyAwarded.length === 0) {
-              await db.insert(matchingAwards).values({
-                userId: currentUserId,
-                totalPairs: newTotalPairs,
-                awardName: award.name,
-              });
-              await db.insert(income).values({
-                userId: currentUserId,
-                type: "award",
-                amount: 0,
-                description: `Award: ${award.name} at ${newTotalPairs} pairs`,
-              });
+          // Check matching awards (milestones track the lifetime count)
+          const newTotalPairs = lifetimePairs + 1;
+          for (const award of MATCHING_AWARDS) {
+            if (newTotalPairs === award.threshold) {
+              // Check if already awarded
+              const alreadyAwarded = await db
+                .select()
+                .from(matchingAwards)
+                .where(
+                  and(
+                    eq(matchingAwards.userId, currentUserId),
+                    eq(matchingAwards.awardName, award.name),
+                  ),
+                );
+              if (alreadyAwarded.length === 0) {
+                await db.insert(matchingAwards).values({
+                  userId: currentUserId,
+                  totalPairs: newTotalPairs,
+                  awardName: award.name,
+                });
+                await db.insert(income).values({
+                  userId: currentUserId,
+                  type: "award",
+                  amount: 0,
+                  description: `Award: ${award.name} at ${newTotalPairs} pairs`,
+                });
+              }
             }
           }
         }
@@ -547,7 +632,7 @@ export async function getIncomeSummary(userId: number) {
 const DAILY_ACTIVATION_REWARD = 100;
 
 export async function dailyActivationReward(userId: number) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = istToday();
   
   // Check if user already activated today
   const existing = await db
@@ -587,7 +672,7 @@ export async function dailyActivationReward(userId: number) {
 
 // ── Get daily activation status ───────────────────────
 export async function getDailyActivationStatus(userId: number) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = istToday();
   
   const existing = await db
     .select()
