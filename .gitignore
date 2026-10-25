@@ -28,6 +28,10 @@ backups/
 # Deepwork state
 .slim/deepwork/
 
+# Scratch analysis scripts (talk to the live DB, never commit)
+tmp-*.mjs
+tmp-*.cjs
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
