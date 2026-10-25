@@ -25,6 +25,7 @@ import { Route as AdminBulkRouteImport } from './routes/admin/bulk'
 import { Route as AdminGoldrateRouteImport } from './routes/admin/goldrate'
 import { Route as AdminHistoryRouteImport } from './routes/admin/history'
 import { Route as AdminIncomeRouteImport } from './routes/admin/income'
+import { Route as AdminJoiningsRouteImport } from './routes/admin/joinings'
 import { Route as AdminKycRouteImport } from './routes/admin/kyc'
 import { Route as AdminMakePurchaseRouteImport } from './routes/admin/make-purchase'
 import { Route as AdminPayoutRouteImport } from './routes/admin/payout'
@@ -138,6 +139,11 @@ const AdminHistoryRoute = AdminHistoryRouteImport.update({
 const AdminIncomeRoute = AdminIncomeRouteImport.update({
   id: '/income',
   path: '/income',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminJoiningsRoute = AdminJoiningsRouteImport.update({
+  id: '/joinings',
+  path: '/joinings',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminKycRoute = AdminKycRouteImport.update({
@@ -330,6 +336,7 @@ export interface FileRoutesByFullPath {
   '/admin/goldrate': typeof AdminGoldrateRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
+  '/admin/joinings': typeof AdminJoiningsRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/make-purchase': typeof AdminMakePurchaseRoute
   '/admin/payout': typeof AdminPayoutRoute
@@ -380,6 +387,7 @@ export interface FileRoutesByTo {
   '/admin/goldrate': typeof AdminGoldrateRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
+  '/admin/joinings': typeof AdminJoiningsRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/make-purchase': typeof AdminMakePurchaseRoute
   '/admin/payout': typeof AdminPayoutRoute
@@ -433,6 +441,7 @@ export interface FileRoutesById {
   '/admin/goldrate': typeof AdminGoldrateRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/income': typeof AdminIncomeRoute
+  '/admin/joinings': typeof AdminJoiningsRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/make-purchase': typeof AdminMakePurchaseRoute
   '/admin/payout': typeof AdminPayoutRoute
@@ -487,6 +496,7 @@ export interface FileRouteTypes {
     | '/admin/goldrate'
     | '/admin/history'
     | '/admin/income'
+    | '/admin/joinings'
     | '/admin/kyc'
     | '/admin/make-purchase'
     | '/admin/payout'
@@ -537,6 +547,7 @@ export interface FileRouteTypes {
     | '/admin/goldrate'
     | '/admin/history'
     | '/admin/income'
+    | '/admin/joinings'
     | '/admin/kyc'
     | '/admin/make-purchase'
     | '/admin/payout'
@@ -589,6 +600,7 @@ export interface FileRouteTypes {
     | '/admin/goldrate'
     | '/admin/history'
     | '/admin/income'
+    | '/admin/joinings'
     | '/admin/kyc'
     | '/admin/make-purchase'
     | '/admin/payout'
@@ -749,6 +761,13 @@ declare module '@tanstack/react-router' {
       path: '/income'
       fullPath: '/admin/income'
       preLoaderRoute: typeof AdminIncomeRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/joinings': {
+      id: '/admin/joinings'
+      path: '/joinings'
+      fullPath: '/admin/joinings'
+      preLoaderRoute: typeof AdminJoiningsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/kyc': {
@@ -1000,6 +1019,7 @@ interface AdminRouteChildren {
   AdminGoldrateRoute: typeof AdminGoldrateRoute
   AdminHistoryRoute: typeof AdminHistoryRoute
   AdminIncomeRoute: typeof AdminIncomeRoute
+  AdminJoiningsRoute: typeof AdminJoiningsRoute
   AdminKycRoute: typeof AdminKycRoute
   AdminMakePurchaseRoute: typeof AdminMakePurchaseRoute
   AdminPayoutRoute: typeof AdminPayoutRoute
@@ -1021,6 +1041,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminGoldrateRoute: AdminGoldrateRoute,
   AdminHistoryRoute: AdminHistoryRoute,
   AdminIncomeRoute: AdminIncomeRoute,
+  AdminJoiningsRoute: AdminJoiningsRoute,
   AdminKycRoute: AdminKycRoute,
   AdminMakePurchaseRoute: AdminMakePurchaseRoute,
   AdminPayoutRoute: AdminPayoutRoute,
