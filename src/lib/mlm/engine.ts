@@ -8,6 +8,21 @@ const DIRECT_COMMISSION_PCT = 5;
 const MATCHING_INCOME_PCT = 20;
 const DAILY_PAIR_CAP = 3;
 
+// ── Payout cutoff ──────────────────────────────────────
+// Referral (direct) and matching income is paid ONLY to referrers activated
+// on or after this date. Activations before it — and users whose activation
+// date was never recorded (null) — earn neither income type.
+export const PAYOUT_CUTOFF = "2026-09-15";
+
+export function isPayoutEligible(activatedAt: Date | string | null | undefined): boolean {
+  if (!activatedAt) return false;
+  const d = activatedAt instanceof Date ? activatedAt : new Date(activatedAt);
+  if (Number.isNaN(d.getTime())) return false;
+  // Business runs in IST, so compare the India calendar date, not UTC.
+  const ist = new Date(d.getTime() + 330 * 60_000);
+  return ist.toISOString().slice(0, 10) >= PAYOUT_CUTOFF;
+}
+
 // Matching award milestones (left:right pairs → award)
 const MATCHING_AWARDS: { threshold: number; name: string }[] = [
   { threshold: 100, name: "Bag" },
@@ -147,8 +162,47 @@ export async function distributeIncome(userId: number, grossAmount: number) {
   return { grossAmount, repurchaseAmount, incomeAmount };
 }
 
+// ── Distribute referral (direct) + matching income ────────────
+// These two income types use their own split: a 10% admin charge is
+// deducted at source and the remaining 90% lands in the withdrawable
+// balance. Nothing is routed to the repurchase wallet.
+export async function distributeCommission(userId: number, grossAmount: number) {
+  const withdrawAmount = Math.round((grossAmount * 90) / 100); // 10% admin charge
+  const existing = await db.select().from(wallet).where(eq(wallet.userId, userId));
+  const current = existing[0];
+
+  if (current) {
+    await db
+      .update(wallet)
+      .set({
+        incomeBalance: current.incomeBalance + withdrawAmount,
+        totalEarned: current.totalEarned + grossAmount,
+      })
+      .where(eq(wallet.userId, userId));
+  } else {
+    await db.insert(wallet).values({
+      userId,
+      workingBalance: 0,
+      incomeBalance: withdrawAmount,
+      repurchaseBalance: 0,
+      cashbackBalance: 0,
+      totalEarned: grossAmount,
+    });
+  }
+
+  return { grossAmount, withdrawAmount, adminCharge: grossAmount - withdrawAmount };
+}
+
 // ── Pay direct commission (5% one-time) ────────────────
 export async function payDirectCommission(newUserId: number, referrerId: number) {
+  // Referral income only ever pays referrers activated on/after the cutoff.
+  const referrer = await db
+    .select({ activatedAt: users.activatedAt })
+    .from(users)
+    .where(eq(users.id, referrerId));
+  const referrerRow = referrer[0];
+  if (!referrerRow || !isPayoutEligible(referrerRow.activatedAt)) return 0;
+
   const amount = Math.round(JOINING_AMOUNT * DIRECT_COMMISSION_PCT / 100);
 
   await db.insert(income).values({
@@ -158,8 +212,7 @@ export async function payDirectCommission(newUserId: number, referrerId: number)
     description: `Direct commission for referring user #${newUserId}`,
   });
 
-  // Distribute across wallets (20% repurchase, 10% admin wipe, 70% income)
-  await distributeIncome(referrerId, amount);
+  await distributeCommission(referrerId, amount);
 
   return amount;
 }
@@ -232,10 +285,17 @@ export async function calculateMatchingIncome(newUserId: number) {
   // Load the placement graph once and count ACTIVE MEMBERS per leg subtree:
   // a direct child contributes its whole active subtree to its own side.
   const all = await db
-    .select({ id: users.id, parentId: users.parentId, position: users.position, isActive: users.isActive })
+    .select({
+      id: users.id,
+      parentId: users.parentId,
+      position: users.position,
+      isActive: users.isActive,
+      activatedAt: users.activatedAt,
+    })
     .from(users);
   const parentOf = new Map(all.map((u) => [u.id, u.parentId]));
   const activeById = new Map(all.map((u) => [u.id, u.isActive]));
+  const activatedAtById = new Map(all.map((u) => [u.id, u.activatedAt]));
   const childrenByParent = new Map<number, { id: number; position: string | null }[]>();
   for (const u of all) {
     if (u.parentId == null) continue;
@@ -264,6 +324,13 @@ export async function calculateMatchingIncome(newUserId: number) {
   const seenAncestors = new Set<number>();
   while (currentUserId != null && !seenAncestors.has(currentUserId)) {
     seenAncestors.add(currentUserId);
+
+    // Matching income only pays ancestors activated on/after the cutoff —
+    // advance to the next ancestor without forming a pair or crediting.
+    if (!isPayoutEligible(activatedAtById.get(currentUserId))) {
+      currentUserId = parentOf.get(currentUserId) ?? null;
+      continue;
+    }
 
     let leftLeg = 0;
     let rightLeg = 0;
@@ -304,8 +371,8 @@ export async function calculateMatchingIncome(newUserId: number) {
           description: `Matching income pair #${totalPairs + 1}`,
         });
 
-        // Distribute matching income across wallets (20% repurchase, 10% admin wipe, 70% income)
-        await distributeIncome(currentUserId, amount);
+        // Matching income: 10% admin charge, 90% withdrawable, 0% repurchase
+        await distributeCommission(currentUserId, amount);
 
         // Increment daily pairs
         await incrementTodayPairs(currentUserId);
@@ -432,7 +499,10 @@ export async function getIncomeSummary(userId: number) {
   const workingGross = allIncome
     .filter((i) => i.type === "cashback" || i.type === "level" || i.type === "performance_incentive")
     .reduce((sum, i) => sum + i.amount, 0);
-  const workingWithdraw = Math.round((workingGross * 70) / 100);
+  // Referral + matching credit 90% straight into the withdrawable balance
+  // (see distributeCommission), so surface them alongside the 70% working split.
+  const commissionWithdraw = Math.round(((direct + matching) * 90) / 100);
+  const workingWithdraw = Math.round((workingGross * 70) / 100) + commissionWithdraw;
 
   // Per-type totals for the Total Wallet card (performance incentive + level income only)
   const performanceTotal = allIncome
